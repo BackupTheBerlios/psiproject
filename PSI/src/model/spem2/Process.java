@@ -10,5 +10,5 @@ package model.spem2;
  */
 public class Process extends Activity
 {
-
+	//private String 
 }

@@ -20,7 +20,7 @@ public interface WorkDefinition
 	 * 
 	 * @return the Role Descriptors associated to te Work Definition
 	 */
-	public Collection <RoleDescriptor> getPerformingRoles () ;
+	public Collection <RoleDefinition> getPerformingRoles () ;
 
 	/**
 	 * Sets the roles lists with new values
@@ -31,6 +31,6 @@ public interface WorkDefinition
 	 * @param _roleDescriptor
 	 *            the new roles list
 	 */
-	public void setPerformingRoles (Collection <RoleDescriptor> _roleDescriptor) ;
+	public void setPerformingRoles (Collection <RoleDefinition> _roleDescriptor) ;
 
 }

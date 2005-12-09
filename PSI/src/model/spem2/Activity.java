@@ -1,8 +1,7 @@
 
 package model.spem2 ;
 
-
-import java.util.Collection;
+import java.util.Collection ;
 
 /**
  * Activity : the first non abstract class/interface. Represents a basic process activity.
@@ -13,11 +12,6 @@ import java.util.Collection;
  */
 public class Activity implements WorkBreakdownElement, WorkDefinition
 {
-	/**
-	 * A list of activity descriptors linked to the activity
-	 */
-	private Collection<ActivityDescriptor> activities ;
-	
 	/**
 	 * A common prefix which can be set by the project manager to id elements.
 	 */
@@ -60,11 +54,41 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	 * @see PlanningData
 	 */
 	private PlanningData planningData ;
-	
+
+	/**
+	 * 
+	 */
+	private String id ;
+
+	/**
+	 * 
+	 */
+	private String name ;
+
+	/**
+	 * 
+	 */
+	private String description ;
+
+	/**
+	 * 
+	 */
+	private String authorFullName ;
+
+	/**
+	 * 
+	 */
+	private String authorMail ;
+
+	/**
+	 * Performers of an activity
+	 */
+	private Collection <RoleDefinition> performingRoles = null ;
+
 	/**
 	 * An activity is composed of Breakdown Elements
 	 */
-	private Collection<BreakdownElement> nestedElements ;
+	private Collection <BreakdownElement> nestedElements = null ;
 
 	/**
 	 * Getter
@@ -234,67 +258,172 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 		this.prefix = _prefix ;
 	}
 
-	
 	/**
 	 * Getter
-	 *
-	 * @return Returns the activities.
-	 */
-	public Collection <ActivityDescriptor> getActivities ()
-	{
-		return this.activities ;
-	}
-	
-
-	/**
-	 * Setter
-	 *
-	 * @param _activities The activities to set.
-	 */
-	public void setActivities (Collection <ActivityDescriptor> _activities)
-	{
-		this.activities = _activities ;
-	}
-	
-
-	/**
-	 * Getter
-	 *
+	 * 
 	 * @return Returns the nestedElements.
 	 */
 	public Collection <BreakdownElement> getNestedElements ()
 	{
 		return this.nestedElements ;
 	}
-	
 
 	/**
 	 * Setter
-	 *
-	 * @param _nestedElements The nestedElements to set.
+	 * 
+	 * @param _nestedElements
+	 *            The nestedElements to set.
 	 */
 	public void setNestedElements (Collection <BreakdownElement> _nestedElements)
 	{
 		this.nestedElements = _nestedElements ;
 	}
 
-	
 	/**
-	 * @see model.spem2.WorkDefinition#getPerformingRoles()
+	 * Getter
+	 * 
+	 * @return Returns the authorFullName.
 	 */
-	public Collection <RoleDescriptor> getPerformingRoles ()
+	public String getAuthorFullName ()
 	{
-		return null ;
+		return this.authorFullName ;
 	}
 
-	
 	/**
-	 * @see model.spem2.WorkDefinition#setPerformingRoles(java.util.Collection)
+	 * Setter
+	 * 
+	 * @param _authorFullName
+	 *            The authorFullName to set.
 	 */
-	public void setPerformingRoles (Collection <RoleDescriptor> _roleDescriptor)
+	public void setAuthorFullName (String _authorFullName)
 	{
-		// TODO Auto-generated method stub
-		
+		this.authorFullName = _authorFullName ;
 	}
-	
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the authorMail.
+	 */
+	public String getAuthorMail ()
+	{
+		return this.authorMail ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _authorMail
+	 *            The authorMail to set.
+	 */
+	public void setAuthorMail (String _authorMail)
+	{
+		this.authorMail = _authorMail ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the description.
+	 */
+	public String getDescription ()
+	{
+		return this.description ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _description
+	 *            The description to set.
+	 */
+	public void setDescription (String _description)
+	{
+		this.description = _description ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the hasMultipleOccurences.
+	 */
+	public boolean isHasMultipleOccurences ()
+	{
+		return this.hasMultipleOccurences ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _hasMultipleOccurences
+	 *            The hasMultipleOccurences to set.
+	 */
+	public void setHasMultipleOccurences (boolean _hasMultipleOccurences)
+	{
+		this.hasMultipleOccurences = _hasMultipleOccurences ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the id.
+	 */
+	public String getId ()
+	{
+		return this.id ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _id
+	 *            The id to set.
+	 */
+	public void setId (String _id)
+	{
+		this.id = _id ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the name.
+	 */
+	public String getName ()
+	{
+		return this.name ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _name
+	 *            The name to set.
+	 */
+	public void setName (String _name)
+	{
+		this.name = _name ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the performingRoles.
+	 */
+	public Collection <RoleDefinition> getPerformingRoles ()
+	{
+		return this.performingRoles ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _performingRoles
+	 *            The performingRoles to set.
+	 */
+	public void setPerformingRoles (Collection <RoleDefinition> _performingRoles)
+	{
+		this.performingRoles = _performingRoles ;
+	}
+
 }

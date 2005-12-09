@@ -26,12 +26,7 @@ public class TaskDefinition implements MethodContentElement, WorkDefinition
 	 * The description of the definition
 	 */
 	private String description ;
-
-	/**
-	 * A list of tasks linked to the definition
-	 */
-	private Collection <TaskDescriptor> tasks ;
-
+	
 	/**
 	 * Primary performers of one task
 	 */
@@ -173,31 +168,11 @@ public class TaskDefinition implements MethodContentElement, WorkDefinition
 		this.primaryPerformers = _primaryPerformers ;
 	}
 
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the tasks.
-	 */
-	public Collection <TaskDescriptor> getTasks ()
-	{
-		return this.tasks ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _tasks
-	 *            The tasks to set.
-	 */
-	public void setTasks (Collection <TaskDescriptor> _tasks)
-	{
-		this.tasks = _tasks ;
-	}
-
+	
 	/**
 	 * @see model.spem2.WorkDefinition#getPerformingRoles()
 	 */
-	public Collection <RoleDescriptor> getPerformingRoles ()
+	public Collection <RoleDefinition> getPerformingRoles ()
 	{
 		return null ;
 	}
@@ -205,7 +180,7 @@ public class TaskDefinition implements MethodContentElement, WorkDefinition
 	/**
 	 * @see model.spem2.WorkDefinition#setPerformingRoles(java.util.Collection)
 	 */
-	public void setPerformingRoles (Collection <RoleDescriptor> _roleDescriptor)
+	public void setPerformingRoles (Collection <RoleDefinition> _roleDescriptor)
 	{
 	}
 }

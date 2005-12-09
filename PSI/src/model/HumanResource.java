@@ -16,14 +16,9 @@ public class HumanResource
 	private String id ;
 
 	/**
-	 * The member's first name
+	 * The member's full name
 	 */
-	private String firstName ;
-
-	/**
-	 * The member's last name
-	 */
-	private String lastName ;
+	private String fullName ;
 
 	/**
 	 * The member's mail
@@ -31,24 +26,51 @@ public class HumanResource
 	private String email ;
 
 	/**
+	 * Constructor
+	 *
+	 * @param _id
+	 * @param _fullName
+	 */
+	public HumanResource (String _id, String _fullName)
+	{
+		super() ;
+
+		this.id = _id ;
+		this.fullName = _fullName ;
+	}
+
+	/**
+	 * Constructor
+	 *
+	 * @param _id
+	 * @param _fullName
+	 * @param _email
+	 */
+	public HumanResource (String _id, String _fullName, String _email)
+	{
+		this(_id, _fullName) ;
+		this.email = _email ;
+	}
+
+	/**
 	 * Getter
 	 * 
-	 * @return Returns the firstName.
+	 * @return Returns the fullName.
 	 */
-	public String getFirstName ()
+	public String getFullName ()
 	{
-		return this.firstName ;
+		return this.fullName ;
 	}
 
 	/**
 	 * Setter
 	 * 
 	 * @param _firstName
-	 *            The firstName to set.
+	 *            The fullName to set.
 	 */
-	public void setFirstName (String _firstName)
+	public void setFullName (String _fullName)
 	{
-		this.firstName = _firstName ;
+		this.fullName = _fullName ;
 	}
 
 	/**
@@ -75,34 +97,12 @@ public class HumanResource
 	/**
 	 * Getter
 	 * 
-	 * @return Returns the lastName.
-	 */
-	public String getLastName ()
-	{
-		return this.lastName ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _lastName
-	 *            The lastName to set.
-	 */
-	public void setLastName (String _lastName)
-	{
-		this.lastName = _lastName ;
-	}
-
-	/**
-	 * Getter
-	 * 
 	 * @return Returns the email.
 	 */
 	public String getEmail ()
 	{
 		return this.email ;
 	}
-	
 
 	/**
 	 * Setter

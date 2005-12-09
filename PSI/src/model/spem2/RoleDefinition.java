@@ -28,13 +28,8 @@ public class RoleDefinition implements MethodContentElement
 	private String description ;
 
 	/**
-	 * A list of roles linked to the definition, in the current version of apes should be alwas null ?
-	 */
-	private Collection <RoleDescriptor> roles ;
-
-	/**
 	 * Getter
-	 *
+	 * 
 	 * @return Returns the description.
 	 */
 	public String getDescription ()
@@ -44,8 +39,9 @@ public class RoleDefinition implements MethodContentElement
 
 	/**
 	 * Setter
-	 *
-	 * @param _description The description to set.
+	 * 
+	 * @param _description
+	 *            The description to set.
 	 */
 	public void setDescription (String _description)
 	{
@@ -54,7 +50,7 @@ public class RoleDefinition implements MethodContentElement
 
 	/**
 	 * Getter
-	 *
+	 * 
 	 * @return Returns the id.
 	 */
 	public String getId ()
@@ -64,8 +60,9 @@ public class RoleDefinition implements MethodContentElement
 
 	/**
 	 * Setter
-	 *
-	 * @param _id The id to set.
+	 * 
+	 * @param _id
+	 *            The id to set.
 	 */
 	public void setId (String _id)
 	{
@@ -74,7 +71,7 @@ public class RoleDefinition implements MethodContentElement
 
 	/**
 	 * Getter
-	 *
+	 * 
 	 * @return Returns the name.
 	 */
 	public String getName ()
@@ -84,31 +81,13 @@ public class RoleDefinition implements MethodContentElement
 
 	/**
 	 * Setter
-	 *
-	 * @param _name The name to set.
+	 * 
+	 * @param _name
+	 *            The name to set.
 	 */
 	public void setName (String _name)
 	{
 		this.name = _name ;
 	}
 
-	/**
-	 * Getter
-	 *
-	 * @return Returns the roles.
-	 */
-	public Collection <RoleDescriptor> getRoles ()
-	{
-		return this.roles ;
-	}
-
-	/**
-	 * Setter
-	 *
-	 * @param _roles The roles to set.
-	 */
-	public void setRoles (Collection <RoleDescriptor> _roles)
-	{
-		this.roles = _roles ;
-	}
 }

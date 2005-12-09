@@ -1,6 +1,7 @@
 
 package model ;
 
+import java.util.Collection ;
 import java.util.Date ;
 
 import model.spem2.DeliveryProcess ;
@@ -17,32 +18,58 @@ public class Project
 	/**
 	 * The unique ID of the project
 	 */
-	private String id ;
+	private String id = null ;
 
 	/**
 	 * The name of the project
 	 */
-	private String name ;
+	private String name = null ;
 
+	/**
+	 * Is the project closed or not
+	 */
+	// private boolean closed ;
+	/**
+	 * Is the project active or not
+	 */
+	// private boolean active ;
+	/**
+	 * Is the project approved or not
+	 */
+	// private boolean approved ;
 	/**
 	 * The description of the project
 	 */
-	private String description ;
+	private String description = null ;
 
 	/**
 	 * Beginning of the project
 	 */
-	private Date startDate ;
+	private Date startDate = null ;
 
 	/**
 	 * End of the project
 	 */
-	private Date finishDate ;
+	private Date finishDate = null ;
+
+	/**
+	 * Resources working within a project
+	 */
+	private Collection <HumanResource> resources = null ;
 
 	/**
 	 * The delivery process associated to the project
 	 */
-	private DeliveryProcess process ;
+	private DeliveryProcess process = null ;
+
+	/**
+	 * Constructor
+	 *
+	 */
+	public Project ()
+	{
+		super() ;
+	}
 
 	/**
 	 * Constructor
@@ -204,6 +231,27 @@ public class Project
 	public void setProcess (DeliveryProcess _process)
 	{
 		this.process = _process ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the resources.
+	 */
+	public Collection <HumanResource> getResources ()
+	{
+		return this.resources ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _resources
+	 *            The resources to set.
+	 */
+	public void setResources (Collection <HumanResource> _resources)
+	{
+		this.resources = _resources ;
 	}
 
 }

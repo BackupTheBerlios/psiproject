@@ -1,3 +1,6 @@
+import java.util.MissingResourceException ;
+
+import ui.window.MainFrame ;
 
 /**
  * PSI : type description
@@ -10,18 +13,30 @@ public final class PSI
 {
 
 	/**
-	 * Method description
-	 * 
+	 * Main method for this application
+	 * TODO exit codes and logs and complete comments if necessary
 	 * @author Condé Mickaël K.
 	 * 
-	 * @param args
+	 * @param args command args
 	 */
 	public static void main (String[] args)
 	{
-		/*
-		 * MainFrame localMainFrame = new MainFrame() ;
-		 * localMainFrame.show(true) ;
-		 */
+		try
+		{
+			MainFrame localMainFrame = new MainFrame() ;
+			localMainFrame.setVisible(true) ;
+		}
+		catch (MissingResourceException e1)
+		{
+			System.out.println("PSI> Cannot load resource file, exiting.") ;
+			System.exit(58) ;
+		}
+		
+		catch (Exception ef)
+		{
+			System.out.println("PSI> Unknown exception occured while loading, exiting.") ;
+			System.exit(58) ;
+		}
 
 	}
 

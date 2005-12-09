@@ -2,18 +2,127 @@
 package ui.window ;
 
 import java.awt.HeadlessException ;
+import java.awt.event.ActionEvent ;
+import java.io.File ;
 
+import ui.resource.Bundle ;
+import ui.tree.ProjectTreeNode ;
+
+import javax.swing.AbstractAction ;
+import javax.swing.JFileChooser ;
 import javax.swing.JFrame ;
+import javax.swing.JSplitPane ;
+import javax.swing.JMenuBar ;
+import javax.swing.JMenu ;
+
+import javax.swing.JMenuItem ;
+import javax.swing.JTree ;
+import javax.swing.JPanel ;
+import javax.swing.JTabbedPane ;
+import javax.swing.filechooser.FileFilter ;
+import javax.swing.tree.DefaultMutableTreeNode ;
+
+import model.Project ;
+
+import process.Preferences ;
+import process.exception.FileParseException ;
+import process.utility.ProjectControler ;
 
 /**
- * Fenêtre principale de l'application
+ * PSI Main window
  * 
  * @author Condé Mickael K.
+ * @version 1.0
  * 
  */
 public class MainFrame extends JFrame
 {
-	private static final long serialVersionUID = 1 ;
+	/**
+	 * Serial ID for serialisation
+	 */
+	private static final long serialVersionUID = 1834045581012841557L ;
+
+	/*
+	 * GUI Elements
+	 */
+	private JSplitPane mainSplitPane = null ;
+
+	private JMenuBar mainJMenuBar = null ;
+
+	private JMenu fileMenu = null ;
+
+	private JMenu editMenu = null ;
+
+	private JMenu aboutMenu = null ;
+
+	private JMenuItem openFileMenuItem = null ;
+
+	private JMenuItem closeFileMenuItem = null ;
+
+	private JMenuItem quitFileMenuItem = null ;
+
+	private JMenuItem createFileMenuItem = null ;
+
+	private JMenuItem helpAboutMenuItem = null ;
+
+	private JMenuItem aboutAboutMenuItem = null ;
+
+	private JMenuItem prefsEditMenuItem = null ;
+
+	private JMenuItem importProcessFileMenuItem = null ;
+
+	private JMenuItem saveFileMenuItem = null ;
+
+	private JMenuItem saveAsFileMenuItem = null ;
+
+	private JMenuItem exportDominoFileMenuItem = null ;
+
+	private JMenuItem export2DBFileMenuItem = null ;
+
+	private JMenuItem exportOWFileMenuItem = null ;
+
+	private JMenu exportFileMenu = null ;
+
+	private JTree projectTree = null ;
+
+	private JSplitPane rightSplitPane = null ;
+
+	private JTabbedPane mainContainer = null ;
+
+	private JPanel statusPanel = null ;
+	
+	private Project currentProject = null ;
+
+	/*
+	 * Here are defined actions which can be performed by the user. Abstract Actions are used to
+	 * group the same actions being performed from different components
+	 */
+	private AbstractAction actionOpen = new AbstractAction(Bundle.getText("MainFrameFileMenuOpen"))
+	{
+		private static final long serialVersionUID = -2015126209086384143L ;
+
+		public void actionPerformed (ActionEvent e)
+		{
+			actionOpen(e) ;
+		}
+	} ;
+
+	/*
+	 * private AbstractAction importAction = new
+	 * AbstractAction(Bundle.getText("MainFrameFileMenuImport")) { private static final long
+	 * serialVersionUID = 101L ;
+	 * 
+	 * public void actionPerformed (ActionEvent e) { actionOpen(e) ; } } ;
+	 */
+	private AbstractAction actionCreate = new AbstractAction(Bundle.getText("MainFrameFileMenuCreate"))
+	{
+		private static final long serialVersionUID = 7373920162223888058L ;
+
+		public void actionPerformed (ActionEvent e)
+		{
+			actionCreate(e) ;
+		}
+	} ;
 
 	/**
 	 * @throws HeadlessException
@@ -21,16 +130,538 @@ public class MainFrame extends JFrame
 	public MainFrame () throws HeadlessException
 	{
 		super() ;
-		initialize();
+		initialize() ;
 	}
 
 	/**
 	 * This method initializes this
 	 * 
 	 */
-	private void initialize() {
-        this.setSize(new java.awt.Dimension(299,112));
-			
+	private void initialize ()
+	{
+		Preferences localPrefs = Preferences.getInstance() ;
+		this.setSize(new java.awt.Dimension(localPrefs.getWidth(), localPrefs.getHeight())) ;
+		this.setName("mainFrame") ;
+		this.setContentPane(getMainSplitPane()) ;
+		this.setJMenuBar(getMainJMenuBar()) ;
+		this.setContentPane(getMainSplitPane()) ;
+		this.setTitle("Project Supervising Indicators") ;
+		this.setLocation(localPrefs.getXPosition(), localPrefs.getYPosition()) ;
+
+		this.addWindowListener(new java.awt.event.WindowAdapter()
+		{
+			/*
+			 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
+			 */
+			public void windowClosing (java.awt.event.WindowEvent e)
+			{
+				actionExit() ;
+			}
+		}) ;
+
+		this.addComponentListener(new java.awt.event.ComponentAdapter()
+		{
+			/*
+			 * @see java.awt.event.ComponentListener#componentResized(java.awt.event.ComponentEvent)
+			 */
+			public void componentResized (java.awt.event.ComponentEvent e)
+			{
+				Preferences.getInstance().setWidth(e.getComponent().getWidth()) ;
+				Preferences.getInstance().setHeight(e.getComponent().getHeight()) ;
+			}
+
+			/*
+			 * @see java.awt.event.ComponentListener#componentMoved(java.awt.event.ComponentEvent)
+			 */
+			public void componentMoved (java.awt.event.ComponentEvent e)
+			{
+				Preferences.getInstance().setXPosition(e.getComponent().getX()) ;
+				Preferences.getInstance().setYPosition(e.getComponent().getY()) ;
+			}
+		}) ;
 	}
 
-}  //  @jve:decl-index=0:visual-constraint="10,10"
+	/**
+	 * Handling the closing of the window
+	 * 
+	 * @author Condé Mickael K.
+	 * @version 1.0
+	 * 
+	 */
+	private void actionExit ()
+	{
+		Preferences.getInstance().save() ;
+		System.exit(0) ;
+	}
+
+	/**
+	 * Creates new project from a open workbench file
+	 * 
+	 * @author Condé Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param e
+	 *            the Action Event that caused the action
+	 */
+	private void actionCreate (ActionEvent evt)
+	{
+		/*
+		 * Setting up a JFile Choosser with a special file filter that will only accept .xml files
+		 */
+		JFileChooser localFileChooser = new JFileChooser() ;
+		localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileCreateProjectTitle")) ;
+		localFileChooser.setAcceptAllFileFilterUsed(false) ;
+		localFileChooser.setApproveButtonText(Bundle.getText("MainFrameFileCreateProjectButton")) ;
+		File localDirectory = new File(Preferences.getInstance().getLastProject()).getParentFile() ;
+		if (localDirectory != null)
+		{
+			localFileChooser.setCurrentDirectory(localDirectory) ;
+		}
+		localFileChooser.setFileFilter(new FileFilter()
+		{
+			/*
+			 * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
+			 */
+			public boolean accept (File _file)
+			{
+				String localFileName = _file.getName() ;
+				String localFileExtension = localFileName.substring(localFileName.lastIndexOf(".") + 1) ;
+				return (_file.isDirectory() || (_file.isFile() && _file.canRead() && localFileExtension.equalsIgnoreCase("xml"))) ;
+			}
+
+			/*
+			 * @see javax.swing.filechooser.FileFilter#getDescription()
+			 */
+			public String getDescription ()
+			{
+				return Bundle.getText("MainFrameFileOWProjectDescription") ;
+			}
+		}) ;
+		localFileChooser.showOpenDialog(MainFrame.this) ;
+
+		/*
+		 * Working on a selected file
+		 */
+		File localFile ;
+		if ( (localFile = localFileChooser.getSelectedFile()) != null)
+		{
+			Preferences.getInstance().setLastProject(localFile.getAbsolutePath()) ;
+			try
+			{
+				currentProject = ProjectControler.create(localFile);
+				if (currentProject != null)
+				{
+					mainSplitPane.remove(1) ;
+					projectTree = new JTree(new ProjectTreeNode(currentProject)) ;
+					mainSplitPane.setLeftComponent(projectTree) ;
+					mainSplitPane.setDividerLocation(Preferences.getInstance().getTreeWidth()) ;
+				}
+			}
+			catch (FileParseException exc)
+			{
+				System.out.println("aye") ;
+			}
+		}
+	}
+
+	/**
+	 * Opens a project from file
+	 * 
+	 * @author Condé Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param e
+	 *            the Action Event that caused the action
+	 */
+	private void actionOpen (ActionEvent e)
+	{
+		JFileChooser localFileChooser = new JFileChooser() ;
+		localFileChooser.showOpenDialog(MainFrame.this) ;
+	}
+
+	/**
+	 * This method initializes mainSplitPane
+	 * 
+	 * @return javax.swing.JSplitPane
+	 */
+	private JSplitPane getMainSplitPane ()
+	{
+		if (mainSplitPane == null)
+		{
+			mainSplitPane = new JSplitPane() ;
+			mainSplitPane.setOneTouchExpandable(true) ;
+			mainSplitPane.setLeftComponent(getProjectTree()) ;
+			mainSplitPane.setRightComponent(getRightSplitPane()) ;
+			mainSplitPane.setDividerLocation(Preferences.getInstance().getTreeWidth()) ;
+			mainSplitPane.addPropertyChangeListener("lastDividerLocation", new java.beans.PropertyChangeListener()
+			{
+				public void propertyChange (java.beans.PropertyChangeEvent e)
+				{
+					Preferences.getInstance().setTreeWidth(mainSplitPane.getDividerLocation()) ;
+				}
+			}) ;
+		}
+		return mainSplitPane ;
+	}
+
+	/**
+	 * This method initializes mainJMenuBar
+	 * 
+	 * @return javax.swing.JMenuBar
+	 */
+	private JMenuBar getMainJMenuBar ()
+	{
+		if (mainJMenuBar == null)
+		{
+			mainJMenuBar = new JMenuBar() ;
+			mainJMenuBar.add(getFileMenu()) ;
+			mainJMenuBar.add(getEditMenu()) ;
+			mainJMenuBar.add(getAboutMenu()) ;
+		}
+		return mainJMenuBar ;
+	}
+
+	/**
+	 * This method initializes fileMenu
+	 * 
+	 * @return javax.swing.JMenu
+	 */
+	private JMenu getFileMenu ()
+	{
+		if (fileMenu == null)
+		{
+			fileMenu = new JMenu() ;
+			fileMenu.setText(Bundle.getText("MainFrameFileMenu")) ;
+			fileMenu.add(getOpenFileMenuItem()) ;
+			fileMenu.add(getCreateFileMenuItem()) ;
+			fileMenu.add(getImportProcessFileMenuItem()) ;
+			fileMenu.add(getCloseFileMenuItem()) ;
+			fileMenu.addSeparator() ;
+			fileMenu.add(getSaveFileMenuItem()) ;
+			fileMenu.add(getSaveAsFileMenuItem()) ;
+			fileMenu.addSeparator() ;
+			fileMenu.add(getExportFileMenu()) ;
+			fileMenu.addSeparator() ;
+			fileMenu.add(getQuitFileMenuItem()) ;
+		}
+		return fileMenu ;
+	}
+
+	/**
+	 * This method initializes editMenu
+	 * 
+	 * @return javax.swing.JMenu
+	 */
+	private JMenu getEditMenu ()
+	{
+		if (editMenu == null)
+		{
+			editMenu = new JMenu() ;
+			editMenu.setText(Bundle.getText("MainFrameEditMenu")) ;
+			editMenu.add(getPrefsEditMenuItem()) ;
+		}
+		return editMenu ;
+	}
+
+	/**
+	 * This method initializes aboutMenu
+	 * 
+	 * @return javax.swing.JMenu
+	 */
+	private JMenu getAboutMenu ()
+	{
+		if (aboutMenu == null)
+		{
+			aboutMenu = new JMenu() ;
+			aboutMenu.setText(Bundle.getText("MainFrameAboutMenu")) ;
+			aboutMenu.setHorizontalAlignment(javax.swing.SwingConstants.LEADING) ;
+			aboutMenu.add(getHelpAboutMenuItem()) ;
+			aboutMenu.addSeparator() ;
+			aboutMenu.add(getAboutAboutMenuItem()) ;
+		}
+		return aboutMenu ;
+	}
+
+	/**
+	 * This method initializes openFileMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getOpenFileMenuItem ()
+	{
+		if (openFileMenuItem == null)
+		{
+			openFileMenuItem = new JMenuItem() ;
+			openFileMenuItem.setAction(actionOpen) ;
+		}
+		return openFileMenuItem ;
+	}
+
+	/**
+	 * This method initializes createFileMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getCreateFileMenuItem ()
+	{
+		if (createFileMenuItem == null)
+		{
+			createFileMenuItem = new JMenuItem() ;
+			createFileMenuItem.setAction(actionCreate) ;
+		}
+		return createFileMenuItem ;
+	}
+
+	/**
+	 * This method initializes importProjectFileMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getImportProcessFileMenuItem ()
+	{
+		if (importProcessFileMenuItem == null)
+		{
+			importProcessFileMenuItem = new JMenuItem() ;
+			importProcessFileMenuItem.setText(Bundle.getText("MainFrameFileMenuImportProcess")) ;
+		}
+		return importProcessFileMenuItem ;
+	}
+
+	/**
+	 * This method initializes saveFileMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getSaveFileMenuItem ()
+	{
+		if (saveFileMenuItem == null)
+		{
+			saveFileMenuItem = new JMenuItem() ;
+			saveFileMenuItem.setText(Bundle.getText("MainFrameFileMenuSave")) ;
+		}
+		return saveFileMenuItem ;
+	}
+
+	/**
+	 * This method initializes saveAsFileMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getSaveAsFileMenuItem ()
+	{
+		if (saveAsFileMenuItem == null)
+		{
+			saveAsFileMenuItem = new JMenuItem() ;
+			saveAsFileMenuItem.setText(Bundle.getText("MainFrameFileMenuSaveAs")) ;
+		}
+		return saveAsFileMenuItem ;
+	}
+
+	/**
+	 * This method initializes closeFileMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getCloseFileMenuItem ()
+	{
+		if (closeFileMenuItem == null)
+		{
+			closeFileMenuItem = new JMenuItem() ;
+			closeFileMenuItem.setText(Bundle.getText("MainFrameFileMenuClose")) ;
+		}
+		return closeFileMenuItem ;
+	}
+
+	/**
+	 * This method initializes quitFileMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getQuitFileMenuItem ()
+	{
+		if (quitFileMenuItem == null)
+		{
+			quitFileMenuItem = new JMenuItem() ;
+			quitFileMenuItem.setText(Bundle.getText("MainFrameFileMenuQuit")) ;
+			quitFileMenuItem.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+					actionExit() ;
+				}
+			}) ;
+		}
+		return quitFileMenuItem ;
+	}
+
+	/**
+	 * This method initializes helbAboutMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getHelpAboutMenuItem ()
+	{
+		if (helpAboutMenuItem == null)
+		{
+			helpAboutMenuItem = new JMenuItem() ;
+			helpAboutMenuItem.setText(Bundle.getText("MainFrameAboutMenuHelp")) ;
+		}
+		return helpAboutMenuItem ;
+	}
+
+	/**
+	 * This method initializes aboutAboutMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getAboutAboutMenuItem ()
+	{
+		if (aboutAboutMenuItem == null)
+		{
+			aboutAboutMenuItem = new JMenuItem() ;
+			aboutAboutMenuItem.setText(Bundle.getText("MainFrameAboutMenuAbout")) ;
+		}
+		return aboutAboutMenuItem ;
+	}
+
+	/**
+	 * This method initializes prefsEditMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getPrefsEditMenuItem ()
+	{
+		if (prefsEditMenuItem == null)
+		{
+			prefsEditMenuItem = new JMenuItem() ;
+			prefsEditMenuItem.setText(Bundle.getText("MainFrameEditMenuPrefs")) ;
+		}
+		return prefsEditMenuItem ;
+	}
+
+	/**
+	 * This method initializes projectTree
+	 * 
+	 * @return javax.swing.JTree
+	 */
+	private JTree getProjectTree ()
+	{
+		if (projectTree == null)
+		{
+			DefaultMutableTreeNode localNode = new DefaultMutableTreeNode(Bundle.getText("MainFrameTreeDefault")) ;
+			projectTree = new JTree(localNode) ;
+		}
+		return projectTree ;
+	}
+
+	/**
+	 * This method initializes exportFileMenu
+	 * 
+	 * @return javax.swing.JMenu
+	 */
+	private JMenu getExportFileMenu ()
+	{
+		if (exportFileMenu == null)
+		{
+			exportFileMenu = new JMenu() ;
+			exportFileMenu.setText(Bundle.getText("MainFrameFileMenuExport")) ;
+			exportFileMenu.add(getExportDominoFileMenuItem()) ;
+			exportFileMenu.add(getExportOWFileMenuItem()) ;
+			exportFileMenu.add(getExport2DBFileMenuItem()) ;
+		}
+		return exportFileMenu ;
+	}
+
+	/**
+	 * This method initializes exportDominoFileMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getExportDominoFileMenuItem ()
+	{
+		if (exportDominoFileMenuItem == null)
+		{
+			exportDominoFileMenuItem = new JMenuItem() ;
+			exportDominoFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExportDomino")) ;
+		}
+		return exportDominoFileMenuItem ;
+	}
+
+	/**
+	 * This method initializes export2DBFileMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getExport2DBFileMenuItem ()
+	{
+		if (export2DBFileMenuItem == null)
+		{
+			export2DBFileMenuItem = new JMenuItem() ;
+			export2DBFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExport2DB")) ;
+		}
+		return export2DBFileMenuItem ;
+	}
+
+	/**
+	 * This method initializes exportOWFileMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getExportOWFileMenuItem ()
+	{
+		if (exportOWFileMenuItem == null)
+		{
+			exportOWFileMenuItem = new JMenuItem() ;
+			exportOWFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExportOW")) ;
+		}
+		return exportOWFileMenuItem ;
+	}
+
+	/**
+	 * This method initializes rightSplitPane
+	 * 
+	 * @return javax.swing.JSplitPane
+	 */
+	private JSplitPane getRightSplitPane ()
+	{
+		if (rightSplitPane == null)
+		{
+			rightSplitPane = new JSplitPane() ;
+			rightSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT) ;
+			rightSplitPane.setResizeWeight(0.8D) ;
+			rightSplitPane.setTopComponent(getMainContainer()) ;
+			rightSplitPane.setBottomComponent(getStatusPanel()) ;
+
+		}
+		return rightSplitPane ;
+	}
+
+	/**
+	 * This method initializes mainContainer
+	 * 
+	 * @return javax.swing.JTabbedPane
+	 */
+	private JTabbedPane getMainContainer ()
+	{
+		if (mainContainer == null)
+		{
+			mainContainer = new JTabbedPane() ;
+		}
+		return mainContainer ;
+	}
+
+	/**
+	 * This method initializes statusPanel
+	 * 
+	 * @return javax.swing.JPanel
+	 */
+	private JPanel getStatusPanel ()
+	{
+		if (statusPanel == null)
+		{
+			statusPanel = new JPanel() ;
+		}
+		return statusPanel ;
+	}
+
+} // @jve:decl-index=0:visual-constraint="158,10"

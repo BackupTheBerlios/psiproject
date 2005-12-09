@@ -17,7 +17,7 @@ public class Bundle
 	/**
 	 * Basename to the resource file, contains the prefix
 	 */
-	private static String BASENAME = "view/resource/label" ;
+	private static String BASENAME = "ui/resource/label" ;
 
 	/**
 	 * Resource used to load the labels (i.e. text)

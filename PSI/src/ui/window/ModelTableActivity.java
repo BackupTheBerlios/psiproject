@@ -62,7 +62,7 @@ public class ModelTableActivity extends AbstractTableModel
 	public boolean isCellEditable(int row, int col) 
 	{
         // toutes les colonnes 0 et 1 sont non editable
-        if (col == 0) return false;
+        if ((col == 0)||(col == 1)) return false;
         else return true;
     }
 	

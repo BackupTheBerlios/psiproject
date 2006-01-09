@@ -54,6 +54,7 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	 * @see PlanningData
 	 */
 	private PlanningData planningData ;
+	private PlanningData realData;
 
 	/**
 	 * 
@@ -225,6 +226,11 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	{
 		return this.planningData ;
 	}
+	
+	public PlanningData getRealData ()
+	{
+		return this.realData ;
+	}
 
 	/**
 	 * Setter
@@ -235,6 +241,11 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	public void setPlanningData (PlanningData _planningData)
 	{
 		this.planningData = _planningData ;
+	}
+	
+	public void setRealData (PlanningData _realData)
+	{
+		this.realData = _realData;
 	}
 
 	/**

@@ -33,7 +33,7 @@ import process.utility.ProjectControler ;
 /**
  * PSI Main window
  * 
- * @author Condé Mickael K.
+ * @author Cond? Mickael K.
  * @version 1.0
  * 
  */
@@ -216,7 +216,7 @@ public class MainFrame extends JFrame
 	/**
 	 * Handling the closing of the window
 	 * 
-	 * @author Condé Mickael K.
+	 * @author Cond? Mickael K.
 	 * @version 1.0
 	 * 
 	 */
@@ -229,7 +229,7 @@ public class MainFrame extends JFrame
 	/**
 	 * Creates new project from a open workbench file
 	 * 
-	 * @author Condé Mickael K.
+	 * @author Cond? Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param e
@@ -290,7 +290,7 @@ public class MainFrame extends JFrame
 			}
 			catch (FileParseException exc)
 			{
-				System.out.println("aye") ;
+				System.out.println(Bundle.getText("MainFrameFileCreateIncorrectFormat")) ;
 			}
 		}
 	}
@@ -298,7 +298,7 @@ public class MainFrame extends JFrame
 	/**
 	 * Imports a process dpe description to a newly created project
 	 * 
-	 * @author Condé Mickael K.
+	 * @author Cond? Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param e
@@ -369,7 +369,7 @@ public class MainFrame extends JFrame
 	/**
 	 * Opens a project from file
 	 * 
-	 * @author Condé Mickael K.
+	 * @author Cond? Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param e
@@ -384,7 +384,7 @@ public class MainFrame extends JFrame
 	/**
 	 * Saves the current project (quick save)
 	 * 
-	 * @author Condé Mickael K.
+	 * @author Cond? Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param e
@@ -398,7 +398,7 @@ public class MainFrame extends JFrame
 	/**
 	 * Saves the current project [under another name]
 	 * 
-	 * @author Condé Mickael K.
+	 * @author Cond? Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param e

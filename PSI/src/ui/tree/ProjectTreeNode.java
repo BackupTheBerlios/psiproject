@@ -35,6 +35,15 @@ public class ProjectTreeNode extends DefaultMutableTreeNode
 
 		this.project = _project ;
 		this.setUserObject(project.getName()) ;
+		
+		// Process information
+		if (project.getProcess() != null)
+		{
+			DefaultMutableTreeNode localProcessRoot = new ProcessTreeNode(project.getProcess()) ;			
+			this.add(localProcessRoot) ;
+		}
+		
+		// Resources information
 		if (project.getResources() != null)
 		{
 			DefaultMutableTreeNode localRessourcesRoot = new DefaultMutableTreeNode(Bundle.getText("MainFrameTreeResources")) ;

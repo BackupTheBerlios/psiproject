@@ -10,8 +10,19 @@ package model.spem2 ;
  */
 public class Iteration extends Activity
 {
-	public Iteration()
+
+	/**
+	 * Constructor
+	 * 
+	 * @param _id
+	 * @param _name
+	 * @param _description
+	 * @param _authorFullName
+	 * @param _authorMail
+	 */
+	public Iteration (String _id, String _name, String _description, String _authorFullName, String _authorMail)
 	{
-		//isRepeatable = true ;
+		super(_id, _name, _description, _authorFullName, _authorMail) ;
 	}
+
 }

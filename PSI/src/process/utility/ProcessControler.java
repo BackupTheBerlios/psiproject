@@ -6,22 +6,16 @@ import java.io.File ;
 import java.io.FileInputStream ;
 import java.io.FileNotFoundException ;
 import java.io.IOException ;
-import java.text.ParseException ;
-import java.text.SimpleDateFormat ;
-import java.util.ArrayList ;
-import java.util.Collection ;
 
 import javax.xml.parsers.DocumentBuilder ;
 import javax.xml.parsers.DocumentBuilderFactory ;
 import javax.xml.parsers.ParserConfigurationException ;
 
 import org.w3c.dom.Document ;
-import org.w3c.dom.NamedNodeMap ;
 import org.w3c.dom.Node ;
 import org.w3c.dom.NodeList ;
 import org.xml.sax.SAXException ;
 import org.xml.sax.SAXParseException ;
-
 
 import model.spem2.DeliveryProcess ;
 import process.exception.FileParseException ;
@@ -96,7 +90,33 @@ public class ProcessControler
 				Document localDocument = localDB.parse(localBIS) ;
 				if (!localDocument.getDocumentElement().getTagName().equalsIgnoreCase("exportExecution")) { throw new FileParseException() ; }
 
-				return new DeliveryProcess() ;
+				/*
+				 * General process information variables
+				 */
+				String localID = "" ;
+				String localName = "" ;
+				String localDescription = "" ;
+				String localAuthorName = "" ;
+				String localAuthorMail = "" ;
+				
+				NodeList localProcessNodeList = localDocument.getElementsByTagName("processus") ;
+				int localChildMax = localProcessNodeList.getLength() ;
+				if (localChildMax != 1) { throw new FileParseException() ; }
+				
+				NodeList localPAttribList = localProcessNodeList.item(0).getChildNodes() ;
+				localChildMax = localPAttribList.getLength() ;
+				System.out.println(localDocument) ;
+				for(int i = 0 ; i < localChildMax ; i++)
+				{//System.out.println(localPAttribList.item(i).getNodeName()) ;
+					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localPAttribList.item(i).getNodeName().equalsIgnoreCase("id"))
+					{
+						//localID = localPAttribList.item(i).getNodeValue() ;
+						//System.out.println(localID) ;
+					}
+				}
+
+				return new DeliveryProcess(localID, localName, localDescription, localAuthorName, localAuthorMail) ;
 			}
 			catch (ParserConfigurationException eDBF)
 			{

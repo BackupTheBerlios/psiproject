@@ -92,6 +92,26 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	private Collection <BreakdownElement> nestedElements = null ;
 
 	/**
+	 * Constructor
+	 *
+	 * @param _id
+	 * @param _name
+	 * @param _description
+	 * @param _authorFullName
+	 * @param _authorMail
+	 */
+	public Activity (String _id, String _name, String _description, String _authorFullName, String _authorMail)
+	{
+		super() ;
+
+		this.id = _id ;
+		this.name = _name ;
+		this.description = _description ;
+		this.authorFullName = _authorFullName ;
+		this.authorMail = _authorMail ;
+	}
+
+	/**
 	 * Getter
 	 * 
 	 * @return Returns the hasMultipleOccurences.

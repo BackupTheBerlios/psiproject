@@ -20,7 +20,7 @@ public interface Descriptor extends BreakdownElement
 	 * 
 	 * @author Condé Mickaël K.
 	 * @version 1.0
-	 *
+	 * 
 	 * @return the isSynchronizedWithSource property
 	 */
 	public boolean isSynchronizedWithSource () ;
@@ -34,4 +34,65 @@ public interface Descriptor extends BreakdownElement
 	 * @param _isSynchronizedWithSource
 	 */
 	public void setSynchronizedWithSource (boolean _isSynchronizedWithSource) ;
+
+	/**
+	 * TODO Method description
+	 * 
+	 * @author Condé Mickaël K.
+	 * @version 1.0
+	 * 
+	 * @return
+	 */
+	public String getId () ;
+
+	/**
+	 * TODO Method description
+	 * 
+	 * @author Condé Mickaël K.
+	 * @version 1.0
+	 * 
+	 * @param _id
+	 */
+	public void setId (String _id) ;
+
+	/**
+	 * TODO Method description
+	 * 
+	 * @author Condé Mickaël K.
+	 * @version 1.0
+	 * 
+	 * @return
+	 */
+	public String getName () ;
+
+	/**
+	 * TODO Method description
+	 * 
+	 * @author Condé Mickaël K.
+	 * @version 1.0
+	 * 
+	 * @param _name
+	 */
+	public void setName (String _name) ;
+
+	/**
+	 * TODO Method description
+	 * 
+	 * @author Condé Mickaël K.
+	 * @version 1.0
+	 * 
+	 * @return
+	 */
+	public String getDescription () ;
+
+	/**
+	 * TODO Method description
+	 * 
+	 * @author Condé Mickaël K.
+	 * @version 1.0
+	 * 
+	 * @param _description
+	 */
+	public void setDescription (String _description) ;
+
 }

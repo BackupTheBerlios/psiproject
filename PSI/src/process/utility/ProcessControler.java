@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilder ;
 import javax.xml.parsers.DocumentBuilderFactory ;
 import javax.xml.parsers.ParserConfigurationException ;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document ;
 import org.w3c.dom.Node ;
 import org.w3c.dom.NodeList ;
@@ -91,7 +92,7 @@ public class ProcessControler
 				if (!localDocument.getDocumentElement().getTagName().equalsIgnoreCase("exportExecution")) { throw new FileParseException() ; }
 
 				/*
-				 * General process information variables
+				 * Step 1 : General process information variables
 				 */
 				String localID = "" ;
 				String localName = "" ;
@@ -104,17 +105,98 @@ public class ProcessControler
 				if (localChildMax != 1) { throw new FileParseException() ; }
 				
 				NodeList localPAttribList = localProcessNodeList.item(0).getChildNodes() ;
-				localChildMax = localPAttribList.getLength() ;
-				System.out.println(localDocument) ;
+				localChildMax = localPAttribList.getLength() ; // ! new meaning
+
 				for(int i = 0 ; i < localChildMax ; i++)
-				{//System.out.println(localPAttribList.item(i).getNodeName()) ;
+				{
+					/*
+					 * Getting the ID of the process
+					 */
 					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE
 							&& localPAttribList.item(i).getNodeName().equalsIgnoreCase("id"))
 					{
-						//localID = localPAttribList.item(i).getNodeValue() ;
-						//System.out.println(localID) ;
+						try
+						{
+							localID = localPAttribList.item(i).getFirstChild().getNodeValue() ;
+						}
+						catch (NullPointerException exc)
+						{
+							localID = "NA" ;
+						}
+					}
+					
+					/*
+					 * Getting the name of the process
+					 */
+					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localPAttribList.item(i).getNodeName().equalsIgnoreCase("nom"))
+					{
+						try
+						{
+							localName = localPAttribList.item(i).getFirstChild().getNodeValue() ;
+						}
+						catch (NullPointerException exc)
+						{
+							localName = "NA" ;
+						}
+					}
+					
+					/*
+					 * Getting the description of the process
+					 */
+					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localPAttribList.item(i).getNodeName().equalsIgnoreCase("description"))
+					{
+						try
+						{
+							localDescription = localPAttribList.item(i).getFirstChild().getNodeValue() ;
+						}
+						catch (NullPointerException exc)
+						{
+							localDescription = "NA" ;
+						}
+					}
+					
+					/*
+					 * Getting the author's name
+					 */
+					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localPAttribList.item(i).getNodeName().equalsIgnoreCase("nomAuteur"))
+					{
+						try
+						{
+							localAuthorName = localPAttribList.item(i).getFirstChild().getNodeValue() ;
+						}
+						catch (NullPointerException exc)
+						{
+							localAuthorName = "NA" ;
+						}
+					}
+					
+					/*
+					 * Getting the description of the process
+					 */
+					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localPAttribList.item(i).getNodeName().equalsIgnoreCase("emailAuteur"))
+					{
+						try
+						{
+							localDescription = localPAttribList.item(i).getFirstChild().getNodeValue() ;
+						}
+						catch (NullPointerException exc)
+						{
+							localAuthorMail = "NA" ;
+						}
 					}
 				}
+				
+				/*
+				 * Step 2 : Roles
+				 */
+				
+				/*
+				 * Step 3 : Activities
+				 */
 
 				return new DeliveryProcess(localID, localName, localDescription, localAuthorName, localAuthorMail) ;
 			}

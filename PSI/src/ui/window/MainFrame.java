@@ -236,8 +236,7 @@ public class MainFrame extends JFrame
 	 *            the Action Event that caused the action
 	 */
 	private void actionCreate (ActionEvent evt)
-	{
-		actionImport.setEnabled(false) ;
+	{		
 		/*
 		 * Setting up a JFile Chooser with a special file filter that will only accept .xml files
 		 */
@@ -278,6 +277,7 @@ public class MainFrame extends JFrame
 		File localFile ;
 		if ( (localFile = localFileChooser.getSelectedFile()) != null)
 		{
+			actionImport.setEnabled(false) ;
 			Preferences.getInstance().setLastProject(localFile.getAbsolutePath()) ;
 			try
 			{

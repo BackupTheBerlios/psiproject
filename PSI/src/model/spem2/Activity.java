@@ -13,26 +13,6 @@ import java.util.Collection ;
 public class Activity implements WorkBreakdownElement, WorkDefinition
 {
 	/**
-	 * A common prefix which can be set by the project manager to id elements.
-	 */
-	private String prefix ;
-
-	/**
-	 * Is the element planned within a project or not.
-	 */
-	private boolean isPlanned ;
-
-	/**
-	 * Has the element multiple occurences within a project or not
-	 */
-	private boolean hasMultipleOccurences ;
-
-	/**
-	 * Is the element optional for a project or not.
-	 */
-	private boolean isOptional ;
-
-	/**
 	 * Is the element repeatable or can be executed more than once in one project or not. For
 	 * example, an iteration which is a WorkBreakdownElement is repeatable whereas a phase is not.
 	 */
@@ -54,22 +34,18 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	 * @see PlanningData
 	 */
 	private PlanningData planningData ;
-	private PlanningData realData;
 
 	/**
-	 * 
+	 * The actual data for this element
 	 */
-	private String id ;
+	private PlanningData realData ;
 
 	/**
-	 * 
+	 * The descriptor of the activity
 	 */
-	private String name ;
+	private ActivityDescriptor descriptor ;
 
-	/**
-	 * 
-	 */
-	private String description ;
+	private Collection <RoleDescriptor> performingRoles ;
 
 	/**
 	 * 
@@ -82,18 +58,13 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	private String authorMail ;
 
 	/**
-	 * Performers of an activity
-	 */
-	private Collection <RoleDefinition> performingRoles = null ;
-
-	/**
 	 * An activity is composed of Breakdown Elements
 	 */
 	private Collection <BreakdownElement> nestedElements = null ;
 
 	/**
 	 * Constructor
-	 *
+	 * 
 	 * @param _id
 	 * @param _name
 	 * @param _description
@@ -104,32 +75,78 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	{
 		super() ;
 
-		this.id = _id ;
-		this.name = _name ;
-		this.description = _description ;
+		/*
+		 * this.id = _id ; this.name = _name ; this.description = _description ;
+		 */
 		this.authorFullName = _authorFullName ;
 		this.authorMail = _authorMail ;
 	}
 
 	/**
-	 * Getter
-	 * 
-	 * @return Returns the hasMultipleOccurences.
+	 * @see model.spem2.BreakdownElement#getPrefix()
 	 */
-	public boolean hasMultipleOccurences ()
+	public String getPrefix ()
 	{
-		return this.hasMultipleOccurences ;
+		return descriptor.getPrefix() ;
 	}
 
 	/**
-	 * Setter
-	 * 
-	 * @param _hasMultipleOccurences
-	 *            The hasMultipleOccurences to set.
+	 * @see model.spem2.BreakdownElement#hasMultipleOccurences()
+	 */
+	public boolean hasMultipleOccurences ()
+	{
+		return descriptor.hasMultipleOccurences() ;
+	}
+
+	/**
+	 * @see model.spem2.BreakdownElement#isOptional()
+	 */
+	public boolean isOptional ()
+	{
+		return descriptor.isOptional() ;
+	}
+
+	/**
+	 * @see model.spem2.BreakdownElement#isPlanned()
+	 */
+	public boolean isPlanned ()
+	{
+		return descriptor.isPlanned() ;
+	}
+
+	/**
+	 * @see model.spem2.BreakdownElement#setMultipleOccurences(boolean)
 	 */
 	public void setMultipleOccurences (boolean _hasMultipleOccurences)
 	{
-		this.hasMultipleOccurences = _hasMultipleOccurences ;
+		descriptor.setMultipleOccurences(_hasMultipleOccurences) ;
+
+	}
+
+	/**
+	 * @see model.spem2.BreakdownElement#setOptional(boolean)
+	 */
+	public void setOptional (boolean _isOptional)
+	{
+		descriptor.setOptional(_isOptional) ;
+	}
+
+	/**
+	 * @see model.spem2.BreakdownElement#setPlanned(boolean)
+	 */
+	public void setPlanned (boolean _isPlanned)
+	{
+		descriptor.setPlanned(_isPlanned) ;
+
+	}
+
+	/**
+	 * @see model.spem2.BreakdownElement#setPrefix(java.lang.String)
+	 */
+	public void setPrefix (String _prefix)
+	{
+		descriptor.setPrefix(_prefix) ;
+
 	}
 
 	/**
@@ -177,48 +194,6 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	/**
 	 * Getter
 	 * 
-	 * @return Returns the isOptional.
-	 */
-	public boolean isOptional ()
-	{
-		return this.isOptional ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _isOptional
-	 *            The isOptional to set.
-	 */
-	public void setOptional (boolean _isOptional)
-	{
-		this.isOptional = _isOptional ;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the isPlanned.
-	 */
-	public boolean isPlanned ()
-	{
-		return this.isPlanned ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _isPlanned
-	 *            The isPlanned to set.
-	 */
-	public void setPlanned (boolean _isPlanned)
-	{
-		this.isPlanned = _isPlanned ;
-	}
-
-	/**
-	 * Getter
-	 * 
 	 * @return Returns the isRepeatable.
 	 */
 	public boolean isRepeatable ()
@@ -246,7 +221,12 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	{
 		return this.planningData ;
 	}
-	
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the realData.
+	 */
 	public PlanningData getRealData ()
 	{
 		return this.realData ;
@@ -262,31 +242,16 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	{
 		this.planningData = _planningData ;
 	}
-	
-	public void setRealData (PlanningData _realData)
-	{
-		this.realData = _realData;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the prefix.
-	 */
-	public String getPrefix ()
-	{
-		return this.prefix ;
-	}
 
 	/**
 	 * Setter
 	 * 
-	 * @param _prefix
-	 *            The prefix to set.
+	 * @param _realData
+	 *            The realData to set.
 	 */
-	public void setPrefix (String _prefix)
+	public void setRealData (PlanningData _realData)
 	{
-		this.prefix = _prefix ;
+		this.realData = _realData ;
 	}
 
 	/**
@@ -355,104 +320,40 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	/**
 	 * Getter
 	 * 
-	 * @return Returns the description.
+	 * @return Returns the descriptor.
 	 */
-	public String getDescription ()
+	public ActivityDescriptor getDescriptor ()
 	{
-		return this.description ;
+		return this.descriptor ;
 	}
 
 	/**
 	 * Setter
 	 * 
-	 * @param _description
-	 *            The description to set.
+	 * @param _descriptor
+	 *            The descriptor to set.
 	 */
-	public void setDescription (String _description)
+	public void setDescriptor (ActivityDescriptor _descriptor)
 	{
-		this.description = _description ;
+		this.descriptor = _descriptor ;
 	}
 
 	/**
 	 * Getter
-	 * 
-	 * @return Returns the hasMultipleOccurences.
-	 */
-	public boolean isHasMultipleOccurences ()
-	{
-		return this.hasMultipleOccurences ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _hasMultipleOccurences
-	 *            The hasMultipleOccurences to set.
-	 */
-	public void setHasMultipleOccurences (boolean _hasMultipleOccurences)
-	{
-		this.hasMultipleOccurences = _hasMultipleOccurences ;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the id.
-	 */
-	public String getId ()
-	{
-		return this.id ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _id
-	 *            The id to set.
-	 */
-	public void setId (String _id)
-	{
-		this.id = _id ;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the name.
-	 */
-	public String getName ()
-	{
-		return this.name ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _name
-	 *            The name to set.
-	 */
-	public void setName (String _name)
-	{
-		this.name = _name ;
-	}
-
-	/**
-	 * Getter
-	 * 
+	 *
 	 * @return Returns the performingRoles.
 	 */
-	public Collection <RoleDefinition> getPerformingRoles ()
+	public Collection <RoleDescriptor> getPerformingRoles ()
 	{
 		return this.performingRoles ;
 	}
 
 	/**
 	 * Setter
-	 * 
-	 * @param _performingRoles
-	 *            The performingRoles to set.
+	 *
+	 * @param _performingRoles The performingRoles to set.
 	 */
-	public void setPerformingRoles (Collection <RoleDefinition> _performingRoles)
+	public void setPerformingRoles (Collection <RoleDescriptor> _performingRoles)
 	{
 		this.performingRoles = _performingRoles ;
 	}

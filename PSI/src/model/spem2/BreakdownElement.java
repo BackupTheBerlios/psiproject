@@ -113,5 +113,25 @@ public interface BreakdownElement extends ProcessElement
 	 * @param _planningData
 	 */
 	public void setPlanningData (PlanningData _planningData) ;
+	
+	/**
+	 * Gets the real Planning Data associated to the Breakdown Element
+	 * 
+	 * @author Condé Mickaël K.
+	 * @version 1.0
+	 * 
+	 * @return the Planning Data associated to current element
+	 */
+	public PlanningData getRealData () ;
+
+	/**
+	 * Sets the real Planning Data associated to the Breakdown Element
+	 * 
+	 * @author Condé Mickaël K.
+	 * @version 1.0
+	 * 
+	 * @param _planningData
+	 */
+	public void setRealData (PlanningData _realData) ;
 
 }

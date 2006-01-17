@@ -30,7 +30,7 @@ public class ProcessTreeNode extends DefaultMutableTreeNode
 		super() ;
 
 		this.process = _process ;
-		this.setUserObject(process.getName()) ;
+		this.setUserObject(process.getDescriptor().getName()) ;
 
 		/*
 		 * Adding roles to the tree

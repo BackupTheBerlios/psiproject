@@ -45,8 +45,6 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	 */
 	private ActivityDescriptor descriptor ;
 
-	private Collection <RoleDescriptor> performingRoles ;
-
 	/**
 	 * 
 	 */
@@ -337,25 +335,4 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	{
 		this.descriptor = _descriptor ;
 	}
-
-	/**
-	 * Getter
-	 *
-	 * @return Returns the performingRoles.
-	 */
-	public Collection <RoleDescriptor> getPerformingRoles ()
-	{
-		return this.performingRoles ;
-	}
-
-	/**
-	 * Setter
-	 *
-	 * @param _performingRoles The performingRoles to set.
-	 */
-	public void setPerformingRoles (Collection <RoleDescriptor> _performingRoles)
-	{
-		this.performingRoles = _performingRoles ;
-	}
-
 }

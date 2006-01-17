@@ -14,7 +14,9 @@ import model.HumanResource;
 public class ResourceTreeNode extends DefaultMutableTreeNode
 {
 	private static final long serialVersionUID = -2206326976916871308L ;
+	
 	private HumanResource resource = null ;
+	
 	/**
 	 * Constructor
 	 *

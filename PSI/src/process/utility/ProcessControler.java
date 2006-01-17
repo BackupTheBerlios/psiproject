@@ -6,19 +6,22 @@ import java.io.File ;
 import java.io.FileInputStream ;
 import java.io.FileNotFoundException ;
 import java.io.IOException ;
+import java.util.ArrayList ;
 
 import javax.xml.parsers.DocumentBuilder ;
 import javax.xml.parsers.DocumentBuilderFactory ;
 import javax.xml.parsers.ParserConfigurationException ;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document ;
 import org.w3c.dom.Node ;
 import org.w3c.dom.NodeList ;
 import org.xml.sax.SAXException ;
 import org.xml.sax.SAXParseException ;
 
+import model.spem2.BreakdownElement ;
 import model.spem2.DeliveryProcess ;
+import model.spem2.RoleDescriptor ;
+import model.spem2.TaskDescriptor ;
 import process.exception.FileParseException ;
 
 /**
@@ -99,21 +102,20 @@ public class ProcessControler
 				String localDescription = "" ;
 				String localAuthorName = "" ;
 				String localAuthorMail = "" ;
-				
+
 				NodeList localProcessNodeList = localDocument.getElementsByTagName("processus") ;
 				int localChildMax = localProcessNodeList.getLength() ;
 				if (localChildMax != 1) { throw new FileParseException() ; }
-				
+
 				NodeList localPAttribList = localProcessNodeList.item(0).getChildNodes() ;
 				localChildMax = localPAttribList.getLength() ; // ! new meaning
 
-				for(int i = 0 ; i < localChildMax ; i++)
+				for (int i = 0; i < localChildMax; i++ )
 				{
 					/*
 					 * Getting the ID of the process
 					 */
-					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE
-							&& localPAttribList.item(i).getNodeName().equalsIgnoreCase("id"))
+					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE && localPAttribList.item(i).getNodeName().equalsIgnoreCase("id"))
 					{
 						try
 						{
@@ -121,15 +123,14 @@ public class ProcessControler
 						}
 						catch (NullPointerException exc)
 						{
-							localID = "NA" ;
+							localID = "[N/A]" ;
 						}
 					}
-					
+
 					/*
 					 * Getting the name of the process
 					 */
-					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE
-							&& localPAttribList.item(i).getNodeName().equalsIgnoreCase("nom"))
+					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE && localPAttribList.item(i).getNodeName().equalsIgnoreCase("nom"))
 					{
 						try
 						{
@@ -137,15 +138,14 @@ public class ProcessControler
 						}
 						catch (NullPointerException exc)
 						{
-							localName = "NA" ;
+							localName = "[N/A]" ;
 						}
 					}
-					
+
 					/*
 					 * Getting the description of the process
 					 */
-					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE
-							&& localPAttribList.item(i).getNodeName().equalsIgnoreCase("description"))
+					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE && localPAttribList.item(i).getNodeName().equalsIgnoreCase("description"))
 					{
 						try
 						{
@@ -153,15 +153,14 @@ public class ProcessControler
 						}
 						catch (NullPointerException exc)
 						{
-							localDescription = "NA" ;
+							localDescription = "[N/A]" ;
 						}
 					}
-					
+
 					/*
 					 * Getting the author's name
 					 */
-					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE
-							&& localPAttribList.item(i).getNodeName().equalsIgnoreCase("nomAuteur"))
+					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE && localPAttribList.item(i).getNodeName().equalsIgnoreCase("nomAuteur"))
 					{
 						try
 						{
@@ -169,15 +168,14 @@ public class ProcessControler
 						}
 						catch (NullPointerException exc)
 						{
-							localAuthorName = "NA" ;
+							localAuthorName = "[N/A]" ;
 						}
 					}
-					
+
 					/*
 					 * Getting the description of the process
 					 */
-					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE
-							&& localPAttribList.item(i).getNodeName().equalsIgnoreCase("emailAuteur"))
+					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE && localPAttribList.item(i).getNodeName().equalsIgnoreCase("emailAuteur"))
 					{
 						try
 						{
@@ -185,20 +183,140 @@ public class ProcessControler
 						}
 						catch (NullPointerException exc)
 						{
-							localAuthorMail = "NA" ;
+							localAuthorMail = "[N/A]" ;
 						}
 					}
 				}
-				
-				/*
-				 * Step 2 : Roles
-				 */
-				
-				/*
-				 * Step 3 : Activities
-				 */
 
-				return new DeliveryProcess(localID, localName, localDescription, localAuthorName, localAuthorMail) ;
+				DeliveryProcess localProcess = new DeliveryProcess(localID, localName, localDescription, localAuthorName, localAuthorMail) ;
+
+				// Work breakdowns elements
+				ArrayList <BreakdownElement> localNested = new ArrayList <BreakdownElement>() ;
+
+				// Temporary variables for loops
+				int localChildCount ;
+				NodeList localChildList ;
+				// int localLoopBreaker ;
+
+				/*
+				 * Step 2 : Roles (RoleDescriptor)
+				 */
+				NodeList localRolesListRoot = localDocument.getElementsByTagName("liste_role") ;
+				if (localRolesListRoot.getLength() != 1 || localRolesListRoot.item(0).getChildNodes().getLength() == 0) { throw new FileParseException() ; }
+				NodeList localRolesList = localRolesListRoot.item(0).getChildNodes() ;
+				Node localRole ;
+
+				localChildMax = localRolesList.getLength() ;
+				for (int i = 0; i < localChildMax; i++ )
+				{
+					if (localRolesList.item(i).getNodeType() == Node.ELEMENT_NODE && localRolesList.item(i).getNodeName().equalsIgnoreCase("role"))
+					{
+						localRole = localRolesList.item(i) ;
+						localChildList = localRole.getChildNodes() ;
+						localChildCount = localChildList.getLength() ;
+						localName = "" ;
+						localID = "" ;
+						localDescription = "" ;
+
+						for (int j = 0; j < localChildCount; j++ )
+						{
+							/*
+							 * The identifier
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							{
+								try
+								{
+									localID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localID = "[N/A]" ;
+								}
+							}
+
+							/*
+							 * The name
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
+							{
+								try
+								{
+									localName = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localName = "[N/A]" ;
+								}
+							}
+
+						} // End For j
+
+						localNested.add(new RoleDescriptor(localID, localName, localDescription)) ;
+
+					} // End If
+				} // End for i
+
+				/*
+				 * Step 3 : Tasks (TaskDescriptor)
+				 */
+				NodeList localTasksListRoot = localDocument.getElementsByTagName("liste_activite") ;
+				if (localTasksListRoot.getLength() != 1 || localTasksListRoot.item(0).getChildNodes().getLength() == 0) { throw new FileParseException() ; }
+				NodeList localTasksList = localTasksListRoot.item(0).getChildNodes() ;
+				Node localTask ;
+
+				localChildMax = localTasksList.getLength() ;
+				for (int i = 0; i < localChildMax; i++ )
+				{
+					if (localTasksList.item(i).getNodeType() == Node.ELEMENT_NODE && localTasksList.item(i).getNodeName().equalsIgnoreCase("activite"))
+					{
+						localTask = localTasksList.item(i) ;
+						localChildList = localTask.getChildNodes() ;
+						localChildCount = localChildList.getLength() ;
+						localName = "" ;
+						localID = "" ;
+						localDescription = "" ;
+
+						for (int j = 0; j < localChildCount; j++ )
+						{
+							/*
+							 * The identifier
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							{
+								try
+								{
+									localID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localID = "[N/A]" ;
+								}
+							}
+
+							/*
+							 * The name
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
+							{
+								try
+								{
+									localName = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localName = "[N/A]" ;
+								}
+							}
+						} // End For j
+
+						localNested.add(new TaskDescriptor(localID, localName, localDescription)) ;
+
+					} // End If
+				} // End for i
+
+				localProcess.setNestedElements(localNested) ;
+				return localProcess ;
 			}
 			catch (ParserConfigurationException eDBF)
 			{

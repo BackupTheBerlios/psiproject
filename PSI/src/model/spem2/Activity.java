@@ -64,6 +64,24 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	 * Constructor
 	 * 
 	 * @param _id
+	 *            the identifier of the activity
+	 * @param _name
+	 *            the name of the activity
+	 * @param _description
+	 *            the description
+	 */
+	public Activity (String _id, String _name, String _description)
+	{
+		super() ;
+
+		this.descriptor = new ActivityDescriptor(_id, _name, _description) ;
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param _id
+	 *            the identifier of the activity
 	 * @param _name
 	 * @param _description
 	 * @param _authorFullName
@@ -71,11 +89,8 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	 */
 	public Activity (String _id, String _name, String _description, String _authorFullName, String _authorMail)
 	{
-		super() ;
+		this(_id, _name, _description) ;
 
-		/*
-		 * this.id = _id ; this.name = _name ; this.description = _description ;
-		 */
 		this.authorFullName = _authorFullName ;
 		this.authorMail = _authorMail ;
 	}

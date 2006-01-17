@@ -362,6 +362,7 @@ public class MainFrame extends JFrame
 			}
 			catch (FileParseException exc)
 			{
+				System.out.println("processus incorrect") ;
 			}
 		}
 	}

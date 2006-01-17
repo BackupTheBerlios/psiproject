@@ -60,6 +60,22 @@ public class ActivityDescriptor implements Descriptor
 	private String prefix ;
 
 	/**
+	 * Constructor
+	 *
+	 * @param _id
+	 * @param _name
+	 * @param _description
+	 */
+	public ActivityDescriptor (String _id, String _name, String _description)
+	{
+		super() ;
+
+		this.id = _id ;
+		this.name = _name ;
+		this.description = _description ;
+	}
+
+	/**
 	 * Getter
 	 * 
 	 * @return Returns the hasMultipleOccurences.

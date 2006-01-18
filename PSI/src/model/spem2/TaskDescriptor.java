@@ -91,6 +91,8 @@ public class TaskDescriptor implements Descriptor
 		this.id = _id ;
 		this.name = _name ;
 		this.description = _description ;
+		this.planningData = new PlanningData();
+		this.realData = new PlanningData();
 	}
 
 	/**

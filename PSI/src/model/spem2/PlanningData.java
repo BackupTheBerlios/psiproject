@@ -51,6 +51,15 @@ public class PlanningData implements ProcessElement
 		this.rank = _rank ;
 		this.duration = _duration ;
 	}
+	
+	public PlanningData()
+	{
+		super() ;
+		this.startDate = new Date();
+		this.finishDate = new Date();
+		this.rank = 0;
+		this.duration = 0;		
+	}
 
 	/**
 	 * Getter

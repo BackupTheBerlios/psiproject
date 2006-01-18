@@ -5,8 +5,10 @@ import java.awt.HeadlessException ;
 import java.awt.event.ActionEvent ;
 import java.io.File ;
 
+import ui.misc.JPanelTaskDescriptor;
 import ui.resource.Bundle ;
 import ui.tree.ProjectTreeNode ;
+import ui.tree.TaskDescriptorTreeNode;
 
 import javax.swing.AbstractAction ;
 import javax.swing.JFileChooser ;
@@ -19,11 +21,14 @@ import javax.swing.JMenuItem ;
 import javax.swing.JTree ;
 import javax.swing.JPanel ;
 import javax.swing.JTabbedPane ;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter ;
 import javax.swing.tree.DefaultMutableTreeNode ;
 import javax.swing.tree.DefaultTreeModel;
 
 import model.Project ;
+import model.spem2.*;
 
 import process.Preferences ;
 import process.exception.FileParseException ;
@@ -682,6 +687,16 @@ public class MainFrame extends JFrame
 			DefaultMutableTreeNode localNode = new DefaultMutableTreeNode(Bundle.getText("MainFrameTreeDefault")) ;
 			DefaultTreeModel localDTM = new DefaultTreeModel(localNode) ;
 			projectTree = new JTree(localDTM) ;
+			projectTree.addTreeSelectionListener(new TreeSelectionListener()
+					{
+						public void valueChanged(TreeSelectionEvent e)
+						{
+							 DefaultMutableTreeNode d = (DefaultMutableTreeNode)e.getPath().getLastPathComponent();
+				                if(d instanceof TaskDescriptorTreeNode) // si le noeud est un projet
+				                    afficherTaskDescriptor(((TaskDescriptorTreeNode)d).getTaskDescriptor());
+						}
+					}
+			);
 		}
 		return projectTree ;
 	}
@@ -794,6 +809,13 @@ public class MainFrame extends JFrame
 			statusPanel = new JPanel() ;
 		}
 		return statusPanel ;
+	}
+	
+	private void afficherTaskDescriptor(TaskDescriptor _task)
+	{
+		 mainContainer.removeAll();
+	     mainContainer.add(new JPanelTaskDescriptor(_task));
+	     this.validate();
 	}
 
 } // @jve:decl-index=0:visual-constraint="158,10"

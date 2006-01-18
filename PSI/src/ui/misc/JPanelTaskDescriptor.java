@@ -8,6 +8,8 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import ui.resource.Bundle;
 import model.spem2.TaskDescriptor;
+import java.util.Locale;
+import java.text.DateFormat;
 /**
  * JPanelTaskDescriptor : TODO type description
  *
@@ -27,6 +29,8 @@ public class JPanelTaskDescriptor extends JPanel
 	private Object[][] donnees = null ;
 	private javax.swing.JTable table;
 	private javax.swing.JScrollPane tableScrollPane;
+	private Locale locale = Locale.getDefault();
+	private DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, locale);
 	/**
 	 * This is the default constructor
 	 */
@@ -35,12 +39,12 @@ public class JPanelTaskDescriptor extends JPanel
 		super() ;
 		donnees = new Object[2][4];
 		
-		donnees[0][0] = Bundle.getText("JTaskDescriptorRow1");
-		donnees[1][0] = Bundle.getText("JTaskDescriptorRow2");
-		donnees[0][1] = (_task.getPlanningData()).getStartDate();
-		donnees[1][1] = (_task.getRealData()).getStartDate();
-		donnees[0][2] = (_task.getPlanningData()).getFinishDate();
-		donnees[1][2] = (_task.getRealData()).getFinishDate();
+		donnees[0][0] = Bundle.getText("JPanelTaskDescriptorRow1");
+		donnees[1][0] = Bundle.getText("JPanelTaskDescriptorRow2");
+		donnees[0][1] = dateFormat.format((_task.getPlanningData()).getStartDate());
+		donnees[1][1] = dateFormat.format((_task.getRealData()).getStartDate());
+		donnees[0][2] = dateFormat.format((_task.getPlanningData()).getFinishDate());
+		donnees[1][2] = dateFormat.format((_task.getRealData()).getFinishDate());
 		donnees[0][3] = (_task.getPlanningData()).getDuration();
 		donnees[1][3] = (_task.getRealData()).getDuration();
 		
@@ -133,5 +137,6 @@ class ModelTableTaskDescriptor extends AbstractTableModel
     }
 	
 	
-
+	
 }
+

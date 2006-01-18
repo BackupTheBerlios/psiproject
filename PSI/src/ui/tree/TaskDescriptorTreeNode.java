@@ -32,5 +32,10 @@ public class TaskDescriptorTreeNode extends DefaultMutableTreeNode
 		this.task = _task ;
 		this.setUserObject(task.getName()) ;
 	}
+	
+	public TaskDescriptor getTaskDescriptor()
+	{
+		return this.task;
+	}
 
 }

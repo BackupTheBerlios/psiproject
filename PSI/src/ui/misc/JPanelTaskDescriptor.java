@@ -10,6 +10,8 @@ import ui.resource.Bundle;
 import model.spem2.TaskDescriptor;
 import java.util.Locale;
 import java.text.DateFormat;
+import javax.swing.event.*;
+
 /**
  * JPanelTaskDescriptor : TODO type description
  *
@@ -94,6 +96,7 @@ class ModelTableTaskDescriptor extends AbstractTableModel
 	{
 		this.donnees = donnees;
 	    this.titres = titres;
+	   
 	}
 
 	
@@ -124,6 +127,12 @@ class ModelTableTaskDescriptor extends AbstractTableModel
 		return donnees[ligne][colonne];
 	}
 	
+	public void setValueAt (Object value, int ligne, int colonne)
+	{
+		donnees[ligne][colonne]= value;
+		fireTableChanged (new TableModelEvent (this, ligne, ligne, colonne));
+	}
+	
 	public String getColumnName(int colonne)
 	{
 	    return titres[colonne];
@@ -135,7 +144,6 @@ class ModelTableTaskDescriptor extends AbstractTableModel
         if (col == 0) return false;
         else return true;
     }
-	
 	
 	
 }

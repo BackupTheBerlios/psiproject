@@ -1,11 +1,12 @@
-package model.spem2;
+
+package model.spem2 ;
 
 /**
  * ActivityDescriptor : textual definition of an activity
- *
+ * 
  * @author Condé Mickaël K.
  * @version 1.0
- *
+ * 
  */
 public class ActivityDescriptor implements Descriptor
 {
@@ -23,6 +24,13 @@ public class ActivityDescriptor implements Descriptor
 	 * The description of the element
 	 */
 	private String description ;
+
+	/**
+	 * The parent ID of the element : Component
+	 * 
+	 * @see Component
+	 */
+	private String parentId ;
 
 	/**
 	 * The estimation associated to this element
@@ -61,18 +69,20 @@ public class ActivityDescriptor implements Descriptor
 
 	/**
 	 * Constructor
-	 *
+	 * 
 	 * @param _id
 	 * @param _name
 	 * @param _description
+	 * @param _parentId
 	 */
-	public ActivityDescriptor (String _id, String _name, String _description)
+	public ActivityDescriptor (String _id, String _name, String _description, String _parentId)
 	{
 		super() ;
 
 		this.id = _id ;
 		this.name = _name ;
 		this.description = _description ;
+		this.parentId = _parentId ;
 	}
 
 	/**
@@ -224,7 +234,7 @@ public class ActivityDescriptor implements Descriptor
 
 	/**
 	 * Getter
-	 *
+	 * 
 	 * @return Returns the description.
 	 */
 	public String getDescription ()
@@ -234,8 +244,9 @@ public class ActivityDescriptor implements Descriptor
 
 	/**
 	 * Setter
-	 *
-	 * @param _description The description to set.
+	 * 
+	 * @param _description
+	 *            The description to set.
 	 */
 	public void setDescription (String _description)
 	{
@@ -244,7 +255,7 @@ public class ActivityDescriptor implements Descriptor
 
 	/**
 	 * Getter
-	 *
+	 * 
 	 * @return Returns the id.
 	 */
 	public String getId ()
@@ -254,8 +265,9 @@ public class ActivityDescriptor implements Descriptor
 
 	/**
 	 * Setter
-	 *
-	 * @param _id The id to set.
+	 * 
+	 * @param _id
+	 *            The id to set.
 	 */
 	public void setId (String _id)
 	{
@@ -264,7 +276,7 @@ public class ActivityDescriptor implements Descriptor
 
 	/**
 	 * Getter
-	 *
+	 * 
 	 * @return Returns the name.
 	 */
 	public String getName ()
@@ -274,11 +286,33 @@ public class ActivityDescriptor implements Descriptor
 
 	/**
 	 * Setter
-	 *
-	 * @param _name The name to set.
+	 * 
+	 * @param _name
+	 *            The name to set.
 	 */
 	public void setName (String _name)
 	{
 		this.name = _name ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the parentId.
+	 */
+	public String getParentId ()
+	{
+		return this.parentId ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _parentId
+	 *            The parentId to set.
+	 */
+	public void setParentId (String _parentId)
+	{
+		this.parentId = _parentId ;
 	}
 }

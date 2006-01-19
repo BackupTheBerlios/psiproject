@@ -1,6 +1,7 @@
 
 package model.spem2 ;
 
+import java.util.ArrayList ;
 import java.util.Collection ;
 
 /**
@@ -48,12 +49,17 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	/**
 	 * 
 	 */
-	private String authorFullName ;
+	private String interfaceDiagramPath ;
 
 	/**
 	 * 
 	 */
-	private String authorMail ;
+	private String flowDiagramPath ;
+
+	/**
+	 * 
+	 */
+	private String activityDiagramPath ;
 
 	/**
 	 * An activity is composed of Breakdown Elements
@@ -70,29 +76,28 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	 * @param _description
 	 *            the description
 	 */
-	public Activity (String _id, String _name, String _description)
+	public Activity (String _id, String _name, String _description, String _parentId)
 	{
 		super() ;
-
-		this.descriptor = new ActivityDescriptor(_id, _name, _description) ;
+		nestedElements = new ArrayList <BreakdownElement>() ;
+		this.descriptor = new ActivityDescriptor(_id, _name, _description, _parentId) ;
 	}
 
 	/**
 	 * Constructor
 	 * 
-	 * @param _id
-	 *            the identifier of the activity
-	 * @param _name
-	 * @param _description
-	 * @param _authorFullName
-	 * @param _authorMail
+	 * @param _interfaceDiagramPath
+	 * @param _flowDiagramPath
+	 * @param _activityDiagramPath
 	 */
-	public Activity (String _id, String _name, String _description, String _authorFullName, String _authorMail)
+	public Activity (String _id, String _name, String _description, String _parentId, String _interfaceDiagramPath, String _flowDiagramPath,
+			String _activityDiagramPath)
 	{
-		this(_id, _name, _description) ;
+		this(_id, _name, _description, _parentId) ;
 
-		this.authorFullName = _authorFullName ;
-		this.authorMail = _authorMail ;
+		this.interfaceDiagramPath = _interfaceDiagramPath ;
+		this.flowDiagramPath = _flowDiagramPath ;
+		this.activityDiagramPath = _activityDiagramPath ;
 	}
 
 	/**
@@ -291,48 +296,6 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	/**
 	 * Getter
 	 * 
-	 * @return Returns the authorFullName.
-	 */
-	public String getAuthorFullName ()
-	{
-		return this.authorFullName ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _authorFullName
-	 *            The authorFullName to set.
-	 */
-	public void setAuthorFullName (String _authorFullName)
-	{
-		this.authorFullName = _authorFullName ;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the authorMail.
-	 */
-	public String getAuthorMail ()
-	{
-		return this.authorMail ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _authorMail
-	 *            The authorMail to set.
-	 */
-	public void setAuthorMail (String _authorMail)
-	{
-		this.authorMail = _authorMail ;
-	}
-
-	/**
-	 * Getter
-	 * 
 	 * @return Returns the descriptor.
 	 */
 	public ActivityDescriptor getDescriptor ()
@@ -349,5 +312,68 @@ public class Activity implements WorkBreakdownElement, WorkDefinition
 	public void setDescriptor (ActivityDescriptor _descriptor)
 	{
 		this.descriptor = _descriptor ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the activityDiagramPath.
+	 */
+	public String getActivityDiagramPath ()
+	{
+		return this.activityDiagramPath ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _activityDiagramPath
+	 *            The activityDiagramPath to set.
+	 */
+	public void setActivityDiagramPath (String _activityDiagramPath)
+	{
+		this.activityDiagramPath = _activityDiagramPath ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the flowDiagramPath.
+	 */
+	public String getFlowDiagramPath ()
+	{
+		return this.flowDiagramPath ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _flowDiagramPath
+	 *            The flowDiagramPath to set.
+	 */
+	public void setFlowDiagramPath (String _flowDiagramPath)
+	{
+		this.flowDiagramPath = _flowDiagramPath ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the interfaceDiagramPath.
+	 */
+	public String getInterfaceDiagramPath ()
+	{
+		return this.interfaceDiagramPath ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _interfaceDiagramPath
+	 *            The interfaceDiagramPath to set.
+	 */
+	public void setInterfaceDiagramPath (String _interfaceDiagramPath)
+	{
+		this.interfaceDiagramPath = _interfaceDiagramPath ;
 	}
 }

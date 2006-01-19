@@ -1,7 +1,10 @@
 
 package model.spem2 ;
 
+import java.util.ArrayList ;
 import java.util.Collection ;
+
+import model.HumanResource ;
 
 /**
  * RoleDescriptor : a role within a project
@@ -26,6 +29,13 @@ public class RoleDescriptor implements Descriptor
 	 * The description of the element
 	 */
 	private String description ;
+
+	/**
+	 * The parent identifier : Component
+	 * 
+	 * @see Component
+	 */
+	private String parentId ;
 
 	/**
 	 * The estimation associated to this element
@@ -63,6 +73,11 @@ public class RoleDescriptor implements Descriptor
 	private String prefix ;
 
 	/**
+	 * The actual performers
+	 */
+	private Collection <HumanResource> performers ;
+
+	/**
 	 * The main tasks of the role
 	 */
 	private Collection <TaskDescriptor> primaryTasks ;
@@ -83,14 +98,21 @@ public class RoleDescriptor implements Descriptor
 	 * @param _id
 	 * @param _name
 	 * @param _description
+	 * @param _parentId
 	 */
-	public RoleDescriptor (String _id, String _name, String _description)
+	public RoleDescriptor (String _id, String _name, String _description, String _parentId)
 	{
 		super() ;
 
 		this.id = _id ;
 		this.name = _name ;
 		this.description = _description ;
+		this.parentId = _parentId ;
+
+		primaryTasks = new ArrayList <TaskDescriptor>() ;
+		additionalTasks = new ArrayList <TaskDescriptor>() ;
+		assistingTasks = new ArrayList <TaskDescriptor>() ;
+		performers = new ArrayList <HumanResource>() ;
 	}
 
 	/**
@@ -302,7 +324,6 @@ public class RoleDescriptor implements Descriptor
 	{
 		this.name = _name ;
 	}
-	
 
 	/**
 	 * Getter
@@ -313,7 +334,6 @@ public class RoleDescriptor implements Descriptor
 	{
 		return this.additionalTasks ;
 	}
-	
 
 	/**
 	 * Setter
@@ -325,7 +345,6 @@ public class RoleDescriptor implements Descriptor
 	{
 		this.additionalTasks = _additionalTasks ;
 	}
-	
 
 	/**
 	 * Getter
@@ -336,7 +355,6 @@ public class RoleDescriptor implements Descriptor
 	{
 		return this.assistingTasks ;
 	}
-	
 
 	/**
 	 * Setter
@@ -348,7 +366,6 @@ public class RoleDescriptor implements Descriptor
 	{
 		this.assistingTasks = _assistingTasks ;
 	}
-	
 
 	/**
 	 * Getter
@@ -359,7 +376,6 @@ public class RoleDescriptor implements Descriptor
 	{
 		return this.primaryTasks ;
 	}
-	
 
 	/**
 	 * Setter
@@ -370,6 +386,47 @@ public class RoleDescriptor implements Descriptor
 	public void setPrimaryTasks (Collection <TaskDescriptor> _primaryTasks)
 	{
 		this.primaryTasks = _primaryTasks ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the parentId.
+	 */
+	public String getParentId ()
+	{
+		return this.parentId ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _parentId
+	 *            The parentId to set.
+	 */
+	public void setParentId (String _parentId)
+	{
+		this.parentId = _parentId ;
+	}
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the performers.
+	 */
+	public Collection <HumanResource> getPerformers ()
+	{
+		return this.performers ;
+	}
+
+	/**
+	 * Setter
+	 *
+	 * @param _performers The performers to set.
+	 */
+	public void setPerformers (Collection <HumanResource> _performers)
+	{
+		this.performers = _performers ;
 	}
 
 }

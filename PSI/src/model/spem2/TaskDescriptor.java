@@ -1,6 +1,7 @@
 
 package model.spem2 ;
 
+import java.util.ArrayList ;
 import java.util.Collection ;
 
 /**
@@ -26,6 +27,13 @@ public class TaskDescriptor implements Descriptor
 	 * The description of the element
 	 */
 	private String description ;
+
+	/**
+	 * The parent ID of the element
+	 * 
+	 * @see
+	 */
+	private String parentId ;
 
 	/**
 	 * The estimation associated to this element
@@ -79,20 +87,27 @@ public class TaskDescriptor implements Descriptor
 
 	/**
 	 * Constructor
-	 *
+	 * 
 	 * @param _id
 	 * @param _name
 	 * @param _description
+	 * @param _parentId
 	 */
-	public TaskDescriptor (String _id, String _name, String _description)
+	public TaskDescriptor (String _id, String _name, String _description, String _parentId)
 	{
 		super() ;
 
 		this.id = _id ;
 		this.name = _name ;
 		this.description = _description ;
-		this.planningData = new PlanningData();
-		this.realData = new PlanningData();
+		this.parentId = _parentId ;
+
+		primaryPerformers = new ArrayList <RoleDescriptor>() ;
+		additionalPerformers = new ArrayList <RoleDescriptor>() ;
+		assistingPerformers = new ArrayList <RoleDescriptor>() ;
+
+		this.planningData = new PlanningData() ;
+		this.realData = new PlanningData() ;
 	}
 
 	/**
@@ -366,6 +381,27 @@ public class TaskDescriptor implements Descriptor
 	public void setAssistingPerformers (Collection <RoleDescriptor> _assistingPerformers)
 	{
 		this.assistingPerformers = _assistingPerformers ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the parentId.
+	 */
+	public String getParentId ()
+	{
+		return this.parentId ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _parentId
+	 *            The parentId to set.
+	 */
+	public void setParentId (String _parentId)
+	{
+		this.parentId = _parentId ;
 	}
 
 }

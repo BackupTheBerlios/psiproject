@@ -52,6 +52,10 @@ public class PlanningData implements ProcessElement
 		this.duration = _duration ;
 	}
 	
+	/**
+	 * Constructor
+	 *
+	 */
 	public PlanningData()
 	{
 		super() ;

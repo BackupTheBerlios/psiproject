@@ -1,6 +1,11 @@
 
 package model ;
 
+import java.util.ArrayList ;
+import java.util.Collection ;
+
+import model.spem2.RoleDescriptor ;
+
 /**
  * HumanResource : a member working on a project
  * 
@@ -25,9 +30,11 @@ public class HumanResource
 	 */
 	private String email ;
 
+	private Collection <RoleDescriptor> performingRoles ;
+
 	/**
 	 * Constructor
-	 *
+	 * 
 	 * @param _id
 	 * @param _fullName
 	 */
@@ -37,11 +44,13 @@ public class HumanResource
 
 		this.id = _id ;
 		this.fullName = _fullName ;
+
+		performingRoles = new ArrayList <RoleDescriptor>() ;
 	}
 
 	/**
 	 * Constructor
-	 *
+	 * 
 	 * @param _id
 	 * @param _fullName
 	 * @param _email
@@ -113,6 +122,27 @@ public class HumanResource
 	public void setEmail (String _email)
 	{
 		this.email = _email ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the performingRoles.
+	 */
+	public Collection <RoleDescriptor> getPerformingRoles ()
+	{
+		return this.performingRoles ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _performingRoles
+	 *            The performingRoles to set.
+	 */
+	public void setPerformingRoles (Collection <RoleDescriptor> _performingRoles)
+	{
+		this.performingRoles = _performingRoles ;
 	}
 
 }

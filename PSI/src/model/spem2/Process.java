@@ -13,8 +13,18 @@ public class Process extends Activity
 {
 
 	/**
-	 * Constructor
 	 * 
+	 */
+	private String authorFullName ;
+
+	/**
+	 * 
+	 */
+	private String authorMail ;
+
+	/**
+	 * Constructor
+	 *
 	 * @param _id
 	 * @param _name
 	 * @param _description
@@ -23,6 +33,50 @@ public class Process extends Activity
 	 */
 	public Process (String _id, String _name, String _description, String _authorFullName, String _authorMail)
 	{
-		super(_id, _name, _description, _authorFullName, _authorMail) ;
+		super(_id, _name, _description, "") ;
+
+		this.authorFullName = _authorFullName ;
+		this.authorMail = _authorMail ;
 	}
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the authorFullName.
+	 */
+	public String getAuthorFullName ()
+	{
+		return this.authorFullName ;
+	}
+
+	/**
+	 * Setter
+	 *
+	 * @param _authorFullName The authorFullName to set.
+	 */
+	public void setAuthorFullName (String _authorFullName)
+	{
+		this.authorFullName = _authorFullName ;
+	}
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the authorMail.
+	 */
+	public String getAuthorMail ()
+	{
+		return this.authorMail ;
+	}
+
+	/**
+	 * Setter
+	 *
+	 * @param _authorMail The authorMail to set.
+	 */
+	public void setAuthorMail (String _authorMail)
+	{
+		this.authorMail = _authorMail ;	}
+
+	
 }

@@ -17,12 +17,11 @@ public class Iteration extends Activity
 	 * @param _id
 	 * @param _name
 	 * @param _description
-	 * @param _authorFullName
-	 * @param _authorMail
+	 * @param _parentId
 	 */
-	public Iteration (String _id, String _name, String _description, String _authorFullName, String _authorMail)
+	public Iteration (String _id, String _name, String _description, String _parentId)
 	{
-		super(_id, _name, _description, _authorFullName, _authorMail) ;
+		super(_id, _name, _description, _parentId) ;
 	}
 
 }

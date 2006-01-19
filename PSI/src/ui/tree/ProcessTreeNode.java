@@ -2,16 +2,13 @@
 package ui.tree ;
 
 import java.util.Collection ;
-import java.util.Iterator;
+import java.util.Iterator ;
 
 import javax.swing.tree.DefaultMutableTreeNode ;
 
-import ui.resource.Bundle ;
-
+import model.Component ;
 import model.spem2.BreakdownElement ;
 import model.spem2.DeliveryProcess ;
-import model.spem2.RoleDescriptor;
-import model.spem2.TaskDescriptor ;
 
 /**
  * ProcessTreeNode : tree like representation of a Delivery Process
@@ -41,29 +38,42 @@ public class ProcessTreeNode extends DefaultMutableTreeNode
 		/*
 		 * Adding elements to the tree
 		 */
-		DefaultMutableTreeNode localTaskNode = new DefaultMutableTreeNode(Bundle.getText("MainFrameTreeActivities")) ;
-		DefaultMutableTreeNode localRoleNode = new DefaultMutableTreeNode(Bundle.getText("MainFrameTreeRoles")) ;
 		Collection <BreakdownElement> localNested = process.getNestedElements() ;
+
 		BreakdownElement localElement ;
-		Iterator<BreakdownElement> localIterator = localNested.iterator() ;
-		
+		Iterator <BreakdownElement> localIterator = localNested.iterator() ;
+
 		while (localIterator.hasNext())
 		{
 			localElement = localIterator.next() ;
 
-			if (localElement instanceof TaskDescriptor)
+			if (localElement instanceof Component)
 			{
-				localTaskNode.add(new TaskDescriptorTreeNode((TaskDescriptor)localElement)) ;
-			}
-
-			else if (localElement instanceof RoleDescriptor)
-			{
-				localRoleNode.add(new RoleDescriptorTreeNode((RoleDescriptor)localElement)) ;
+				this.add(new ComponentTreeNode((Component) localElement)) ;
 			}
 		}
-		
-		this.add(localTaskNode) ;
-		this.add(localRoleNode) ;
 	}
 
+	
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the process.
+	 */
+	public DeliveryProcess getProcess ()
+	{
+		return this.process ;
+	}
+
+	
+	/**
+	 * Setter
+	 * 
+	 * @param _process
+	 *            The process to set.
+	 */
+	public void setProcess (DeliveryProcess _process)
+	{
+		this.process = _process ;
+	}
 }

@@ -36,7 +36,7 @@ public interface Descriptor extends BreakdownElement
 	public void setSynchronizedWithSource (boolean _isSynchronizedWithSource) ;
 
 	/**
-	 * TODO Method description
+	 * Returns the identifier of the current element
 	 * 
 	 * @author Condé Mickaël K.
 	 * @version 1.0
@@ -46,7 +46,7 @@ public interface Descriptor extends BreakdownElement
 	public String getId () ;
 
 	/**
-	 * TODO Method description
+	 * Sets the identifier with a new value
 	 * 
 	 * @author Condé Mickaël K.
 	 * @version 1.0
@@ -56,7 +56,7 @@ public interface Descriptor extends BreakdownElement
 	public void setId (String _id) ;
 
 	/**
-	 * TODO Method description
+	 * Gets the name of the current element
 	 * 
 	 * @author Condé Mickaël K.
 	 * @version 1.0
@@ -66,7 +66,7 @@ public interface Descriptor extends BreakdownElement
 	public String getName () ;
 
 	/**
-	 * TODO Method description
+	 * Sets the name with a new value
 	 * 
 	 * @author Condé Mickaël K.
 	 * @version 1.0
@@ -76,7 +76,7 @@ public interface Descriptor extends BreakdownElement
 	public void setName (String _name) ;
 
 	/**
-	 * TODO Method description
+	 * Gets the description of the current element
 	 * 
 	 * @author Condé Mickaël K.
 	 * @version 1.0
@@ -86,7 +86,7 @@ public interface Descriptor extends BreakdownElement
 	public String getDescription () ;
 
 	/**
-	 * TODO Method description
+	 * Sets the description with a new value
 	 * 
 	 * @author Condé Mickaël K.
 	 * @version 1.0
@@ -94,5 +94,25 @@ public interface Descriptor extends BreakdownElement
 	 * @param _description
 	 */
 	public void setDescription (String _description) ;
+	
+	/**
+	 * Gets the parent ID of the current element
+	 * 
+	 * @author Condé Mickaël K.
+	 * @version 1.0
+	 * 
+	 * @return
+	 */
+	public String getParentId () ;
+
+	/**
+	 * Sets the parent ID with a new value
+	 * 
+	 * @author Condé Mickaël K.
+	 * @version 1.0
+	 * 
+	 * @param _description
+	 */
+	public void setParentId (String _parentId) ;
 
 }

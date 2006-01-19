@@ -6,7 +6,7 @@ import java.util.Date ;
 /**
  * LogInformation : basic information on user's actions
  * 
- * @author Condé Mickaël K.
+ * @author Cond? Micka?l K.
  * @version 1.0
  * 
  */
@@ -25,7 +25,7 @@ public class LogInformation
 	/**
 	 * Success or failure
 	 */
-	private String result ;
+	private boolean success ;
 
 	/**
 	 * Constructor
@@ -34,13 +34,13 @@ public class LogInformation
 	 * @param _name
 	 * @param _result
 	 */
-	public LogInformation (Date _date, String _name, String _result)
+	public LogInformation (Date _date, String _name, boolean _success)
 	{
 		super() ;
-		// TODO Auto-generated constructor stub
+
 		this.date = _date ;
 		this.name = _name ;
-		this.result = _result ;
+		this.success = _success ;
 	}
 
 	/**
@@ -87,22 +87,23 @@ public class LogInformation
 
 	/**
 	 * Getter
-	 * 
-	 * @return Returns the result.
+	 *
+	 * @return Returns the success.
 	 */
-	public String getResult ()
+	public boolean isSuccess ()
 	{
-		return this.result ;
+		return this.success ;
 	}
 
 	/**
 	 * Setter
-	 * 
-	 * @param _result
-	 *            The result to set.
+	 *
+	 * @param _success The success to set.
 	 */
-	public void setResult (String _result)
+	public void setSuccess (boolean _success)
 	{
-		this.result = _result ;
+		this.success = _success ;
 	}
+
+	
 }

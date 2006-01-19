@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent ;
 import java.io.File ;
 
 import ui.misc.JPanelTaskDescriptor;
+import ui.misc.LogPanel;
 import ui.resource.Bundle ;
 import ui.tree.ProjectTreeNode ;
 import ui.tree.TaskDescriptorTreeNode;
@@ -19,7 +20,6 @@ import javax.swing.JMenu ;
 
 import javax.swing.JMenuItem ;
 import javax.swing.JTree ;
-import javax.swing.JPanel ;
 import javax.swing.JTabbedPane ;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -35,12 +35,13 @@ import process.exception.FileParseException ;
 import process.utility.ProcessControler;
 import process.utility.ProjectControler ;
 
+
 /**
- * PSI Main window
- * 
- * @author Cond? Mickael K.
+ * MainFrame : PSI main window
+ *
+ * @author Conde Mickael K.
  * @version 1.0
- * 
+ *
  */
 public class MainFrame extends JFrame
 {
@@ -95,8 +96,10 @@ public class MainFrame extends JFrame
 	private JSplitPane rightSplitPane = null ;
 
 	private JTabbedPane mainContainer = null ;
+	
+	private JTabbedPane logContainer = null ;
 
-	private JPanel statusPanel = null ;
+	private LogPanel statusPanel = null ;
 
 	private Project currentProject = null ;
 
@@ -174,7 +177,6 @@ public class MainFrame extends JFrame
 		this.setName("mainFrame") ;
 		this.setContentPane(getMainSplitPane()) ;
 		this.setJMenuBar(getMainJMenuBar()) ;
-		this.setContentPane(getMainSplitPane()) ;
 		this.setTitle("Project Supervising Indicators") ;
 		this.setLocation(localPrefs.getXPosition(), localPrefs.getYPosition()) ;
 
@@ -777,7 +779,7 @@ public class MainFrame extends JFrame
 			rightSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT) ;
 			rightSplitPane.setResizeWeight(0.8D) ;
 			rightSplitPane.setTopComponent(getMainContainer()) ;
-			rightSplitPane.setBottomComponent(getStatusPanel()) ;
+			rightSplitPane.setBottomComponent(getLogContainer()) ;
 
 		}
 		return rightSplitPane ;
@@ -796,17 +798,32 @@ public class MainFrame extends JFrame
 		}
 		return mainContainer ;
 	}
+	
+	/**
+	 * This method initializes logContainer
+	 * 
+	 * @return javax.swing.JTabbedPane
+	 */
+	private JTabbedPane getLogContainer ()
+	{
+		if (logContainer == null)
+		{
+			logContainer = new JTabbedPane() ;
+			logContainer.add(Bundle.getText("MainFrameLogTab"), getStatusPanel()) ;
+		}
+		return logContainer ;
+	}
 
 	/**
 	 * This method initializes statusPanel
 	 * 
 	 * @return javax.swing.JPanel
 	 */
-	private JPanel getStatusPanel ()
+	private LogPanel getStatusPanel ()
 	{
 		if (statusPanel == null)
 		{
-			statusPanel = new JPanel() ;
+			statusPanel = new LogPanel() ;
 		}
 		return statusPanel ;
 	}

@@ -1,5 +1,6 @@
 package ui.dialog;
 
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
 
 import javax.swing.JButton;
@@ -8,6 +9,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import ui.resource.Bundle;
@@ -65,7 +67,8 @@ public class PreferenceDialog
 		if (jDialog == null)
 		{
 			jDialog = new JDialog();
-			jDialog.add(getJTabbedPaneOnglets());
+			jDialog.setLayout(new BorderLayout());
+			jDialog.add(getJTabbedPaneOnglets(), BorderLayout.CENTER);
 			jDialog.add(getJPanelValider(),BorderLayout.SOUTH);
 									
 		}

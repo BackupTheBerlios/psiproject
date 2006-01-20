@@ -22,8 +22,10 @@ import ui.resource.Bundle;
 public class PreferenceDialog
 {
 	private JDialog jDialog = null;
+	private JTabbedPane jTabbedPaneOnglets = null;
 	
-	// Variables de l'onglet General
+	
+	// General Panel
 	private JPanel jPanelGeneral = null;
 	private JPanel jPanelGeneralChoixLangue = null;
 	private JPanel jPanelGeneralDefautLangage = null;
@@ -35,7 +37,7 @@ public class PreferenceDialog
 	private JCheckBox jCheckBoxDefautLangage = null;
 	private JComboBox jComboBoxLook = null;
 	
-	// Variables de l'onglet Travail
+	// Travail Panel
 	private JPanel jPanelTravail = null;
 	private JPanel jPanelTravailRepertoireTravail = null;
 	private JPanel jPanelTravailRepertoireExport = null;
@@ -52,23 +54,38 @@ public class PreferenceDialog
 	private JCheckBox jCheckBoxDernierProjet = null;
 	private JCheckBox jCheckBoxAide = null;
 	
-	// Panel avec les boutons OK et Annuler
+	// Buttons OK And Cancel/Annuler
 	private JPanel jPanelValider = null;
 	private JButton jButtonPreferenceOK = null;
 	private JButton jButtonPreferenceCancel = null;
-		
+	
 	
 	public JDialog getJDialog()
 	{
 		if (jDialog == null)
 		{
-			jDialog = new JDialog();				
+			jDialog = new JDialog();
+			jDialog.add(getJTabbedPaneOnglets);
+			jDialog.add(getJPanelValider(),BorderLayout.SOUTH);
+									
 		}
 		
 		return jDialog;
 	}
 	
-	//Methodes de l'onglet General
+	public JTabbedPane getJTabbedPaneOnglets()
+	{
+		if (jTabbedPaneOnglets == null)
+		{
+			jTabbedPaneOnglets = new JTabbedPane();
+			jTabbedPaneOnglets.addTab(Bundle.getText("JPanelPreferenceGeneralLabel"),getJPanelGeneral());
+			jTabbedPaneOnglets.addTab(Bundle.getText("JPanelPreferenceTravailLabel"),getJPanelTravail());
+		}
+		
+		return jTabbedPaneOnglets;
+	}
+	
+	// General methods
 	public JPanel getJPanelGeneral()
 	{
 		if (jPanelGeneral == null)
@@ -135,9 +152,9 @@ public class PreferenceDialog
 		
 		return jPanelGeneralLook;
 	}
-	// Fin methodes de l'onglet General
+	// End General methods
 	
-	// Methodes de l'onglet Travail
+	// Travail methods
 	public JPanel getJPanelTravail()
 	{
 		if (jPanelTravail == null)
@@ -228,7 +245,8 @@ public class PreferenceDialog
 		return jPanelTravailRepertoireExport;
 	}
 	
-	//	 Fin methodes de l'onglet Travail
+	//	End Travail methods
+	
 	
 	public JPanel getJPanelValider()
 	{
@@ -237,11 +255,13 @@ public class PreferenceDialog
 			jPanelValider = new JPanel();
 			jButtonPreferenceOK = new JButton();
 			jButtonPreferenceCancel = new JButton();
-			
+			jButtonPreferenceOK.setText(Bundle.getText("JPanelValiderOKLabel"));
+			jButtonPreferenceCancel.setText(Bundle.getText("JPanelValiderCancelLabel"));
 			jPanelValider.add(jButtonPreferenceOK);
 			jPanelValider.add(jButtonPreferenceCancel);
 		}
 		
-		return jPanelGeneral;
-	}
+		return jPanelValider;
+	}	
+	
 }

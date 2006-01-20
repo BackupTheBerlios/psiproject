@@ -52,6 +52,11 @@ public class PreferenceDialog
 	private JCheckBox jCheckBoxDernierProjet = null;
 	private JCheckBox jCheckBoxAide = null;
 	
+	// Panel avec les boutons OK et Annuler
+	private JPanel jPanelValider = null;
+	private JButton jButtonPreferenceOK = null;
+	private JButton jButtonPreferenceCancel = null;
+		
 	
 	public JDialog getJDialog()
 	{
@@ -225,4 +230,18 @@ public class PreferenceDialog
 	
 	//	 Fin methodes de l'onglet Travail
 	
+	public JPanel getJPanelValider()
+	{
+		if (jPanelValider == null)
+		{
+			jPanelValider = new JPanel();
+			jButtonPreferenceOK = new JButton();
+			jButtonPreferenceCancel = new JButton();
+			
+			jPanelValider.add(jButtonPreferenceOK);
+			jPanelValider.add(jButtonPreferenceCancel);
+		}
+		
+		return jPanelGeneral;
+	}
 }

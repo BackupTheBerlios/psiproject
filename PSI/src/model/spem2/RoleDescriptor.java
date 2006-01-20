@@ -3,6 +3,7 @@ package model.spem2 ;
 
 import java.util.ArrayList ;
 import java.util.Collection ;
+import java.util.Observable;
 
 import model.HumanResource ;
 
@@ -13,7 +14,7 @@ import model.HumanResource ;
  * @version 1.0
  * 
  */
-public class RoleDescriptor implements Descriptor
+public class RoleDescriptor extends Observable implements Descriptor
 {
 	/**
 	 * The unique identifier of the element

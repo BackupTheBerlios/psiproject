@@ -1,6 +1,9 @@
 
 package ui.tree ;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import javax.swing.tree.DefaultMutableTreeNode ;
 
 import model.spem2.TaskDescriptor ;
@@ -12,7 +15,7 @@ import model.spem2.TaskDescriptor ;
  * @version 1.0
  * 
  */
-public class TaskDescriptorTreeNode extends DefaultMutableTreeNode
+public class TaskDescriptorTreeNode extends DefaultMutableTreeNode implements Observer
 {
 	private static final long serialVersionUID = -5327466955359571281L ;
 
@@ -31,6 +34,7 @@ public class TaskDescriptorTreeNode extends DefaultMutableTreeNode
 		super() ;
 
 		this.task = _task ;
+		this.task.addObserver(this) ;
 		this.setUserObject(task.getName()) ;
 	}
 	
@@ -58,6 +62,16 @@ public class TaskDescriptorTreeNode extends DefaultMutableTreeNode
 	public void setTask (TaskDescriptor _task)
 	{
 		this.task = _task ;
+	}
+
+	
+	/**
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 */
+	public void update (Observable _arg0, Object _arg1)
+	{
+		
+		
 	}
 
 }

@@ -1,6 +1,8 @@
 
 package model.spem2 ;
 
+import java.util.Observable;
+
 /**
  * ActivityDescriptor : textual definition of an activity
  * 
@@ -8,7 +10,7 @@ package model.spem2 ;
  * @version 1.0
  * 
  */
-public class ActivityDescriptor implements Descriptor
+public class ActivityDescriptor extends Observable implements Descriptor
 {
 	/**
 	 * The unique identifier of the element

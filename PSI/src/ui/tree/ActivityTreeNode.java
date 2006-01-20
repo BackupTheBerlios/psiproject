@@ -3,6 +3,8 @@ package ui.tree ;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode ;
 
@@ -17,7 +19,7 @@ import model.spem2.TaskDescriptor;
  * @version 1.0
  * 
  */
-public class ActivityTreeNode extends DefaultMutableTreeNode
+public class ActivityTreeNode extends DefaultMutableTreeNode implements Observer
 {
 	private static final long serialVersionUID = -6783865116938275134L ;
 
@@ -70,6 +72,14 @@ public class ActivityTreeNode extends DefaultMutableTreeNode
 	public void setActivity (Activity _activity)
 	{
 		this.activity = _activity ;
+	}
+
+	/**
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 */
+	public void update (Observable _arg0, Object _arg1)
+	{		
+		
 	}
 
 }

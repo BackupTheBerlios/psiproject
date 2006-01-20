@@ -42,7 +42,6 @@ public class Bundle
 		}
 		catch (MissingResourceException e)
 		{
-			e.printStackTrace() ;
 			return _key ;
 		}
 

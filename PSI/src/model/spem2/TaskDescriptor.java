@@ -3,6 +3,7 @@ package model.spem2 ;
 
 import java.util.ArrayList ;
 import java.util.Collection ;
+import java.util.Observable ;
 
 /**
  * TaskDescriptor : a task within a project
@@ -11,7 +12,7 @@ import java.util.Collection ;
  * @version 1.0
  * 
  */
-public class TaskDescriptor implements Descriptor
+public class TaskDescriptor extends Observable implements Descriptor
 {
 	/**
 	 * The unique identifier of the element

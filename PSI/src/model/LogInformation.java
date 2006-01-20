@@ -23,9 +23,14 @@ public class LogInformation
 	private String name ;
 
 	/**
-	 * Success or failure
+	 * Constructor
+	 * 
+	 * @param _name
 	 */
-	private boolean success ;
+	public LogInformation (String _name)
+	{
+		this(new Date(), _name) ;
+	}
 
 	/**
 	 * Constructor
@@ -34,13 +39,12 @@ public class LogInformation
 	 * @param _name
 	 * @param _result
 	 */
-	public LogInformation (Date _date, String _name, boolean _success)
+	public LogInformation (Date _date, String _name)
 	{
 		super() ;
 
 		this.date = _date ;
 		this.name = _name ;
-		this.success = _success ;
 	}
 
 	/**
@@ -85,25 +89,4 @@ public class LogInformation
 		this.name = _name ;
 	}
 
-	/**
-	 * Getter
-	 *
-	 * @return Returns the success.
-	 */
-	public boolean isSuccess ()
-	{
-		return this.success ;
-	}
-
-	/**
-	 * Setter
-	 *
-	 * @param _success The success to set.
-	 */
-	public void setSuccess (boolean _success)
-	{
-		this.success = _success ;
-	}
-
-	
 }

@@ -2,7 +2,7 @@
 package process.exception ;
 
 /**
- * ProjectParseException : an exception which can occur while parsing an xml file.
+ * FileParseException : an exception which can occur while parsing an xml file.
  * 
  * @author Condé Mickael K.
  * @version 1.0
@@ -10,5 +10,6 @@ package process.exception ;
  */
 public class FileParseException extends Exception
 {
-	public static final long serialVersionUID = 501L ;
+	private static final long serialVersionUID = -6845629115369905555L ;
+	
 }

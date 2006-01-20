@@ -3,6 +3,7 @@ package model.spem2 ;
 
 import java.util.ArrayList ;
 import java.util.Collection ;
+import java.util.Observable;
 
 /**
  * Activity : the first non abstract class/interface. Represents a basic process activity.
@@ -11,7 +12,7 @@ import java.util.Collection ;
  * @version 1.0
  * 
  */
-public class Activity implements WorkBreakdownElement, WorkDefinition
+public class Activity extends Observable implements WorkBreakdownElement, WorkDefinition
 {
 	/**
 	 * Is the element repeatable or can be executed more than once in one project or not. For

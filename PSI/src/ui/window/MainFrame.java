@@ -727,6 +727,20 @@ public class MainFrame extends JFrame
 		}
 		return projectTree ;
 	}
+	
+	/**
+	 * 
+	 * TODO Method description
+	 *
+	 * @author l3isi4
+	 * @version 1.0
+	 * 
+	 * @return
+	 */
+	public Project getCurrentProject()
+	{
+		return this.currentProject;
+	}
 
 	/**
 	 * This method initializes exportFileMenu

@@ -6,8 +6,10 @@ import java.awt.event.ActionEvent ;
 import java.io.File ;
 
 import ui.misc.LogPanel ;
+import ui.misc.TaskDescriptorPanel ;
 import ui.resource.Bundle ;
 import ui.tree.ProjectTreeNode ;
+import ui.tree.TaskDescriptorTreeNode ;
 
 import javax.swing.AbstractAction ;
 import javax.swing.JFileChooser ;
@@ -369,7 +371,8 @@ public class MainFrame extends JFrame
 
 					// Updating UI
 					((DefaultTreeModel) getProjectTree().getModel()).setRoot(new ProjectTreeNode(currentProject)) ;
-					statusPanel.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProcessImported") + " : " + currentProject.getProcess().getDescriptor().getName())) ;
+					statusPanel.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProcessImported") + " : "
+							+ currentProject.getProcess().getDescriptor().getName())) ;
 				}
 			}
 			catch (FileParseException exc)
@@ -694,6 +697,22 @@ public class MainFrame extends JFrame
 			DefaultMutableTreeNode localNode = new DefaultMutableTreeNode(Bundle.getText("MainFrameTreeDefault")) ;
 			DefaultTreeModel localDTM = new DefaultTreeModel(localNode) ;
 			projectTree = new JTree(localDTM) ;
+			projectTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener()
+			{
+				public void valueChanged (javax.swing.event.TreeSelectionEvent e)
+				{
+					DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) projectTree.getLastSelectedPathComponent() ;
+					/*
+					 * Task descriptors => displaying estimations
+					 */
+					if (localNode instanceof TaskDescriptorTreeNode)
+					{
+						getMainContainer().add(new TaskDescriptorPanel( ((TaskDescriptorTreeNode) localNode).getTask()),
+								((TaskDescriptorTreeNode) localNode).getTask().getName()) ;
+					}
+				}
+			}) ;
+
 		}
 		return projectTree ;
 	}

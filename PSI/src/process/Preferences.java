@@ -61,24 +61,39 @@ public class Preferences
 	private int logHeight = 60 ;
 
 	/**
-	 * Show the left tree (project) or not
-	 */
-	private boolean treeVisible = true ;
-
-	/**
-	 * Show the log component or not
-	 */
-	private boolean logVisible = true ;
-
-	/**
 	 * The locale to use for internationalisation
 	 */
 	private String locale = "FR" ;
 
 	/**
+	 * The default look and feel to load
+	 */
+	private String lookAndFeel = "Metal" ;
+
+	/**
+	 * Auto load help window or not
+	 */
+	private boolean loadHelp = false ;
+
+	/**
 	 * The path to the last project file used
 	 */
 	private String lastProject = "" ;
+
+	/**
+	 * Auto load or not the last project open
+	 */
+	private boolean loadLastProject = false ;
+
+	/**
+	 * Directory used for exporting
+	 */
+	private String exportDirectory = "" ;
+
+	/**
+	 * Directory where working files are stored
+	 */
+	private String workDirectory = "" ;
 
 	/**
 	 * The name of the file containing user preferences
@@ -145,117 +160,192 @@ public class Preferences
 				/*
 				 * Now the parsing can start
 				 */
-				Document localDocument = localDB.parse(localBIS) ;				
+				Document localDocument = localDB.parse(localBIS) ;
 				if (localDocument.getDocumentElement().getTagName().equals("psiPreferences"))
 				{
 					Node localNode ;
 					Node localDataNode ;
-					// TODO Check int and boolean values
+
 					/*
 					 * Width
 					 */
-					if ((localNode = localDocument.getElementsByTagName("width").item(0)) != null)
+					if ( (localNode = localDocument.getElementsByTagName("width").item(0)) != null)
 					{
-						if ((localDataNode = localNode.getFirstChild()) != null)
+						if ( (localDataNode = localNode.getFirstChild()) != null)
 						{
-							this.width = Integer.parseInt(localDataNode.getNodeValue()) ;
+							try
+							{
+								this.width = Integer.parseInt(localDataNode.getNodeValue()) ;
+							}
+							catch (NumberFormatException exc)
+							{
+								this.width = 500 ;
+							}
 						}
 					}
-					
+
 					/*
 					 * Height
 					 */
-					if ((localNode = localDocument.getElementsByTagName("height").item(0)) != null)
+					if ( (localNode = localDocument.getElementsByTagName("height").item(0)) != null)
 					{
-						if ((localDataNode = localNode.getFirstChild()) != null)
+						if ( (localDataNode = localNode.getFirstChild()) != null)
 						{
-							this.height = Integer.parseInt(localDataNode.getNodeValue()) ;
+							try
+							{
+								this.height = Integer.parseInt(localDataNode.getNodeValue()) ;
+							}
+							catch (NumberFormatException exc)
+							{
+								this.height = 500 ;
+							}
 						}
 					}
-					
+
 					/*
 					 * X Position
 					 */
-					if ((localNode = localDocument.getElementsByTagName("xPosition").item(0)) != null)
+					if ( (localNode = localDocument.getElementsByTagName("xPosition").item(0)) != null)
 					{
-						if ((localDataNode = localNode.getFirstChild()) != null)
+						if ( (localDataNode = localNode.getFirstChild()) != null)
 						{
-							this.xPosition = Integer.parseInt(localDataNode.getNodeValue()) ;
+							try
+							{
+								this.xPosition = Integer.parseInt(localDataNode.getNodeValue()) ;
+							}
+							catch (NumberFormatException exc)
+							{
+								this.xPosition = 0 ;
+							}
 						}
 					}
-					
+
 					/*
 					 * Y Position
 					 */
-					if ((localNode = localDocument.getElementsByTagName("yPosition").item(0)) != null)
+					if ( (localNode = localDocument.getElementsByTagName("yPosition").item(0)) != null)
 					{
-						if ((localDataNode = localNode.getFirstChild()) != null)
+						if ( (localDataNode = localNode.getFirstChild()) != null)
 						{
-							this.yPosition = Integer.parseInt(localDataNode.getNodeValue()) ;
+							try
+							{
+								this.yPosition = Integer.parseInt(localDataNode.getNodeValue()) ;
+							}
+							catch (NumberFormatException exc)
+							{
+								this.yPosition = 0 ;
+							}
 						}
 					}
-					
+
 					/*
 					 * Tree width
 					 */
-					if ((localNode = localDocument.getElementsByTagName("treeWidth").item(0)) != null)
+					if ( (localNode = localDocument.getElementsByTagName("treeWidth").item(0)) != null)
 					{
-						if ((localDataNode = localNode.getFirstChild()) != null)
+						if ( (localDataNode = localNode.getFirstChild()) != null)
 						{
-							this.treeWidth = Integer.parseInt(localDataNode.getNodeValue()) ;
+							try
+							{
+								this.treeWidth = Integer.parseInt(localDataNode.getNodeValue()) ;
+							}
+							catch (NumberFormatException exc)
+							{
+								this.treeWidth = 100 ;
+							}
 						}
 					}
-					
+
 					/*
 					 * Log height
 					 */
-					if ((localNode = localDocument.getElementsByTagName("logHeight").item(0)) != null)
+					if ( (localNode = localDocument.getElementsByTagName("logHeight").item(0)) != null)
 					{
-						if ((localDataNode = localNode.getFirstChild()) != null)
+						if ( (localDataNode = localNode.getFirstChild()) != null)
 						{
-							this.logHeight = Integer.parseInt(localDataNode.getNodeValue()) ;
+							try
+							{
+								this.logHeight = Integer.parseInt(localDataNode.getNodeValue()) ;
+							}
+							catch (NumberFormatException exc)
+							{
+								this.logHeight = 50 ;
+							}
 						}
 					}
-					
+
 					/*
-					 * Is tree visible
+					 * Load or not the last project
 					 */
-					if ((localNode = localDocument.getElementsByTagName("treeVisible").item(0)) != null)
+					if ( (localNode = localDocument.getElementsByTagName("loadLastProject").item(0)) != null)
 					{
-						if ((localDataNode = localNode.getFirstChild()) != null)
+						if ( (localDataNode = localNode.getFirstChild()) != null)
 						{
-							this.treeVisible = Boolean.parseBoolean(localDataNode.getNodeValue()) ;
+							this.loadLastProject = Boolean.parseBoolean(localDataNode.getNodeValue()) ;
 						}
 					}
-					
+
 					/*
-					 * Is log visible
+					 * Load or not the help
 					 */
-					if ((localNode = localDocument.getElementsByTagName("logVisible").item(0)) != null)
+					if ( (localNode = localDocument.getElementsByTagName("loadHelp").item(0)) != null)
 					{
-						if ((localDataNode = localNode.getFirstChild()) != null)
+						if ( (localDataNode = localNode.getFirstChild()) != null)
 						{
-							this.logVisible = Boolean.parseBoolean(localDataNode.getNodeValue()) ;
+							this.loadHelp = Boolean.parseBoolean(localDataNode.getNodeValue()) ;
 						}
 					}
-					
+
 					/*
 					 * Locale
 					 */
-					if ((localNode = localDocument.getElementsByTagName("locale").item(0)) != null)
+					if ( (localNode = localDocument.getElementsByTagName("locale").item(0)) != null)
 					{
-						if ((localDataNode = localNode.getFirstChild()) != null)
+						if ( (localDataNode = localNode.getFirstChild()) != null)
 						{
 							this.locale = localDataNode.getNodeValue() ;
 						}
 					}
-					
+
+					/*
+					 * Look and feel
+					 */
+					if ( (localNode = localDocument.getElementsByTagName("lookAndFeel").item(0)) != null)
+					{
+						if ( (localDataNode = localNode.getFirstChild()) != null)
+						{
+							this.lookAndFeel = localDataNode.getNodeValue() ;
+						}
+					}
+
+					/*
+					 * Export directory
+					 */
+					if ( (localNode = localDocument.getElementsByTagName("exportDirectory").item(0)) != null)
+					{
+						if ( (localDataNode = localNode.getFirstChild()) != null)
+						{
+							this.exportDirectory = localDataNode.getNodeValue() ;
+						}
+					}
+
+					/*
+					 * Work directory
+					 */
+					if ( (localNode = localDocument.getElementsByTagName("workDirectory").item(0)) != null)
+					{
+						if ( (localDataNode = localNode.getFirstChild()) != null)
+						{
+							this.workDirectory = localDataNode.getNodeValue() ;
+						}
+					}
+
 					/*
 					 * Last project
 					 */
-					if ((localNode = localDocument.getElementsByTagName("lastProject").item(0)) != null)
+					if ( (localNode = localDocument.getElementsByTagName("lastProject").item(0)) != null)
 					{
-						if ((localDataNode = localNode.getFirstChild()) != null)
+						if ( (localDataNode = localNode.getFirstChild()) != null)
 						{
 							this.lastProject = localDataNode.getNodeValue() ;
 						}
@@ -304,9 +394,12 @@ public class Preferences
 			localOSW.write("\t<yPosition>" + yPosition + "</yPosition>\n") ;
 			localOSW.write("\t<treeWidth>" + treeWidth + "</treeWidth>\n") ;
 			localOSW.write("\t<logHeight>" + logHeight + "</logHeight>\n") ;
-			localOSW.write("\t<treeVisible>" + treeVisible + "</treeVisible>\n") ;
-			localOSW.write("\t<logVisible>" + logVisible + "</logVisible>\n") ;
+			localOSW.write("\t<loadLastProject>" + loadLastProject + "</loadLastProject>\n") ;
+			localOSW.write("\t<loadHelp>" + loadHelp + "</loadHelp>\n") ;
+			localOSW.write("\t<workDirectory>" + workDirectory + "</workDirectory>\n") ;
+			localOSW.write("\t<exportDirectory>" + exportDirectory + "</exportDirectory>\n") ;
 			localOSW.write("\t<locale>" + locale + "</locale>\n") ;
+			localOSW.write("\t<lookAndFeel>" + lookAndFeel + "</lookAndFeel>\n") ;
 			localOSW.write("\t<lastProject>" + lastProject + "</lastProject>\n") ;
 			localOSW.write("</psiPreferences>\n") ;
 
@@ -435,48 +528,6 @@ public class Preferences
 	/**
 	 * Getter
 	 * 
-	 * @return Returns the showLeftTree.
-	 */
-	public boolean isTreeVisible ()
-	{
-		return this.treeVisible ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _showLeftTree
-	 *            The showLeftTree to set.
-	 */
-	public void setTreeVisible (boolean _showLeftTree)
-	{
-		this.treeVisible = _showLeftTree ;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the showLog.
-	 */
-	public boolean isLogVisible ()
-	{
-		return this.logVisible ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _showLog
-	 *            The showLog to set.
-	 */
-	public void setLogVisible (boolean _showLog)
-	{
-		this.logVisible = _showLog ;
-	}
-
-	/**
-	 * Getter
-	 * 
 	 * @return Returns the width.
 	 */
 	public int getWidth ()
@@ -551,6 +602,111 @@ public class Preferences
 		}
 
 		return instance ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the exportDirectory.
+	 */
+	public String getExportDirectory ()
+	{
+		return this.exportDirectory ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _exportDirectory
+	 *            The exportDirectory to set.
+	 */
+	public void setExportDirectory (String _exportDirectory)
+	{
+		this.exportDirectory = _exportDirectory ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the loadHelp.
+	 */
+	public boolean getLoadHelp ()
+	{
+		return this.loadHelp ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _loadHelp
+	 *            The loadHelp to set.
+	 */
+	public void setLoadHelp (boolean _loadHelp)
+	{
+		this.loadHelp = _loadHelp ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the loadLastProject.
+	 */
+	public boolean getLoadLastProject ()
+	{
+		return this.loadLastProject ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _loadLastProject
+	 *            The loadLastProject to set.
+	 */
+	public void setLoadLastProject (boolean _loadLastProject)
+	{
+		this.loadLastProject = _loadLastProject ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the lookAndFeel.
+	 */
+	public String getLookAndFeel ()
+	{
+		return this.lookAndFeel ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _lookAndFeel
+	 *            The lookAndFeel to set.
+	 */
+	public void setLookAndFeel (String _lookAndFeel)
+	{
+		this.lookAndFeel = _lookAndFeel ;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return Returns the workDirectory.
+	 */
+	public String getWorkDirectory ()
+	{
+		return this.workDirectory ;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param _workDirectory
+	 *            The workDirectory to set.
+	 */
+	public void setWorkDirectory (String _workDirectory)
+	{
+		this.workDirectory = _workDirectory ;
 	}
 
 }

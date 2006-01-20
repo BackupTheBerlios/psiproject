@@ -9,9 +9,9 @@ import model.Project;
 import junit.framework.TestCase;
 
 /**
- * ProjectControlerTest : TODO type description
+ * ProjectControlerTest : Test different functions of ProjectControl
  *
- * @author m1isi28
+ * @author Avetisyan Gohar
  * @version 1.0
  *
  */
@@ -34,10 +34,7 @@ public class ProjectControlerTest extends TestCase
 		/**
 		 * project imported with the bad format
 		 */
-		pr2 = ProjectControler.create(mauvais_fich);
-		
-		
-		
+		pr2 = ProjectControler.create(mauvais_fich);	
 	}
 
 	/*

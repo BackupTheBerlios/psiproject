@@ -2,10 +2,14 @@
 package process.utility ;
 
 import java.io.BufferedInputStream ;
+import java.io.BufferedOutputStream ;
 import java.io.File ;
 import java.io.FileInputStream ;
 import java.io.FileNotFoundException ;
+import java.io.FileOutputStream ;
 import java.io.IOException ;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException ;
 import java.text.SimpleDateFormat ;
 import java.util.ArrayList ;
@@ -23,13 +27,14 @@ import org.xml.sax.SAXException ;
 import org.xml.sax.SAXParseException ;
 
 import process.exception.FileParseException ;
+import process.exception.FileSaveException ;
 import model.HumanResource ;
 import model.Project ;
 
 /**
  * ProjectControler : Loads, saves project information
  * 
- * @author Condé Mickael K.
+ * @author Cond? Mickael K.
  * @version 1.0
  * 
  */
@@ -39,7 +44,7 @@ public class ProjectControler
 	 * Loads a NEW project (without a process linked to it) from an xml file, the project me created
 	 * with Open Workbench
 	 * 
-	 * @author Condé Mickael K.
+	 * @author Cond? Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param _source
@@ -251,7 +256,7 @@ public class ProjectControler
 	/**
 	 * Open a previously created project.
 	 * 
-	 * @author Condé Mickael K.
+	 * @author Cond? Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param _source
@@ -264,9 +269,47 @@ public class ProjectControler
 		return null ;
 	}
 
-	public static void save (Project _project, File _destination)
+	/**
+	 * Saves the project in domino format
+	 * 
+	 * @author Cond? Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _project
+	 * @param _destination
+	 */
+	public static void save (Project _project, File _destination) throws FileSaveException
 	{
+		try
+		{
+			FileOutputStream localFOS = new FileOutputStream(_destination) ;
+			BufferedOutputStream localBOS = new BufferedOutputStream(localFOS) ;
+			
+			OutputStreamWriter localOSW = new OutputStreamWriter(localBOS, "ISO-8859-1") ;
 
+			localOSW.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n\n") ;
+			localOSW.write("<psiPreferences>\n") ;
+			
+
+			localOSW.flush() ;
+			localOSW.close() ;
+			
+		}
+
+		catch (FileNotFoundException exc)
+		{
+			throw new FileSaveException() ;
+		}
+		
+		catch(UnsupportedEncodingException exc)
+		{
+			throw new FileSaveException() ;
+		}
+		
+		catch (IOException exc)
+		{
+			throw new FileSaveException() ;
+		}
 	}
 
 }

@@ -6,9 +6,11 @@ import java.awt.event.ActionEvent ;
 import java.io.File ;
 
 import ui.misc.LogPanel ;
+import ui.misc.RoleDescriptorPanel;
 import ui.misc.TaskDescriptorPanel ;
 import ui.resource.Bundle ;
 import ui.tree.ProjectTreeNode ;
+import ui.tree.RoleDescriptorTreeNode;
 import ui.tree.TaskDescriptorTreeNode ;
 
 import javax.swing.AbstractAction ;
@@ -36,7 +38,7 @@ import process.utility.ProjectControler ;
 /**
  * MainFrame : PSI main window
  * 
- * @author Condé Mickael K.
+ * @author Cond? Mickael K.
  * @version 1.0
  * 
  */
@@ -709,6 +711,15 @@ public class MainFrame extends JFrame
 					{
 						getMainContainer().add(new TaskDescriptorPanel( ((TaskDescriptorTreeNode) localNode).getTask()),
 								((TaskDescriptorTreeNode) localNode).getTask().getName()) ;
+					}
+					
+					/*
+					 * Role descriptors => displaying role infos
+					 */
+					else if (localNode instanceof RoleDescriptorTreeNode)
+					{
+						getMainContainer().add(new RoleDescriptorPanel( ((RoleDescriptorTreeNode) localNode).getRole()),
+								((RoleDescriptorTreeNode) localNode).getRole().getName()) ;
 					}
 				}
 			}) ;

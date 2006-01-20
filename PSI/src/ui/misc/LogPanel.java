@@ -5,17 +5,17 @@ import java.awt.BorderLayout ;
 import java.util.ArrayList ;
 
 import javax.swing.JPanel ;
+import javax.swing.JScrollPane ;
 import javax.swing.JTable ;
 import javax.swing.table.AbstractTableModel ;
 
-import ui.resource.Bundle ;
-
 import model.LogInformation ;
+import ui.resource.Bundle ;
 
 /**
  * LogPanel : This is the container of the table containing the log entries
  * 
- * @author Conde Mickael K.
+ * @author Condé Mickael K.
  * @version 1.0
  * 
  */
@@ -31,7 +31,7 @@ public class LogPanel extends JPanel
 	/**
 	 * The maximal amount of columns in the table
 	 */
-	private static final short MAXCOLS = 3 ;
+	private static final short MAXCOLS = 2 ;
 
 	/**
 	 * The table that will display data
@@ -56,9 +56,13 @@ public class LogPanel extends JPanel
 
 		logTableModel = new LogTableModel() ;
 		logTable = new JTable(logTableModel) ;
+		logTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
+		logTable.getColumnModel().getColumn(0).setPreferredWidth(150) ;
+		logTable.getTableHeader().setReorderingAllowed(false) ;
+		JScrollPane localScrollPane = new JScrollPane(logTable) ;
 
 		initialize() ;
-		add(logTable, BorderLayout.CENTER) ;
+		add(localScrollPane, BorderLayout.CENTER) ;
 
 	}
 
@@ -73,10 +77,10 @@ public class LogPanel extends JPanel
 	}
 
 	/**
-	 * Adds one row of type LogInformation into the table
-	 * If max rows reached, then supresses the oldest
+	 * Adds one row of type LogInformation into the table If max rows reached, then supresses the
+	 * oldest
 	 * 
-	 * @author Conde Mickael K.
+	 * @author Condé Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param _logInformation
@@ -86,14 +90,15 @@ public class LogPanel extends JPanel
 	{
 		if (logTable.getRowCount() == MAXROWS)
 		{
-			
+			logTableModel.removeFirstRow() ;
 		}
+		logTableModel.addRow(_logInformation) ;
 	}
 
 	/**
 	 * LogTableModel : The model to be used by the table
 	 * 
-	 * @author m1isi33
+	 * @author Condé Mickael K.
 	 * @version 1.0
 	 * 
 	 */
@@ -104,7 +109,7 @@ public class LogPanel extends JPanel
 		private ArrayList <LogInformation> data ;
 
 		private String[] titles = {
-				Bundle.getText("LogPanelTableColumn1"), Bundle.getText("LogPanelTableColumn2"), Bundle.getText("LogPanelTableColumn3")
+				Bundle.getText("LogPanelTableColumn1"), Bundle.getText("LogPanelTableColumn2")
 		} ;
 
 		public LogTableModel ()
@@ -112,7 +117,6 @@ public class LogPanel extends JPanel
 			super() ;
 
 			this.data = new ArrayList <LogInformation>() ;
-
 		}
 
 		/**
@@ -176,7 +180,16 @@ public class LogPanel extends JPanel
 		{
 			try
 			{
-				return data.get(_rowIndex) ;
+				LogInformation localLog = data.get(_rowIndex) ;
+				switch (_columnIndex)
+				{
+					case 0:
+						return localLog.getDate() ;
+					case 1:
+						return localLog.getName() ;
+					default:
+						return "[N/A]" ;
+				}
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
@@ -184,7 +197,18 @@ public class LogPanel extends JPanel
 			}
 
 		}
+		
+		public void addRow(LogInformation _logInformation)
+		{
+			data.add(_logInformation) ;
+			fireTableRowsInserted(getRowCount(), getRowCount()) ;
+		}
+		
+		public void removeFirstRow()
+		{
+			data.remove(0) ;
+			fireTableRowsDeleted(0, 0) ;
+		}
 
 	}
-
 }

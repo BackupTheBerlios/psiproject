@@ -65,7 +65,7 @@ public class PreferenceDialog
 		if (jDialog == null)
 		{
 			jDialog = new JDialog();
-			jDialog.add(getJTabbedPaneOnglets);
+			jDialog.add(getJTabbedPaneOnglets());
 			jDialog.add(getJPanelValider(),BorderLayout.SOUTH);
 									
 		}

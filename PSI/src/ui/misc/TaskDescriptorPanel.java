@@ -2,21 +2,25 @@
 package ui.misc ;
 
 import javax.swing.JPanel ;
-
-import java.awt.Component ;
-import java.awt.Dimension ;
-import java.awt.GridBagConstraints ;
-import java.awt.GridBagLayout ;
-
-import javax.swing.Box ;
+import javax.swing.JButton ;
 import javax.swing.JScrollPane ;
 import javax.swing.JTable ;
+import javax.swing.JTextArea ;
+import javax.swing.JTextField ;
+import javax.swing.SwingUtilities ;
 import javax.swing.table.AbstractTableModel ;
 import ui.resource.Bundle ;
 import model.spem2.PlanningData ;
 import model.spem2.TaskDescriptor ;
 import java.util.Locale ;
+import java.util.Observable ;
+import java.util.Observer ;
+import java.util.Vector ;
+import java.awt.Dimension ;
+import java.awt.GridLayout ;
 import java.text.DateFormat ;
+import java.text.ParseException ;
+
 import javax.swing.event.* ;
 import javax.swing.JLabel ;
 
@@ -27,7 +31,7 @@ import javax.swing.JLabel ;
  * @version 1.0
  * 
  */
-public class TaskDescriptorPanel extends JPanel
+public class TaskDescriptorPanel extends JPanel implements Observer
 {
 
 	/**
@@ -40,35 +44,37 @@ public class TaskDescriptorPanel extends JPanel
 			Bundle.getText("JPanelTaskDescriptorCol3")
 	} ;
 
-	private Object[][] donnees = null ;
-
 	private javax.swing.JTable table ;
 
 	private javax.swing.JScrollPane tableScrollPane ;
 
-	private Locale locale = Locale.getDefault() ;
-
-	private DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, locale) ;
-
 	private JLabel idLabel = null ;
 
-	private JLabel idLabelValue = null ;
+	private JTextField idTextValue = null ;
 
 	private JLabel nameLabel = null ;
 
-	private JLabel nameLabelValue = null ;
+	private JTextField nameTextValue = null ;
 
 	private JLabel descLabel = null ;
 
-	private JLabel descLabelValue = null ;
-
-	private JLabel decalLabel = null ;
+	private JTextArea descTextValue = null ;
 
 	private JPanel jPanel = null ;
 
-	private JPanel jPanelHaut = null ;
+	private JPanel jPanelCenter = null ;
+
+	private GridLayout layoutCenter = null ;
 
 	private TaskDescriptor task = null ;
+
+	private JButton jButtonModifiar = null ;
+
+	private JButton jButtonSave = null ;
+
+	private JLabel jLabelPlanification = null ;
+
+	private JScrollPane jScrollDesc = null ;
 
 	/**
 	 * This is the default constructor
@@ -76,24 +82,19 @@ public class TaskDescriptorPanel extends JPanel
 	public TaskDescriptorPanel (TaskDescriptor _task)
 	{
 		super() ;
-		donnees = new Object[2][4] ;
 		task = _task ;
-		donnees[0][0] = Bundle.getText("JPanelTaskDescriptorRow1") ;
-		donnees[1][0] = Bundle.getText("JPanelTaskDescriptorRow2") ;
-		donnees[0][1] = dateFormat.format( (task.getPlanningData()).getStartDate()) ;
-		donnees[1][1] = dateFormat.format( (task.getRealData()).getStartDate()) ;
-		donnees[0][2] = dateFormat.format( (task.getPlanningData()).getFinishDate()) ;
-		donnees[1][2] = dateFormat.format( (task.getRealData()).getFinishDate()) ;
-		donnees[0][3] = (task.getPlanningData()).getDuration() ;
-		donnees[1][3] = (task.getRealData()).getDuration() ;
+		task.addObserver(this) ;
 
-		ModelTableTaskDescriptor tableModel = new ModelTableTaskDescriptor(donnees, nomsColonnes, _task) ;
+		ModelTableTaskDescriptor tableModel = new ModelTableTaskDescriptor(nomsColonnes, _task) ;
 		initialize() ;
 		table = new JTable(tableModel) ;
 		table.getTableHeader().setReorderingAllowed(false) ;
 		table.setPreferredScrollableViewportSize(new Dimension(50, 10)) ;
 		tableScrollPane = new JScrollPane(table) ;
-		add(tableScrollPane, java.awt.BorderLayout.CENTER) ;
+
+		jPanelCenter.add(tableScrollPane) ;
+		add(jPanelCenter, java.awt.BorderLayout.CENTER) ;
+
 	}
 
 	/**
@@ -104,9 +105,14 @@ public class TaskDescriptorPanel extends JPanel
 	private void initialize ()
 	{
 
-		this.setSize(300, 200) ;
 		setLayout(new java.awt.BorderLayout()) ;
-		this.add(getJPanel(), java.awt.BorderLayout.NORTH) ;
+		layoutCenter = new GridLayout(2, 1) ;
+
+		jPanelCenter = new JPanel() ;
+		jPanelCenter.setLayout(layoutCenter) ;
+
+		jPanelCenter.add(getJPanel()) ;
+
 	}
 
 	/**
@@ -116,47 +122,124 @@ public class TaskDescriptorPanel extends JPanel
 	 */
 	private JPanel getJPanel ()
 	{
-		GridBagConstraints c = new GridBagConstraints() ;
 
 		idLabel = new JLabel() ;
-		idLabelValue = new JLabel() ;
+		idTextValue = new JTextField() ;
 		nameLabel = new JLabel() ;
-		nameLabelValue = new JLabel() ;
+		nameTextValue = new JTextField() ;
 		descLabel = new JLabel() ;
-		descLabelValue = new JLabel() ;
+		descTextValue = new JTextArea() ;
+		jLabelPlanification = new JLabel() ;
+
 		idLabel.setText(Bundle.getText("JPanelTaskDescriptorIDLabel")) ;
 		nameLabel.setText(Bundle.getText("JPanelTaskDescriptorNameLabel")) ;
 		descLabel.setText(Bundle.getText("JPanelTaskDescriptorDescriptionLabel")) ;
-		if (task.getId() != null) idLabelValue.setText(task.getId()) ;
-		if (task.getName() != null) nameLabelValue.setText(task.getName()) ;
-		if (task.getDescription() != null) descLabelValue.setText(task.getDescription()) ;
+		jLabelPlanification.setText(Bundle.getText("JPanelTaskDescriptorPlanification")) ;
+
 		if (jPanel == null)
 		{
 			jPanel = new JPanel() ;
-			jPanel.setLayout(new GridBagLayout()) ;
-			c.gridx = 0 ;
-			c.gridy = 0 ;
-			c.gridwidth = 1 ;
-			c.gridheight = 1 ;
-			c.fill = GridBagConstraints.WEST ;
-			c.anchor = GridBagConstraints.WEST ;
-			jPanel.add(idLabel, c) ;
-			c.gridx = 1 ;
-			jPanel.add(idLabelValue, c) ;
-			c.gridx = 0 ;
-			c.gridy = 1 ;
+			jPanel.setLayout(null) ;
 
-			jPanel.add(nameLabel, c) ;
-			c.gridx = 1 ;
-			jPanel.add(nameLabelValue, c) ;
-			c.gridx = 0 ;
-			c.gridy = 2 ;
-			jPanel.add(descLabel, c) ;
-			c.gridx = 1 ;
-			jPanel.add(descLabelValue, c) ;
+			if (task.getId() != null)
+			{
+				jPanel.setLayout(null) ;
+				idTextValue.setText(task.getId()) ;
+				idTextValue.setEditable(false) ;
+				jPanel.add(idLabel) ;
+				jPanel.add(idTextValue) ;
+				idLabel.setLocation(1, 1) ;
+				idLabel.setSize(80, 20) ;
+				idTextValue.setLocation(82, 1) ;
+				idTextValue.setSize(300, 20) ;
+
+			}
+
+			if (task.getName() != null)
+			{
+				nameTextValue.setText(task.getName()) ;
+				nameTextValue.setEditable(false) ;
+				jPanel.add(nameLabel) ;
+				jPanel.add(nameTextValue) ;
+				nameLabel.setLocation(1, 22) ;
+				nameLabel.setSize(80, 20) ;
+				nameTextValue.setLocation(82, 22) ;
+				nameTextValue.setSize(300, 20) ;
+
+			}
+
+			/*
+			 * if ( (!task.getDescription().equals("")) && (!task.getDescription().equals("[N/A]"))) {
+			 */
+
+			descTextValue.setText(task.getDescription()) ;
+			descTextValue.setSize(300, 60) ;
+			descTextValue.setEditable(false) ;
+			jScrollDesc = new JScrollPane(descTextValue) ;
+			jPanel.add(descLabel) ;
+			jPanel.add(jScrollDesc) ;
+			descLabel.setLocation(1, 44) ;
+			descLabel.setSize(80, 20) ;
+			jScrollDesc.setSize(300, 60) ;
+			jScrollDesc.setLocation(82, 44) ;
+			// }
+
+			jButtonModifiar = new JButton() ;
+			jButtonModifiar.setText(Bundle.getText("JPanelTaskDescriptorModifiarButton")) ;
+
+			jButtonModifiar.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+
+					nameTextValue.setEditable(true) ;
+					descTextValue.setEditable(true) ;
+					jButtonSave.setEnabled(true) ;
+				}
+			}) ;
+
+			jButtonSave = new JButton() ;
+			jButtonSave.setText(Bundle.getText("JPanelTaskDescriptorSaveButton")) ;
+			jButtonSave.setEnabled(false) ;
+
+			jButtonSave.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+					task.setName(nameTextValue.getText()) ;
+					task.setDescription(descTextValue.getText()) ;
+					nameTextValue.setEditable(false) ;
+					descTextValue.setEditable(false) ;
+					jButtonSave.setEnabled(false) ;
+				}
+			}) ;
+
+			jPanel.add(jButtonModifiar) ;
+			jPanel.add(jButtonSave) ;
+			jButtonModifiar.setLocation(1, 106) ;
+			jButtonModifiar.setSize(80, 20) ;
+			jButtonSave.setLocation(82, 106) ;
+			jButtonSave.setSize(110, 20) ;
+
+			jPanel.add(jLabelPlanification) ;
+			jLabelPlanification.setSize(80, 20) ;
+			jLabelPlanification.setLocation(1, 135) ;
+
 			jPanel.setVisible(true) ;
+
 		}
 		return jPanel ;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 */
+	public void update (Observable _arg0, Object _arg1)
+	{
+		// TODO Auto-generated method stub
+
 	}
 
 }
@@ -170,13 +253,15 @@ public class TaskDescriptorPanel extends JPanel
  * 
  */
 
-class ModelTableTaskDescriptor extends AbstractTableModel
+class ModelTableTaskDescriptor extends AbstractTableModel implements Observer
 {
 	Object donnees[][] ;
 
 	String titres[] ;
 
-	TaskDescriptor task = null ;
+	private Vector data = new Vector() ;
+
+	TaskDescriptor t = null ;
 
 	PlanningData p = new PlanningData() ;
 
@@ -190,17 +275,23 @@ class ModelTableTaskDescriptor extends AbstractTableModel
 	 * 
 	 * @see javax.swing.table.TableModel#getRowCount()
 	 */
-	public ModelTableTaskDescriptor (Object donnees[][], String titres[], TaskDescriptor _task)
+	@ SuppressWarnings ("unchecked")
+	public ModelTableTaskDescriptor (String titres[], TaskDescriptor _task)
 	{
-		this.donnees = donnees ;
+		// this.donnees = donnees ;
 		this.titres = titres ;
-		task = _task ;
+		t = _task ;
+		t.addObserver(this) ;
+
+		data.add(new TableTaskDescriptorRecord(this, t, 0)) ;
+		data.add(new TableTaskDescriptorRecord(this, t, 1)) ;
+
 	}
 
 	public int getRowCount ()
 	{
 		// TODO Auto-generated method stub
-		return donnees.length ;
+		return data.size() ;
 	}
 
 	/*
@@ -210,11 +301,7 @@ class ModelTableTaskDescriptor extends AbstractTableModel
 	 */
 	public int getColumnCount ()
 	{
-		// TODO Auto-generated method stub
-		if (getRowCount() != 0)
-			return donnees[0].length ;
-		else
-			return 0 ;
+		return titres.length ;
 	}
 
 	/*
@@ -225,14 +312,20 @@ class ModelTableTaskDescriptor extends AbstractTableModel
 	public Object getValueAt (int ligne, int colonne)
 	{
 		// TODO Auto-generated method stub
-		return donnees[ligne][colonne] ;
+		return ((TableTaskDescriptorRecord) data.get(ligne)).getValueAt(ligne, colonne) ;
 	}
 
 	public void setValueAt (Object value, int ligne, int colonne)
 	{
-		donnees[ligne][colonne] = value ;
+		((TableTaskDescriptorRecord) data.get(ligne)).setValueAt(value, ligne, colonne) ;
 		fireTableChanged(new TableModelEvent(this, ligne, ligne, colonne)) ;
 
+	}
+
+	@ SuppressWarnings ("unchecked")
+	public Class getColumnClass (int column)
+	{
+		return getValueAt(0, column).getClass() ;
 	}
 
 	public String getColumnName (int colonne)
@@ -247,6 +340,188 @@ class ModelTableTaskDescriptor extends AbstractTableModel
 			return false ;
 		else
 			return true ;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 */
+	public void update (Observable o, Object arg)
+	{
+		// TODO Auto-generated method stub
+		final TaskDescriptor tempTask = (TaskDescriptor) arg ;
+
+		Runnable runnable = new Runnable()
+		{
+			public void run ()
+			{
+				for (int i = 0; i < getRowCount(); i++ )
+				{
+					if ( ((TableTaskDescriptorRecord) data.get(i)).getTask() == tempTask)
+					{
+						data.remove(i) ;
+						fireTableRowsDeleted(i, i) ;
+					}
+				}
+			}
+		} ;
+		SwingUtilities.invokeLater(runnable) ;
+	}
+
+}
+
+
+class TableTaskDescriptorRecord implements Observer
+{
+	private int row ;
+
+	private ModelTableTaskDescriptor modelTableTask = null ;
+
+	private TaskDescriptor t = null ;
+
+	private Locale locale = Locale.getDefault() ;
+
+	private DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, locale) ;
+
+	public TableTaskDescriptorRecord (ModelTableTaskDescriptor aMTTD, TaskDescriptor _task, int aRow)
+	{
+		row = aRow ;
+		modelTableTask = aMTTD ;
+		t = _task ;
+
+		t.addObserver(this) ;
+	}
+
+	public void update (Observable o, Object arg)
+	{
+		modelTableTask.fireTableRowsUpdated(row, row) ;
+	}
+
+	public TaskDescriptor getTask ()
+	{
+		return t ;
+	}
+
+	public void setRow (int aRow)
+	{
+		row = aRow ;
+	}
+
+	public Object getValueAt (int _row, int column)
+	{
+		switch (column)
+		{
+			case 0:
+				if (_row == 0)
+				{
+					return Bundle.getText("JPanelTaskDescriptorRow1") ;
+				}
+				else
+				{
+					return Bundle.getText("JPanelTaskDescriptorRow2") ;
+				}
+
+			case 1:
+				if (_row == 0)
+				{
+					return new String(dateFormat.format( (t.getPlanningData()).getStartDate())) ;
+				}
+				else
+				{
+					return new String(dateFormat.format( (t.getRealData()).getStartDate())) ;
+				}
+			case 2:
+				if (_row == 0)
+				{
+					return new String(dateFormat.format( (t.getPlanningData()).getFinishDate())) ;
+				}
+				else
+				{
+					return new String(dateFormat.format( (t.getRealData()).getFinishDate())) ;
+				}
+			case 3:
+				if (_row == 0)
+				{
+					return new Float( (t.getPlanningData()).getDuration()) ;
+				}
+				else
+				{
+					return new Float( (t.getRealData()).getDuration()) ;
+				}
+			default:
+				return 0 ;
+		}
+	}
+
+	public void setValueAt (Object obj, int _row, int column)
+	{
+		PlanningData pd = new PlanningData() ;
+
+		try
+		{
+
+			switch (column)
+			{
+
+				case 1:
+					if (_row == 0)
+					{
+
+						pd = t.getPlanningData() ;
+						pd.setStartDate(dateFormat.parse((String) obj)) ;
+						t.setPlanningData(pd) ;
+
+					}
+					else
+					{
+						pd = t.getRealData() ;
+						pd.setStartDate(dateFormat.parse((String) obj)) ;
+						t.setRealData(pd) ;
+					}
+
+					break ;
+				case 2:
+					if (_row == 0)
+					{
+						pd = t.getPlanningData() ;
+						pd.setFinishDate(dateFormat.parse((String) obj)) ;
+						t.setPlanningData(pd) ;
+
+					}
+					else
+					{
+						pd = t.getRealData() ;
+						pd.setFinishDate(dateFormat.parse((String) obj)) ;
+						t.setRealData(pd) ;
+					}
+					break ;
+				case 3:
+					if (_row == 0)
+					{
+						pd = t.getPlanningData() ;
+						pd.setDuration( ((Float) obj).floatValue()) ;
+						t.setPlanningData(pd) ;
+
+					}
+					else
+					{
+						pd = t.getRealData() ;
+						pd.setDuration( ((Float) obj).floatValue()) ;
+						t.setRealData(pd) ;
+					}
+					break ;
+
+				default:
+					break ;
+			}
+
+		}
+		catch (ParseException exc)
+		{
+			// Dans le cas ou le format de saisie des dates est incorrect
+			exc.printStackTrace() ;
+		}
 	}
 
 }

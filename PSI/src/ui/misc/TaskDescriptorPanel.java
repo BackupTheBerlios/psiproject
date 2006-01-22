@@ -1,6 +1,8 @@
 
 package ui.misc ;
 
+import javax.swing.Box ;
+import javax.swing.BoxLayout ;
 import javax.swing.JPanel ;
 import javax.swing.JButton ;
 import javax.swing.JScrollPane ;
@@ -10,14 +12,17 @@ import javax.swing.JTextField ;
 import javax.swing.SwingUtilities ;
 import javax.swing.table.AbstractTableModel ;
 import ui.resource.Bundle ;
+import model.HumanResource ;
 import model.spem2.PlanningData ;
+import model.spem2.RoleDescriptor ;
 import model.spem2.TaskDescriptor ;
+
+
 import java.util.Locale ;
 import java.util.Observable ;
 import java.util.Observer ;
 import java.util.Vector ;
 import java.awt.Dimension ;
-import java.awt.GridLayout ;
 import java.text.DateFormat ;
 import java.text.ParseException ;
 
@@ -44,9 +49,9 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 			Bundle.getText("JPanelTaskDescriptorCol3")
 	} ;
 
-	private javax.swing.JTable table ;
+	private JTable table ;
 
-	private javax.swing.JScrollPane tableScrollPane ;
+	private JScrollPane tableScrollPane ;
 
 	private JLabel idLabel = null ;
 
@@ -64,7 +69,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 
 	private JPanel jPanelCenter = null ;
 
-	private GridLayout layoutCenter = null ;
+	private BoxLayout layoutCenter = null ;
 
 	private TaskDescriptor task = null ;
 
@@ -84,15 +89,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		super() ;
 		task = _task ;
 		task.addObserver(this) ;
-
-		ModelTableTaskDescriptor tableModel = new ModelTableTaskDescriptor(nomsColonnes, _task) ;
 		initialize() ;
-		table = new JTable(tableModel) ;
-		table.getTableHeader().setReorderingAllowed(false) ;
-		table.setPreferredScrollableViewportSize(new Dimension(50, 10)) ;
-		tableScrollPane = new JScrollPane(table) ;
-
-		jPanelCenter.add(tableScrollPane) ;
 		add(jPanelCenter, java.awt.BorderLayout.CENTER) ;
 
 	}
@@ -104,15 +101,45 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 	 */
 	private void initialize ()
 	{
-
 		setLayout(new java.awt.BorderLayout()) ;
-		layoutCenter = new GridLayout(2, 1) ;
-
+		// layoutCenter = new GridLayout(3, 1) ;
 		jPanelCenter = new JPanel() ;
+		layoutCenter = new BoxLayout(jPanelCenter, BoxLayout.Y_AXIS) ;
 		jPanelCenter.setLayout(layoutCenter) ;
 
 		jPanelCenter.add(getJPanel()) ;
+		jPanelCenter.add(getJPanelPlanification()) ;
+		
+		 Box bvr = Box.createVerticalBox();
+		 jPanelCenter.add(bvr); 
+		 bvr.add(Box.createRigidArea(new Dimension(0,50)));
+		 
+		jPanelCenter.add(getJPanelResources()) ;
+	}
 
+	private JPanel getJPanelPlanification ()
+	{
+		JPanel jPanelPlanification = new JPanel() ;
+		jLabelPlanification = new JLabel() ;
+
+		jLabelPlanification.setText(Bundle.getText("JPanelTaskDescriptorPlanification")) ;
+		BoxLayout BL = new BoxLayout(jPanelPlanification, BoxLayout.Y_AXIS) ;
+		jPanelPlanification.setLayout(BL) ;
+		jPanelPlanification.add(jLabelPlanification) ;
+		Box bvr = Box.createVerticalBox() ;
+		jPanelPlanification.add(bvr) ;
+		bvr.add(Box.createRigidArea(new Dimension(10, 10))) ;
+		jLabelPlanification.setSize(80, 20) ;
+		ModelTableTaskDescriptor tableModel = new ModelTableTaskDescriptor(nomsColonnes, task) ;
+		table = new JTable(tableModel) ;
+		table.getTableHeader().setReorderingAllowed(false) ;
+		table.setPreferredScrollableViewportSize(new Dimension(50, 30)) ;
+
+		tableScrollPane = new JScrollPane(table) ;
+		jPanelPlanification.add(tableScrollPane) ;
+		tableScrollPane.setMaximumSize(new Dimension(700, 600)) ;
+		tableScrollPane.setAlignmentX(jLabelPlanification.getAlignmentX()) ;
+		return jPanelPlanification ;
 	}
 
 	/**
@@ -122,6 +149,9 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 	 */
 	private JPanel getJPanel ()
 	{
+		JPanel jPanelInfo = new JPanel() ;
+		BoxLayout layoutInfo = new BoxLayout(jPanelInfo, BoxLayout.Y_AXIS) ;
+		jPanelInfo.setLayout(layoutInfo) ;
 
 		idLabel = new JLabel() ;
 		idTextValue = new JTextField() ;
@@ -129,18 +159,17 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		nameTextValue = new JTextField() ;
 		descLabel = new JLabel() ;
 		descTextValue = new JTextArea() ;
-		jLabelPlanification = new JLabel() ;
 
 		idLabel.setText(Bundle.getText("JPanelTaskDescriptorIDLabel")) ;
 		nameLabel.setText(Bundle.getText("JPanelTaskDescriptorNameLabel")) ;
 		descLabel.setText(Bundle.getText("JPanelTaskDescriptorDescriptionLabel")) ;
-		jLabelPlanification.setText(Bundle.getText("JPanelTaskDescriptorPlanification")) ;
 
 		if (jPanel == null)
 		{
 			jPanel = new JPanel() ;
 			jPanel.setLayout(null) ;
 
+			// Creation ID for task
 			if (task.getId() != null)
 			{
 				jPanel.setLayout(null) ;
@@ -155,6 +184,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 
 			}
 
+			// creation name for task
 			if (task.getName() != null)
 			{
 				nameTextValue.setText(task.getName()) ;
@@ -168,10 +198,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 
 			}
 
-			/*
-			 * if ( (!task.getDescription().equals("")) && (!task.getDescription().equals("[N/A]"))) {
-			 */
-
+			// creation description for task
 			descTextValue.setText(task.getDescription()) ;
 			descTextValue.setSize(300, 60) ;
 			descTextValue.setEditable(false) ;
@@ -182,8 +209,8 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 			descLabel.setSize(80, 20) ;
 			jScrollDesc.setSize(300, 60) ;
 			jScrollDesc.setLocation(82, 44) ;
-			// }
 
+			// creation button for task
 			jButtonModifiar = new JButton() ;
 			jButtonModifiar.setText(Bundle.getText("JPanelTaskDescriptorModifiarButton")) ;
 
@@ -221,14 +248,11 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 			jButtonSave.setLocation(82, 106) ;
 			jButtonSave.setSize(110, 20) ;
 
-			jPanel.add(jLabelPlanification) ;
-			jLabelPlanification.setSize(80, 20) ;
-			jLabelPlanification.setLocation(1, 135) ;
-
 			jPanel.setVisible(true) ;
 
 		}
-		return jPanel ;
+		jPanelInfo.add(jPanel) ;
+		return jPanelInfo ;
 	}
 
 	/*
@@ -240,6 +264,74 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 	{
 		// TODO Auto-generated method stub
 
+	}
+
+	public JPanel getJPanelResources ()
+	{
+		String[] nomsColonnesRessources = {
+				Bundle.getText("JPanelTaskDescriptorResourcesCol1"), Bundle.getText("JPanelTaskDescriptorResourcesCol2"),
+				Bundle.getText("JPanelTaskDescriptorResourcesCol3")
+		} ;
+
+		JScrollPane tableRessourcesScrollPane = null ;
+		JPanel JPanelRessources = new JPanel() ;
+		JLabel jLabelRessources = new JLabel() ;
+
+		JTable tableRessources = null ;
+		Object donnees[][] ;
+		// ArrayList ressources = new ArrayList() ;
+		Object listRessources[] ;
+		Object _roles[] ;
+		Object ressources[] = null ;
+		HumanResource HR ;
+		int k = 0 ;
+
+		jLabelRessources.setText(Bundle.getText("JPanelTaskDescriptorResourcesLabel")) ;
+		BoxLayout BL = new BoxLayout(JPanelRessources, BoxLayout.Y_AXIS) ;
+		JPanelRessources.setLayout(BL) ;
+		JPanelRessources.add(jLabelRessources) ;
+		Box bvr = Box.createVerticalBox() ;
+		JPanelRessources.add(bvr) ;
+		bvr.add(Box.createRigidArea(new Dimension(10, 10))) ;
+		jLabelRessources.setSize(80, 20) ;
+
+		_roles = task.getPrimaryPerformers().toArray() ;
+
+		for (int i = 0; i < _roles.length; i++ )
+		{
+
+			listRessources = ( ((RoleDescriptor) _roles[i]).getPerformers()).toArray() ;
+
+			for (int j = 0; j < listRessources.length; j++ )
+			{
+				HR = (HumanResource) listRessources[j] ;
+				ressources[k++ ] = HR ;
+			}
+		}
+
+		donnees = new Object[k][3] ;
+		for (int i = 0; i < donnees.length; i++ )
+		{
+			if (ressources[i] instanceof HumanResource)
+			{
+				donnees[i][0] = new String( ((HumanResource) ressources[i]).getId()) ;
+				donnees[i][1] = new String( ((HumanResource) ressources[i]).getFullName()) ;
+				donnees[i][2] = new String( ((HumanResource) ressources[i]).getEmail()) ;
+			}
+		}
+
+		ModelTableRessources tableModelR = new ModelTableRessources(donnees, nomsColonnesRessources) ;
+
+		tableRessources = new JTable(tableModelR) ;
+		tableRessources.getTableHeader().setReorderingAllowed(false) ;
+		tableRessources.setPreferredScrollableViewportSize(new Dimension(50, 30)) ;
+
+		tableRessourcesScrollPane = new JScrollPane(tableRessources) ;
+		JPanelRessources.add(tableRessourcesScrollPane) ;
+		tableRessourcesScrollPane.setMaximumSize(new Dimension(700, 600)) ;
+		tableRessourcesScrollPane.setAlignmentX(jLabelRessources.getAlignmentX()) ;
+
+		return JPanelRessources ;
 	}
 
 }
@@ -522,6 +614,69 @@ class TableTaskDescriptorRecord implements Observer
 			// Dans le cas ou le format de saisie des dates est incorrect
 			exc.printStackTrace() ;
 		}
+	}
+
+}
+
+
+class ModelTableRessources extends AbstractTableModel
+{
+	Object donnees[][] ;
+
+	String titres[] ;
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L ;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.table.TableModel#getRowCount()
+	 */
+	public ModelTableRessources (Object donnees[][], String titres[])
+	{
+		this.donnees = donnees ;
+		this.titres = titres ;
+	}
+
+	public int getRowCount ()
+	{
+		// TODO Auto-generated method stub
+		return donnees.length ;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.table.TableModel#getColumnCount()
+	 */
+
+	public int getColumnCount ()
+	{
+		return titres.length ;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.table.TableModel#getValueAt(int, int)
+	 */
+	public Object getValueAt (int ligne, int colonne)
+	{
+		// TODO Auto-generated method stub
+		return donnees[ligne][colonne] ;
+	}
+
+	public String getColumnName (int colonne)
+	{
+		return titres[colonne] ;
+	}
+
+	public boolean isCellEditable (int row, int col)
+	{
+		return false ;
 	}
 
 }

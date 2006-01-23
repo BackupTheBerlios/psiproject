@@ -2,14 +2,20 @@
 package ui.window ;
 
 import java.awt.HeadlessException ;
+import java.awt.MouseInfo;
 import java.awt.event.ActionEvent ;
+import java.awt.event.ActionListener ;
+import java.awt.event.MouseAdapter ;
+import java.awt.event.MouseEvent ;
 import java.io.File ;
 
-import ui.dialog.PreferenceDialog;
+import ui.dialog.PreferenceDialog ;
+import ui.dialog.TaskDescriptorAdderDialog;
 import ui.misc.LogPanel ;
 import ui.misc.RoleDescriptorPanel ;
 import ui.misc.TaskDescriptorPanel ;
 import ui.resource.Bundle ;
+import ui.tree.ActivityTreeNode ;
 import ui.tree.ProjectTreeNode ;
 import ui.tree.RoleDescriptorTreeNode ;
 import ui.tree.TaskDescriptorTreeNode ;
@@ -18,11 +24,12 @@ import javax.swing.AbstractAction ;
 import javax.swing.JFileChooser ;
 import javax.swing.JFrame ;
 import javax.swing.JOptionPane ;
+import javax.swing.JPopupMenu ;
 import javax.swing.JSplitPane ;
 import javax.swing.JMenuBar ;
 import javax.swing.JMenu ;
-import javax.swing.KeyStroke;
-import javax.swing.WindowConstants;
+import javax.swing.KeyStroke ;
+import javax.swing.WindowConstants ;
 
 import javax.swing.JMenuItem ;
 import javax.swing.JTree ;
@@ -30,6 +37,7 @@ import javax.swing.JTabbedPane ;
 import javax.swing.filechooser.FileFilter ;
 import javax.swing.tree.DefaultMutableTreeNode ;
 import javax.swing.tree.DefaultTreeModel ;
+import javax.swing.tree.TreePath ;
 
 import model.LogInformation ;
 import model.Project ;
@@ -106,8 +114,10 @@ public class MainFrame extends JFrame
 	private LogPanel statusPanel = null ;
 
 	private Project currentProject = null ;
-	
+
 	private boolean projectModified = false ;
+
+	private JPopupMenu activityPopupMenu = null ;
 
 	/*
 	 * Here are defined actions which can be performed by the user. Abstract Actions are used to
@@ -238,25 +248,26 @@ public class MainFrame extends JFrame
 	private void actionExit ()
 	{
 		Preferences.getInstance().save() ;
-		
+
 		if (projectModified)
 		{
-			int localChoice = JOptionPane.showConfirmDialog(this, Bundle.getText("MainFrameConfirmExitMessage"), "PSI", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) ;
-			
+			int localChoice = JOptionPane.showConfirmDialog(this, Bundle.getText("MainFrameConfirmExitMessage"), "PSI", JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE) ;
+
 			if (localChoice == JOptionPane.YES_OPTION)
 			{
-				//actionSave(new ActionEvent()) ;
+				// actionSave(new ActionEvent()) ;
 				System.exit(0) ;
 			}
-			
-			else if(localChoice == JOptionPane.NO_OPTION)
+
+			else if (localChoice == JOptionPane.NO_OPTION)
 			{
 				System.exit(0) ;
 			}
-			
+
 			return ;
 		}
-		
+
 		System.exit(0) ;
 	}
 
@@ -312,7 +323,7 @@ public class MainFrame extends JFrame
 		if ( (localFile = localFileChooser.getSelectedFile()) != null)
 		{
 			actionImport.setEnabled(false) ;
-			
+
 			if (Preferences.getInstance().getWorkDirectory().trim().equals(""))
 			{
 				Preferences.getInstance().setWorkDirectory(localDirectory.getAbsolutePath()) ;
@@ -437,19 +448,19 @@ public class MainFrame extends JFrame
 	private void actionSave (ActionEvent evt)
 	{
 		File localFile = new File(Preferences.getInstance().getLastProject()) ;
-		
+
 		if (!localFile.exists())
 		{
 			actionSaveAs(evt) ;
 			return ;
 		}
-		
+
 		try
 		{
 			ProjectControler.save(currentProject, localFile) ;
 			actionSave.setEnabled(false) ;
 			statusPanel.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved"))) ;
-			
+
 		}
 		catch (FileSaveException exc)
 		{
@@ -515,8 +526,9 @@ public class MainFrame extends JFrame
 			}
 
 			// Checking if the file already exists before saving
-			if (!localFile.exists() || JOptionPane.showConfirmDialog(MainFrame.this, Bundle.getText("MainFrameFileSaveConfirm"), "PSI", JOptionPane.YES_NO_OPTION,
-					JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+			if (!localFile.exists()
+					|| JOptionPane.showConfirmDialog(MainFrame.this, Bundle.getText("MainFrameFileSaveConfirm"), "PSI", JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
 			{
 				try
 				{
@@ -524,7 +536,7 @@ public class MainFrame extends JFrame
 					actionSave.setEnabled(false) ;
 					Preferences.getInstance().setLastProject(localFile.getAbsolutePath()) ;
 					statusPanel.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved"))) ;
-					
+
 				}
 				catch (FileSaveException exc)
 				{
@@ -592,7 +604,7 @@ public class MainFrame extends JFrame
 			fileMenu.add(getCloseFileMenuItem()) ;
 			fileMenu.addSeparator() ;
 			fileMenu.add(getCreateFileMenuItem()) ;
-			fileMenu.add(getImportProcessFileMenuItem()) ;			
+			fileMenu.add(getImportProcessFileMenuItem()) ;
 			fileMenu.addSeparator() ;
 			fileMenu.add(getSaveFileMenuItem()) ;
 			fileMenu.add(getSaveAsFileMenuItem()) ;
@@ -632,7 +644,7 @@ public class MainFrame extends JFrame
 		{
 			aboutMenu = new JMenu() ;
 			aboutMenu.setText(Bundle.getText("MainFrameAboutMenu")) ;
-			//aboutMenu.setMnemonic(Bundle.getText("MainFrameAboutMenuMn").charAt(0)) ;
+			// aboutMenu.setMnemonic(Bundle.getText("MainFrameAboutMenuMn").charAt(0)) ;
 			aboutMenu.add(getHelpAboutMenuItem()) ;
 			aboutMenu.addSeparator() ;
 			aboutMenu.add(getAboutAboutMenuItem()) ;
@@ -720,7 +732,8 @@ public class MainFrame extends JFrame
 			saveAsFileMenuItem = new JMenuItem() ;
 			saveAsFileMenuItem.setAction(actionSaveAs) ;
 			saveAsFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuSaveAsMn").charAt(0)) ;
-			saveAsFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK|java.awt.event.InputEvent.SHIFT_MASK)) ;
+			saveAsFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK
+					| java.awt.event.InputEvent.SHIFT_MASK)) ;
 		}
 		return saveAsFileMenuItem ;
 	}
@@ -822,7 +835,7 @@ public class MainFrame extends JFrame
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
 				{
-					new PreferenceDialog(MainFrame.this);
+					new PreferenceDialog(MainFrame.this) ;
 				}
 			}) ;
 		}
@@ -841,11 +854,71 @@ public class MainFrame extends JFrame
 			DefaultMutableTreeNode localNode = new DefaultMutableTreeNode(Bundle.getText("MainFrameTreeDefault")) ;
 			DefaultTreeModel localDTM = new DefaultTreeModel(localNode) ;
 			projectTree = new JTree(localDTM) ;
+
+			/*
+			 * Popup classes for jtree
+			 */
+			class ActivityListener extends MouseAdapter implements ActionListener
+			{
+				private int localLocation =0;
+				/**
+				 * Constructor
+				 * 
+				 */
+				public ActivityListener ()
+				{
+					super() ;
+
+					JMenuItem localItem = new JMenuItem(Bundle.getText("MainFramePopupMenuAdd")) ;
+					activityPopupMenu = new JPopupMenu() ;
+					localItem.addActionListener(new java.awt.event.ActionListener()
+					{
+						public void actionPerformed (java.awt.event.ActionEvent e)
+						{
+							System.out.println((((ActivityTreeNode)MainFrame.this.projectTree.getPathForRow(localLocation).getLastPathComponent()).getActivity()).getDescriptor().getName());
+							new TaskDescriptorAdderDialog(MainFrame.this,((ActivityTreeNode)MainFrame.this.projectTree.getPathForRow(localLocation).getLastPathComponent()).getActivity());
+						}
+					}) ;
+
+					activityPopupMenu.add(localItem) ;
+
+				}
+
+				/**
+				 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+				 */
+				public void actionPerformed (ActionEvent _e)
+				{
+					// TODO Auto-generated method stub
+
+				}
+
+				/**
+				 * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
+				 */
+				@ Override
+				public void mouseReleased (MouseEvent _e)
+				{
+					if (_e.isPopupTrigger())
+					{
+						localLocation = MainFrame.this.projectTree.getRowForLocation(_e.getX(), _e.getY()) ;
+						TreePath localPath = MainFrame.this.projectTree.getPathForRow(localLocation) ;
+						
+						if (MainFrame.this.projectTree.getPathForRow(localLocation).getLastPathComponent() instanceof ActivityTreeNode)
+						{
+							MainFrame.this.projectTree.setSelectionPath(localPath) ;
+							activityPopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;
+						}					
+					}
+				}
+			}
+
 			projectTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener()
 			{
 				public void valueChanged (javax.swing.event.TreeSelectionEvent e)
 				{
 					DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) projectTree.getLastSelectedPathComponent() ;
+
 					/*
 					 * Task descriptors => displaying estimations
 					 */
@@ -863,9 +936,10 @@ public class MainFrame extends JFrame
 						getMainContainer().add(new RoleDescriptorPanel( ((RoleDescriptorTreeNode) localNode).getRole()),
 								((RoleDescriptorTreeNode) localNode).getRole().getName()) ;
 					}
+
 				}
 			}) ;
-
+			projectTree.addMouseListener(new ActivityListener()) ;			
 		}
 		return projectTree ;
 	}
@@ -1022,6 +1096,11 @@ public class MainFrame extends JFrame
 			statusPanel = new LogPanel() ;
 		}
 		return statusPanel ;
+	}
+
+	public Project getProject ()
+	{
+		return this.currentProject ;
 	}
 
 } // @jve:decl-index=0:visual-constraint="158,10"

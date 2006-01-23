@@ -25,4 +25,22 @@ public class DeliveryProcess extends Process
 		super(_id, _name, _description, _authorFullName, _authorMail) ;
 	}
 
+	
+	/**
+	 * Constructor
+	 *
+	 * @param _id
+	 * @param _name
+	 * @param _description
+	 * @param _authorFullName
+	 * @param _authorMail
+	 * @param _date
+	 * @param _generationPath
+	 */
+	public DeliveryProcess (String _id, String _name, String _description, String _authorFullName, String _authorMail, String _date, String _generationPath)
+	{
+		super(_id, _name, _description, _authorFullName, _authorMail, _date, _generationPath) ;
+	}
+
+	
 }

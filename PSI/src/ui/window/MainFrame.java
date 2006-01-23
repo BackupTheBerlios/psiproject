@@ -6,19 +6,21 @@ import java.awt.event.ActionEvent ;
 import java.io.File ;
 
 import ui.misc.LogPanel ;
-import ui.misc.RoleDescriptorPanel;
+import ui.misc.RoleDescriptorPanel ;
 import ui.misc.TaskDescriptorPanel ;
 import ui.resource.Bundle ;
 import ui.tree.ProjectTreeNode ;
-import ui.tree.RoleDescriptorTreeNode;
+import ui.tree.RoleDescriptorTreeNode ;
 import ui.tree.TaskDescriptorTreeNode ;
 
 import javax.swing.AbstractAction ;
 import javax.swing.JFileChooser ;
 import javax.swing.JFrame ;
+import javax.swing.JOptionPane ;
 import javax.swing.JSplitPane ;
 import javax.swing.JMenuBar ;
 import javax.swing.JMenu ;
+import javax.swing.KeyStroke;
 
 import javax.swing.JMenuItem ;
 import javax.swing.JTree ;
@@ -32,6 +34,7 @@ import model.Project ;
 
 import process.Preferences ;
 import process.exception.FileParseException ;
+import process.exception.FileSaveException ;
 import process.utility.ProcessControler ;
 import process.utility.ProjectControler ;
 
@@ -251,7 +254,7 @@ public class MainFrame extends JFrame
 		localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileCreateProjectTitle")) ;
 		localFileChooser.setAcceptAllFileFilterUsed(false) ;
 		localFileChooser.setApproveButtonText(Bundle.getText("MainFrameFileCreateProjectButton")) ;
-		File localDirectory = new File(Preferences.getInstance().getLastProject()).getParentFile() ;
+		File localDirectory = new File(Preferences.getInstance().getWorkDirectory()) ;
 		if (localDirectory != null)
 		{
 			localFileChooser.setCurrentDirectory(localDirectory) ;
@@ -285,8 +288,7 @@ public class MainFrame extends JFrame
 		if ( (localFile = localFileChooser.getSelectedFile()) != null)
 		{
 			actionImport.setEnabled(false) ;
-			Preferences.getInstance().setLastProject(localFile.getAbsolutePath()) ;
-
+			
 			if (Preferences.getInstance().getWorkDirectory().trim().equals(""))
 			{
 				Preferences.getInstance().setWorkDirectory(localDirectory.getAbsolutePath()) ;
@@ -304,7 +306,7 @@ public class MainFrame extends JFrame
 			}
 			catch (FileParseException exc)
 			{
-				System.out.println(Bundle.getText("MainFrameFileCreateIncorrectFormat")) ;
+				JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileCreateIncorrectFormat"), "PSI", JOptionPane.ERROR_MESSAGE) ;
 			}
 		}
 	}
@@ -379,7 +381,7 @@ public class MainFrame extends JFrame
 			}
 			catch (FileParseException exc)
 			{
-				System.out.println("processus incorrect") ;
+				JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileImportIncorrectFormat"), "PSI", JOptionPane.ERROR_MESSAGE) ;
 			}
 		}
 	}
@@ -410,7 +412,25 @@ public class MainFrame extends JFrame
 	 */
 	private void actionSave (ActionEvent evt)
 	{
-
+		File localFile = new File(Preferences.getInstance().getLastProject()) ;
+		
+		if (!localFile.exists())
+		{
+			actionSaveAs(evt) ;
+			return ;
+		}
+		
+		try
+		{
+			ProjectControler.save(currentProject, localFile) ;
+			actionSave.setEnabled(false) ;
+			statusPanel.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved"))) ;
+			
+		}
+		catch (FileSaveException exc)
+		{
+			JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileSaveError"), "PSI", JOptionPane.ERROR_MESSAGE) ;
+		}
 	}
 
 	/**
@@ -424,7 +444,70 @@ public class MainFrame extends JFrame
 	 */
 	private void actionSaveAs (ActionEvent evt)
 	{
+		/*
+		 * Setting up a specific JFileChooser
+		 */
+		JFileChooser localFileChooser = new JFileChooser() ;
+		localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileSaveProjectTitle")) ;
+		localFileChooser.setAcceptAllFileFilterUsed(false) ;
+		localFileChooser.setApproveButtonText(Bundle.getText("MainFrameFileImportProjectButton")) ;
+		File localDirectory = new File(Preferences.getInstance().getWorkDirectory()) ;
+		if (localDirectory != null)
+		{
+			localFileChooser.setCurrentDirectory(localDirectory) ;
+		}
+		localFileChooser.setFileFilter(new FileFilter()
+		{
+			/*
+			 * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
+			 */
+			public boolean accept (File _file)
+			{
+				String localFileName = _file.getName() ;
+				String localFileExtension = localFileName.substring(localFileName.lastIndexOf(".") + 1) ;
+				return (_file.isDirectory() || (_file.isFile() && _file.canRead() && localFileExtension.equalsIgnoreCase("xml"))) ;
+			}
 
+			/*
+			 * @see javax.swing.filechooser.FileFilter#getDescription()
+			 */
+			public String getDescription ()
+			{
+				return Bundle.getText("MainFrameFilePSIFileDescription") ;
+			}
+		}) ;
+		localFileChooser.showSaveDialog(MainFrame.this) ;
+
+		/*
+		 * Working on a selected file
+		 */
+		File localFile = null ;
+		if ( (localFile = localFileChooser.getSelectedFile()) != null)
+		{
+			// Adding extension if necessary
+			if (!localFile.getName().endsWith(".xml"))
+			{
+				// localFile.
+			}
+
+			// Checking if the file already exists before saving
+			if (!localFile.exists() || JOptionPane.showConfirmDialog(MainFrame.this, Bundle.getText("MainFrameFileSaveConfirm"), "PSI", JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+			{
+				try
+				{
+					ProjectControler.save(currentProject, localFile) ;
+					actionSave.setEnabled(false) ;
+					Preferences.getInstance().setLastProject(localFile.getAbsolutePath()) ;
+					statusPanel.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved"))) ;
+					
+				}
+				catch (FileSaveException exc)
+				{
+					JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileSaveError"), "PSI", JOptionPane.ERROR_MESSAGE) ;
+				}
+			}
+		}
 	}
 
 	/**
@@ -480,10 +563,12 @@ public class MainFrame extends JFrame
 		{
 			fileMenu = new JMenu() ;
 			fileMenu.setText(Bundle.getText("MainFrameFileMenu")) ;
+			fileMenu.setMnemonic(Bundle.getText("MainFrameFileMenuMn").charAt(0)) ;
 			fileMenu.add(getOpenFileMenuItem()) ;
-			fileMenu.add(getCreateFileMenuItem()) ;
-			fileMenu.add(getImportProcessFileMenuItem()) ;
 			fileMenu.add(getCloseFileMenuItem()) ;
+			fileMenu.addSeparator() ;
+			fileMenu.add(getCreateFileMenuItem()) ;
+			fileMenu.add(getImportProcessFileMenuItem()) ;			
 			fileMenu.addSeparator() ;
 			fileMenu.add(getSaveFileMenuItem()) ;
 			fileMenu.add(getSaveAsFileMenuItem()) ;
@@ -506,6 +591,7 @@ public class MainFrame extends JFrame
 		{
 			editMenu = new JMenu() ;
 			editMenu.setText(Bundle.getText("MainFrameEditMenu")) ;
+			editMenu.setMnemonic(Bundle.getText("MainFrameEditMenuMn").charAt(0)) ;
 			editMenu.add(getPrefsEditMenuItem()) ;
 		}
 		return editMenu ;
@@ -522,7 +608,7 @@ public class MainFrame extends JFrame
 		{
 			aboutMenu = new JMenu() ;
 			aboutMenu.setText(Bundle.getText("MainFrameAboutMenu")) ;
-			aboutMenu.setHorizontalAlignment(javax.swing.SwingConstants.LEADING) ;
+			//aboutMenu.setMnemonic(Bundle.getText("MainFrameAboutMenuMn").charAt(0)) ;
 			aboutMenu.add(getHelpAboutMenuItem()) ;
 			aboutMenu.addSeparator() ;
 			aboutMenu.add(getAboutAboutMenuItem()) ;
@@ -541,6 +627,8 @@ public class MainFrame extends JFrame
 		{
 			openFileMenuItem = new JMenuItem() ;
 			openFileMenuItem.setAction(actionOpen) ;
+			openFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuOpenMn").charAt(0)) ;
+			openFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
 		return openFileMenuItem ;
 	}
@@ -556,6 +644,8 @@ public class MainFrame extends JFrame
 		{
 			createFileMenuItem = new JMenuItem() ;
 			createFileMenuItem.setAction(actionCreate) ;
+			createFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuCreateMn").charAt(0)) ;
+			createFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
 		return createFileMenuItem ;
 	}
@@ -571,6 +661,8 @@ public class MainFrame extends JFrame
 		{
 			importProcessFileMenuItem = new JMenuItem() ;
 			importProcessFileMenuItem.setAction(actionImport) ;
+			importProcessFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuImportProcessMn").charAt(0)) ;
+			importProcessFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
 		return importProcessFileMenuItem ;
 	}
@@ -586,6 +678,8 @@ public class MainFrame extends JFrame
 		{
 			saveFileMenuItem = new JMenuItem() ;
 			saveFileMenuItem.setAction(actionSave) ;
+			saveFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuSaveMn").charAt(0)) ;
+			saveFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
 		return saveFileMenuItem ;
 	}
@@ -601,6 +695,8 @@ public class MainFrame extends JFrame
 		{
 			saveAsFileMenuItem = new JMenuItem() ;
 			saveAsFileMenuItem.setAction(actionSaveAs) ;
+			saveAsFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuSaveAsMn").charAt(0)) ;
+			saveAsFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK|java.awt.event.InputEvent.SHIFT_MASK)) ;
 		}
 		return saveAsFileMenuItem ;
 	}
@@ -616,6 +712,8 @@ public class MainFrame extends JFrame
 		{
 			closeFileMenuItem = new JMenuItem() ;
 			closeFileMenuItem.setText(Bundle.getText("MainFrameFileMenuClose")) ;
+			closeFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuCloseMn").charAt(0)) ;
+			closeFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
 		return closeFileMenuItem ;
 	}
@@ -631,6 +729,8 @@ public class MainFrame extends JFrame
 		{
 			quitFileMenuItem = new JMenuItem() ;
 			quitFileMenuItem.setText(Bundle.getText("MainFrameFileMenuQuit")) ;
+			quitFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuQuitMn").charAt(0)) ;
+			quitFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.ALT_MASK)) ;
 			quitFileMenuItem.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
@@ -653,6 +753,8 @@ public class MainFrame extends JFrame
 		{
 			helpAboutMenuItem = new JMenuItem() ;
 			helpAboutMenuItem.setText(Bundle.getText("MainFrameAboutMenuHelp")) ;
+			helpAboutMenuItem.setMnemonic(Bundle.getText("MainFrameAboutMenuHelpMn").charAt(0)) ;
+			helpAboutMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
 		return helpAboutMenuItem ;
 	}
@@ -668,6 +770,14 @@ public class MainFrame extends JFrame
 		{
 			aboutAboutMenuItem = new JMenuItem() ;
 			aboutAboutMenuItem.setText(Bundle.getText("MainFrameAboutMenuAbout")) ;
+			aboutAboutMenuItem.setMnemonic(Bundle.getText("MainFrameAboutMenuAboutMn").charAt(0)) ;
+			aboutAboutMenuItem.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+
+				}
+			}) ;
 		}
 		return aboutAboutMenuItem ;
 	}
@@ -683,6 +793,14 @@ public class MainFrame extends JFrame
 		{
 			prefsEditMenuItem = new JMenuItem() ;
 			prefsEditMenuItem.setText(Bundle.getText("MainFrameEditMenuPrefs")) ;
+			prefsEditMenuItem.setMnemonic(Bundle.getText("MainFrameEditMenuPrefsMn").charAt(0)) ;
+			prefsEditMenuItem.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+					System.out.println("actionPerformed()") ;
+				}
+			}) ;
 		}
 		return prefsEditMenuItem ;
 	}
@@ -712,7 +830,7 @@ public class MainFrame extends JFrame
 						getMainContainer().add(new TaskDescriptorPanel( ((TaskDescriptorTreeNode) localNode).getTask()),
 								((TaskDescriptorTreeNode) localNode).getTask().getName()) ;
 					}
-					
+
 					/*
 					 * Role descriptors => displaying role infos
 					 */
@@ -727,19 +845,19 @@ public class MainFrame extends JFrame
 		}
 		return projectTree ;
 	}
-	
+
 	/**
 	 * 
 	 * TODO Method description
-	 *
+	 * 
 	 * @author l3isi4
 	 * @version 1.0
 	 * 
 	 * @return
 	 */
-	public Project getCurrentProject()
+	public Project getCurrentProject ()
 	{
-		return this.currentProject;
+		return this.currentProject ;
 	}
 
 	/**
@@ -753,6 +871,7 @@ public class MainFrame extends JFrame
 		{
 			exportFileMenu = new JMenu() ;
 			exportFileMenu.setText(Bundle.getText("MainFrameFileMenuExport")) ;
+			exportFileMenu.setMnemonic(Bundle.getText("MainFrameFileMenuExportMn").charAt(0)) ;
 			exportFileMenu.add(getExportDominoFileMenuItem()) ;
 			exportFileMenu.add(getExportOWFileMenuItem()) ;
 			exportFileMenu.add(getExport2DBFileMenuItem()) ;
@@ -771,6 +890,7 @@ public class MainFrame extends JFrame
 		{
 			exportDominoFileMenuItem = new JMenuItem() ;
 			exportDominoFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExportDomino")) ;
+			exportDominoFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExportDominoMn").charAt(0)) ;
 		}
 		return exportDominoFileMenuItem ;
 	}
@@ -786,6 +906,7 @@ public class MainFrame extends JFrame
 		{
 			export2DBFileMenuItem = new JMenuItem() ;
 			export2DBFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExport2DB")) ;
+			export2DBFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExport2DBMn").charAt(0)) ;
 		}
 		return export2DBFileMenuItem ;
 	}
@@ -801,6 +922,7 @@ public class MainFrame extends JFrame
 		{
 			exportOWFileMenuItem = new JMenuItem() ;
 			exportOWFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExportOW")) ;
+			exportOWFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExportOWMn").charAt(0)) ;
 		}
 		return exportOWFileMenuItem ;
 	}

@@ -8,12 +8,13 @@ import java.io.FileInputStream ;
 import java.io.FileNotFoundException ;
 import java.io.FileOutputStream ;
 import java.io.IOException ;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.OutputStreamWriter ;
+import java.io.UnsupportedEncodingException ;
 import java.text.ParseException ;
 import java.text.SimpleDateFormat ;
 import java.util.ArrayList ;
 import java.util.Collection ;
+import java.util.Iterator ;
 
 import javax.xml.parsers.DocumentBuilder ;
 import javax.xml.parsers.DocumentBuilderFactory ;
@@ -28,13 +29,17 @@ import org.xml.sax.SAXParseException ;
 
 import process.exception.FileParseException ;
 import process.exception.FileSaveException ;
+import model.Component ;
 import model.HumanResource ;
 import model.Project ;
+import model.spem2.BreakdownElement ;
+import model.spem2.DeliveryProcess ;
+import model.spem2.RoleDescriptor ;
 
 /**
  * ProjectControler : Loads, saves project information
  * 
- * @author Cond? Mickael K.
+ * @author Conde Mickael K.
  * @version 1.0
  * 
  */
@@ -44,7 +49,7 @@ public class ProjectControler
 	 * Loads a NEW project (without a process linked to it) from an xml file, the project me created
 	 * with Open Workbench
 	 * 
-	 * @author Cond? Mickael K.
+	 * @author Conde Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param _source
@@ -256,7 +261,7 @@ public class ProjectControler
 	/**
 	 * Open a previously created project.
 	 * 
-	 * @author Cond? Mickael K.
+	 * @author Conde Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param _source
@@ -270,9 +275,9 @@ public class ProjectControler
 	}
 
 	/**
-	 * Saves the project in domino format
+	 * Saves the project in domino format TODO : packages handling
 	 * 
-	 * @author Cond? Mickael K.
+	 * @author Conde Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param _project
@@ -284,28 +289,152 @@ public class ProjectControler
 		{
 			FileOutputStream localFOS = new FileOutputStream(_destination) ;
 			BufferedOutputStream localBOS = new BufferedOutputStream(localFOS) ;
-			
+
 			OutputStreamWriter localOSW = new OutputStreamWriter(localBOS, "ISO-8859-1") ;
 
-			localOSW.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n\n") ;
-			localOSW.write("<psiPreferences>\n") ;
+			DeliveryProcess localProcess = _project.getProcess() ;
+
+			/*
+			 * Initialisation
+			 */
+			BreakdownElement localElement ;
+			ArrayList <Component> localComponents = new ArrayList <Component>() ;
+			ArrayList <RoleDescriptor> localRoles = new ArrayList <RoleDescriptor>() ;
+			// ArrayList <Component> localComponents = new ArrayList <Component>() ;
+
+			// Initializing components
+			Iterator <BreakdownElement> localIterator = _project.getProcess().getNestedElements().iterator() ;
+			while (localIterator.hasNext())
+			{
+				localElement = localIterator.next() ;
+				if (localElement instanceof Component)
+				{
+					localComponents.add((Component) localElement) ;
+				}
+			}
 			
+			// Initializing roles
+			localIterator = _project.getProcess().getNestedElements().iterator() ;
+			while (localIterator.hasNext())
+			{
+				localElement = localIterator.next() ;
+				if (localElement instanceof RoleDescriptor)
+				{
+					localRoles.add((RoleDescriptor) localElement) ;
+				}
+			}
+
+			/*
+			 * Writing the file
+			 */
+			localOSW.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n\n") ;
+
+			// Starting project
+			localOSW.write("<exportProjet>\n") ;
+
+			// Starting process
+			localOSW.write("<exportExecution>\n") ;
+
+			// Process info
+			localOSW.write("<processus>\n") ;
+			localOSW.write("<id>" + localProcess.getDescriptor().getId() + "</id>\n" + "<nom>" + localProcess.getDescriptor().getName() + "</nom>\n"
+					+ "<nomAuteur>" + localProcess.getAuthorFullName() + "</nomAuteur>\n" + "<emailAuteur>" + localProcess.getAuthorMail() + "</emailAuteur>\n"
+					+ "<dateExport>" + localProcess.getDate() + "</dateExport>\n") ;
+			localOSW.write(localProcess.getDescriptor().getDescription().equals("") ? "<description/>" : "<description>"
+					+ localProcess.getDescriptor().getDescription() + "</description>") ;
+			localOSW.write("<cheminGeneration>" + localProcess.getGenerationPath() + "</cheminGeneration>\n") ;
+
+			// Components within a process
+			int localComponentsSize = localComponents.size() ;
+			if (localComponentsSize == 0)
+			{
+				localOSW.write("<liste_composantId/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<liste_composantId>\n") ;
+				for (int i = 0; i < localComponentsSize; i++ )
+				{
+					localOSW.write("<composantId>" + localComponents.get(i).getDescriptor().getId() + "</composantId>\n") ;
+				}
+				localOSW.write("</liste_composantId>\n") ;
+			}
+
+			// Packages within a process
+			localOSW.write("</processus>\n") ;
+
+			// Listing all components
+			if (localComponentsSize == 0)
+			{
+				localOSW.write("<liste_composant/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<liste_composant>\n") ;
+				for (int i = 0; i < localComponentsSize; i++ )
+				{
+					localOSW.write("<composant>\n") ;
+					localOSW.write("<id>" + localComponents.get(i).getDescriptor().getId() + "</id>\n") ;
+					localOSW.write("<nom>"+ localComponents.get(i).getDescriptor().getName() + "</nom>\n") ;
+					localOSW.write("<version>" + localComponents.get(i).getVersion()+ "</version>\n") ;
+					localOSW.write("<nomAuteur>" + localComponents.get(i).getAuthorFullName() + "</nomAuteur>\n");
+					localOSW.write("<emailAuteur>"+ localComponents.get(i).getAuthorMail() + "</emailAuteur>\n") ;
+					localOSW.write("<datePlacement>"+ localComponents.get(i).getDate() + "</datePlacement>\n") ;
+					localOSW.write("<description>"+ localComponents.get(i).getDescriptor().getDescription() + "</description>\n") ;
+					localOSW.write("<cheminDiagrammeFlots>"+ localComponents.get(i).getFlowDiagramPath() + "</cheminDiagrammeFlots>\n") ;
+					// Roles
+					// Products
+					// Work definitions (activities)
+					localOSW.write("<liste_definitionTravailId/>\n") ;
+					localOSW.write("</composant>\n") ;
+				}
+				localOSW.write("</liste_composant>\n") ;
+			}
+			
+			// Listing all roles
+			int localRolesSize = localRoles.size() ;
+			if (localRolesSize == 0)
+			{
+				localOSW.write("<liste_role/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<liste_role>\n") ;
+				for (int i = 0; i < localRolesSize; i++ )
+				{
+					localOSW.write("<role>\n") ;
+					localOSW.write("<id>" + localRoles.get(i).getId() + "</id>\n") ;
+					localOSW.write("<nom>"+ localRoles.get(i).getName() + "</nom>\n") ;
+					localOSW.write("<agregatComposant>"+ localRoles.get(i).getParentId() + "</agregatComposant>\n") ;
+					localOSW.write("<liste_responsabiliteProduit>\n") ;
+					localOSW.write("</role>\n") ;
+				}
+				localOSW.write("</liste_role>\n") ;
+			}
+
+			// Ending process
+			localOSW.write("</exportExecution>\n") ;
+
+			// Project's objects
+
+			// Ending project
+			localOSW.write("</exportProjet>\n") ;
 
 			localOSW.flush() ;
 			localOSW.close() ;
-			
+
 		}
 
 		catch (FileNotFoundException exc)
 		{
 			throw new FileSaveException() ;
 		}
-		
-		catch(UnsupportedEncodingException exc)
+
+		catch (UnsupportedEncodingException exc)
 		{
 			throw new FileSaveException() ;
 		}
-		
+
 		catch (IOException exc)
 		{
 			throw new FileSaveException() ;

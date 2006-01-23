@@ -107,9 +107,11 @@ public class ProcessControler
 				String localDescription = "" ;
 				String localAuthorName = "" ;
 				String localAuthorMail = "" ;
+				String localDate = "" ;
+				String localGenerationPath = "" ;
 				String localInterfaceDiagramPath = "" ;
-				String localFlowDiagramPath ;
-				String localActivitiesDiagramPath ;
+				String localFlowDiagramPath = "" ;
+				String localActivitiesDiagramPath = "" ;
 
 				// Work breakdowns elements
 				ArrayList <BreakdownElement> localNested = new ArrayList <BreakdownElement>() ;
@@ -142,7 +144,7 @@ public class ProcessControler
 						}
 						catch (NullPointerException exc)
 						{
-							localID = "[N/A]" ;
+							localID = "" ;
 						}
 					}
 
@@ -157,7 +159,7 @@ public class ProcessControler
 						}
 						catch (NullPointerException exc)
 						{
-							localName = "[N/A]" ;
+							localName = "" ;
 						}
 					}
 
@@ -172,7 +174,7 @@ public class ProcessControler
 						}
 						catch (NullPointerException exc)
 						{
-							localDescription = "[N/A]" ;
+							localDescription = "" ;
 						}
 					}
 
@@ -187,27 +189,57 @@ public class ProcessControler
 						}
 						catch (NullPointerException exc)
 						{
-							localAuthorName = "[N/A]" ;
+							localAuthorName = "" ;
 						}
 					}
 
 					/*
-					 * Getting the description of the process
+					 * Getting the author's mail
 					 */
 					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE && localPAttribList.item(i).getNodeName().equalsIgnoreCase("emailAuteur"))
 					{
 						try
 						{
-							localDescription = localPAttribList.item(i).getFirstChild().getNodeValue() ;
+							localAuthorMail = localPAttribList.item(i).getFirstChild().getNodeValue() ;
 						}
 						catch (NullPointerException exc)
 						{
-							localAuthorMail = "[N/A]" ;
+							localAuthorMail = "" ;
 						}
 					}
+					
+					/*
+					 * Getting the date of export
+					 */
+					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE && localPAttribList.item(i).getNodeName().equalsIgnoreCase("dateExport"))
+					{
+						try
+						{
+							localDate = localPAttribList.item(i).getFirstChild().getNodeValue() ;
+						}
+						catch (NullPointerException exc)
+						{
+							localDate = "" ;
+						}
+					}
+					
+					/*
+					 * Getting the generation path
+					 */
+					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE && localPAttribList.item(i).getNodeName().equalsIgnoreCase("cheminGeneration"))
+					{
+						try
+						{
+							localGenerationPath = localPAttribList.item(i).getFirstChild().getNodeValue() ;
+						}
+						catch (NullPointerException exc)
+						{
+							localGenerationPath = "" ;
+						}
+					}					
 				}
 
-				DeliveryProcess localProcess = new DeliveryProcess(localID, localName, localDescription, localAuthorName, localAuthorMail) ;
+				DeliveryProcess localProcess = new DeliveryProcess(localID, localName, localDescription, localAuthorName, localAuthorMail, localDate, localGenerationPath) ;
 
 				/*
 				 * Tasks (TaskDescriptor)
@@ -243,7 +275,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localID = "[N/A]" ;
+									localID = "" ;
 								}
 							}
 
@@ -258,7 +290,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localName = "[N/A]" ;
+									localName = "" ;
 								}
 							}
 
@@ -274,7 +306,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localParentId = "[N/A]" ;
+									localParentId = "" ;
 								}
 							}
 
@@ -329,7 +361,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localID = "[N/A]" ;
+									localID = "" ;
 								}
 							}
 
@@ -344,7 +376,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localName = "[N/A]" ;
+									localName = "" ;
 								}
 							}
 
@@ -360,7 +392,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localParentId = "[N/A]" ;
+									localParentId = "" ;
 								}
 							}
 
@@ -376,7 +408,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localFlowDiagramPath = "[N/A]" ;
+									localFlowDiagramPath = "" ;
 								}
 							}
 
@@ -392,7 +424,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localActivitiesDiagramPath = "[N/A]" ;
+									localActivitiesDiagramPath = "" ;
 								}
 							}
 
@@ -491,7 +523,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localID = "[N/A]" ;
+									localID = "" ;
 								}
 							}
 
@@ -506,7 +538,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localName = "[N/A]" ;
+									localName = "" ;
 								}
 							}
 
@@ -522,7 +554,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localParentId = "[N/A]" ;
+									localParentId = "" ;
 								}
 							}
 
@@ -584,7 +616,6 @@ public class ProcessControler
 				 */
 				// Temp variables
 				String localVersion ;
-				String localDate ;
 				String localGenOrder ;
 				Component localTempComponent ;
 				Node localComponent ;
@@ -635,7 +666,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localID = "[N/A]" ;
+									localID = "" ;
 								}
 							}
 
@@ -650,7 +681,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localName = "[N/A]" ;
+									localName = "" ;
 								}
 							}
 
@@ -666,7 +697,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localDescription = "[N/A]" ;
+									localDescription = "" ;
 								}
 							}
 
@@ -681,7 +712,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localAuthorName = "[N/A]" ;
+									localAuthorName = "" ;
 								}
 							}
 
@@ -697,7 +728,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localAuthorMail = "[N/A]" ;
+									localAuthorMail = "" ;
 								}
 							}
 
@@ -712,7 +743,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localVersion = "[N/A]" ;
+									localVersion = "" ;
 								}
 							}
 
@@ -728,7 +759,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localDate = "[N/A]" ;
+									localDate = "" ;
 								}
 							}
 
@@ -744,7 +775,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localInterfaceDiagramPath = "[N/A]" ;
+									localInterfaceDiagramPath = "" ;
 								}
 							}
 
@@ -760,7 +791,7 @@ public class ProcessControler
 								}
 								catch (NullPointerException exc)
 								{
-									localFlowDiagramPath = "[N/A]" ;
+									localFlowDiagramPath = "" ;
 								}
 							}
 

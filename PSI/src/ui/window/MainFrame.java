@@ -5,6 +5,7 @@ import java.awt.HeadlessException ;
 import java.awt.event.ActionEvent ;
 import java.io.File ;
 
+import ui.dialog.PreferenceDialog;
 import ui.misc.LogPanel ;
 import ui.misc.RoleDescriptorPanel ;
 import ui.misc.TaskDescriptorPanel ;
@@ -21,6 +22,7 @@ import javax.swing.JSplitPane ;
 import javax.swing.JMenuBar ;
 import javax.swing.JMenu ;
 import javax.swing.KeyStroke;
+import javax.swing.WindowConstants;
 
 import javax.swing.JMenuItem ;
 import javax.swing.JTree ;
@@ -104,6 +106,8 @@ public class MainFrame extends JFrame
 	private LogPanel statusPanel = null ;
 
 	private Project currentProject = null ;
+	
+	private boolean projectModified = false ;
 
 	/*
 	 * Here are defined actions which can be performed by the user. Abstract Actions are used to
@@ -182,6 +186,7 @@ public class MainFrame extends JFrame
 		this.setJMenuBar(getMainJMenuBar()) ;
 		this.setTitle("Project Supervising Indicators") ;
 		this.setLocation(localPrefs.getXPosition(), localPrefs.getYPosition()) ;
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE) ;
 
 		/*
 		 * Actions deactivation
@@ -233,6 +238,25 @@ public class MainFrame extends JFrame
 	private void actionExit ()
 	{
 		Preferences.getInstance().save() ;
+		
+		if (projectModified)
+		{
+			int localChoice = JOptionPane.showConfirmDialog(this, Bundle.getText("MainFrameConfirmExitMessage"), "PSI", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) ;
+			
+			if (localChoice == JOptionPane.YES_OPTION)
+			{
+				//actionSave(new ActionEvent()) ;
+				System.exit(0) ;
+			}
+			
+			else if(localChoice == JOptionPane.NO_OPTION)
+			{
+				System.exit(0) ;
+			}
+			
+			return ;
+		}
+		
 		System.exit(0) ;
 	}
 
@@ -798,7 +822,7 @@ public class MainFrame extends JFrame
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
 				{
-					System.out.println("actionPerformed()") ;
+					new PreferenceDialog(MainFrame.this);
 				}
 			}) ;
 		}

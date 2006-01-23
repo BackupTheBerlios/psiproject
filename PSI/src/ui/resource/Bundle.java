@@ -46,4 +46,10 @@ public class Bundle
 		}
 
 	}
+	
+	public static void setCurrentLocale(Locale locale)
+    {
+        bundle = ResourceBundle.getBundle(BASENAME,locale);
+        Locale.setDefault(locale);
+    }
 }

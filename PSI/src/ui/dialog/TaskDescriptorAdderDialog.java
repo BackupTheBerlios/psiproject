@@ -1,179 +1,354 @@
-package ui.dialog;
 
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import javax.swing.JButton;
+package ui.dialog ;
+
+import java.awt.BorderLayout ;
+import java.awt.Dimension;
+
+import javax.swing.JPanel ;
+import javax.swing.JDialog ;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
+
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Vector;
+import java.util.regex.PatternSyntaxException;
+
+import javax.swing.JTextArea;
 import javax.swing.JList;
+import javax.swing.JButton;
+
+import ui.resource.Bundle;
+import ui.window.MainFrame;
+
+import model.spem2.Activity;
+import model.spem2.BreakdownElement;
+import model.spem2.DeliveryProcess;
+import model.spem2.RoleDescriptor;
+import model.spem2.TaskDescriptor;
 
 /**
- * Activity : TODO type description
+ * TaskDescriptorAdderDialog : TODO type description
  *
- * @author MB
+ * @author Kurvin
  * @version 1.0
  *
  */
-public class TaskDescriptorAdderDialog
+public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 {
 
-	private JDialog jDialog = null;  //  @jve:decl-index=0:visual-constraint="99,12"
-	private JPanel jContentPane = null;
-	private JPanel jPanel = null;
-	private JButton jButton = null;
-	private JButton jButton1 = null;
-	private JPanel jPanel1 = null;
-	private JLabel jLabel = null;
-	private JTextField jTextField = null;
-	private JPanel jPanel2 = null;
-	private JLabel jLabel1 = null;
-	private JList jList = null;
+	private JPanel jContentPane = null ;
+	private JPanel southPanel = null;
+	private JPanel centralPanel = null;
+	private JPanel namePanel = null;
+	private JPanel descriptionPanel = null;
+	private JPanel rolePanel = null;
+	private JLabel nameLabel = null;
+	private JTextField nameTextField = null;
+	private JLabel descriptionLabel = null;
+	private JTextArea descriptionTextArea = null;
+	private JLabel roleLabel = null;
+	private JList roleList = null;
+	private JButton okButton = null;
+	private JButton cancelButton = null;
+	private Vector <RoleDescriptor> roles = new Vector();
+	private Vector <String> roleNames =new Vector();
+	Collection <BreakdownElement> bdeCollection;
+	Activity parentActivity;
+
 	/**
-	 * This method initializes jDialog	
-	 * 	
-	 * @return javax.swing.JDialog	
+	 * This is the default constructor
 	 */
-	private JDialog getJDialog ()
+	public TaskDescriptorAdderDialog (MainFrame _mainFrame, Activity _activity)
 	{
-		if (jDialog == null)
+		super() ;
+		parentActivity = _activity;
+		//retrieving roles preset in the process and adding them to the list model
+		Collection <BreakdownElement> bdeCollection =_mainFrame.getProject().getProcess().getNestedElements();
+		Iterator it = bdeCollection.iterator();
+		while(it.hasNext())
 		{
-			jDialog = new JDialog() ;
-			jDialog.setSize(new java.awt.Dimension(354,184));
-			jDialog.setTitle("Test Activity");
-			jDialog.setContentPane(getJContentPane());
+			BreakdownElement element = (BreakdownElement)it.next();
+			if(element instanceof RoleDescriptor)
+			{	
+				RoleDescriptor r = (RoleDescriptor)element;
+				System.out.println(r.getName());
+				roleNames.add(((RoleDescriptor)element).getName());
+			}
 		}
-		return jDialog ;
+		
+		//roleList = new JList(roleNames);
+		initialize(roleNames);
+		//namePanel = getNamePanel();
+		//descriptionPanel = getDescriptionPanel();
+		
+		
+		//sets events on the buttons
+		okButton.setMnemonic(KeyEvent.VK_O);
+		okButton.setActionCommand("ok");
+		cancelButton.setMnemonic(KeyEvent.VK_C);
+		cancelButton.setActionCommand("cancel");
+		okButton.addActionListener(this);
+		cancelButton.addActionListener(this);
+		
+		this.setVisible(true);
+	}
+
+	
+	/*
+	 * This method handles actions from the dialog
+	 */
+	public void actionPerformed(ActionEvent e) 
+	{
+	    
+		if ("ok".equals(e.getActionCommand()))
+		{
+			//finds an generates an index (hightest index in the activity indices)
+			Iterator it1 = bdeCollection.iterator();
+			while(it1.hasNext())
+			{
+				BreakdownElement bdElement =(BreakdownElement)it1.next();
+				int max =0;
+				int index;
+				String nwIndex;
+				if (bdElement instanceof TaskDescriptor)
+				{
+					
+					TaskDescriptor task =(TaskDescriptor)bdElement;
+					try
+					{
+						index =Integer.parseInt(task.getId().split("_")[0]);
+					}
+					catch (PatternSyntaxException ex)
+					{
+						index =0;
+					}
+					if (index > max)
+					{
+						max = index;
+					}
+					
+				}
+				Integer intmax= new Integer(max);
+				nwIndex="_"+intmax.toString()+"_"+"act";
+				
+				//Creating a new task from values entered
+				
+				
+			}
+			
+	    } 
+	    else
+	    {
+	    	System.out.println("dispose");
+	        TaskDescriptorAdderDialog.this.dispose();
+	    }
+	} 
+
+	
+	/**
+	 * This method initializes this
+	 * 
+	 * @return void
+	 */
+	private void initialize (Vector <String> roleNames)
+	{
+		this.setSize(400, 300) ;
+		this.setContentPane(getJContentPane(roleNames)) ;
 	}
 
 	/**
-	 * This method initializes jContentPane	
-	 * 	
-	 * @return javax.swing.JPanel	
+	 * This method initializes jContentPane
+	 * 
+	 * @return javax.swing.JPanel
 	 */
-	private JPanel getJContentPane ()
+	private JPanel getJContentPane (Vector <String> roleNames)
 	{
 		if (jContentPane == null)
 		{
 			jContentPane = new JPanel() ;
-			jContentPane.setLayout(new BorderLayout());
-			jContentPane.add(getJPanel(), java.awt.BorderLayout.SOUTH);
-			jContentPane.add(getJPanel1(), java.awt.BorderLayout.NORTH);
-			jContentPane.add(getJPanel2(), java.awt.BorderLayout.CENTER);
+			jContentPane.setLayout(new BorderLayout()) ;
+			jContentPane.add(getCentralPanel(roleNames), java.awt.BorderLayout.CENTER);
+			jContentPane.add(getSouthPanel(), java.awt.BorderLayout.SOUTH);
 		}
 		return jContentPane ;
 	}
 
 	/**
-	 * This method initializes jPanel	
+	 * This method initializes southPanel	
 	 * 	
 	 * @return javax.swing.JPanel	
 	 */
-	private JPanel getJPanel ()
+	private JPanel getSouthPanel ()
 	{
-		if (jPanel == null)
+		if (southPanel == null)
 		{
-			jPanel = new JPanel() ;
-			jPanel.add(getJButton(), null);
-			jPanel.add(getJButton1(), null);
+			southPanel = new JPanel() ;
+			southPanel.add(getOkButton(), null);
+			southPanel.add(getCancelButton(), null);
 		}
-		return jPanel ;
+		return southPanel ;
 	}
 
 	/**
-	 * This method initializes jButton	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getJButton ()
-	{
-		if (jButton == null)
-		{
-			jButton = new JButton() ;
-			jButton.setText("OK");
-		}
-		return jButton ;
-	}
-
-	/**
-	 * This method initializes jButton1	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getJButton1 ()
-	{
-		if (jButton1 == null)
-		{
-			jButton1 = new JButton() ;
-			jButton1.setText("Cancel");
-		}
-		return jButton1 ;
-	}
-
-	/**
-	 * This method initializes jPanel1	
+	 * This method initializes centralPanel	
 	 * 	
 	 * @return javax.swing.JPanel	
 	 */
-	private JPanel getJPanel1 ()
+	private JPanel getCentralPanel (Vector <String> roleNames)
 	{
-		if (jPanel1 == null)
+		if (centralPanel == null)
 		{
-			jLabel = new JLabel();
-			jLabel.setText("Nom de l'activité :");
-			jPanel1 = new JPanel() ;
-			jPanel1.add(jLabel, null);
-			jPanel1.add(getJTextField(), null);
+			centralPanel = new JPanel() ;
+			centralPanel.setLayout(new BoxLayout(getCentralPanel(roleNames), BoxLayout.Y_AXIS));
+			centralPanel.add(getNamePanel(), null);
+			centralPanel.add(getDescriptionPanel(), null);
+			centralPanel.add(getRolePanel(roleNames), null);
 		}
-		return jPanel1 ;
+		return centralPanel ;
 	}
 
 	/**
-	 * This method initializes jTextField	
+	 * This method initializes namePanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getNamePanel ()
+	{
+		if (namePanel == null)
+		{
+			FlowLayout flowLayout = new FlowLayout();
+			flowLayout.setAlignment(java.awt.FlowLayout.LEFT);
+			nameLabel = new JLabel();
+			nameLabel.setText(Bundle.getText("TaskDescriptorAdderDialogName"));
+			namePanel = new JPanel() ;
+			namePanel.setLayout(flowLayout);
+			namePanel.add(nameLabel, null);
+			namePanel.add(getNameTextField(), null);
+		}
+		return namePanel ;
+	}
+
+	/**
+	 * This method initializes descriptionPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getDescriptionPanel ()
+	{
+		if (descriptionPanel == null)
+		{
+			descriptionLabel = new JLabel();
+			descriptionLabel.setText(Bundle.getText("TaskDescriptorAdderDialogDescription"));
+			FlowLayout flowLayout1 = new FlowLayout();
+			flowLayout1.setAlignment(java.awt.FlowLayout.LEFT);
+			descriptionPanel = new JPanel() ;
+			descriptionPanel.setLayout(flowLayout1);
+			descriptionPanel.add(descriptionLabel, null);
+			descriptionPanel.add(getDescriptionTextArea(), null);
+		}
+		return descriptionPanel ;
+	}
+
+	/**
+	 * This method initializes rolePanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getRolePanel (Vector <String> roleNames)
+	{
+		if (rolePanel == null)
+		{
+			roleLabel = new JLabel();
+			roleLabel.setText(Bundle.getText("TaskDescriptorAdderDialogRole"));
+			FlowLayout flowLayout = new FlowLayout();
+			flowLayout.setAlignment(java.awt.FlowLayout.LEFT);
+			rolePanel = new JPanel() ;
+			rolePanel.setLayout(flowLayout);
+			rolePanel.add(roleLabel, null);
+			rolePanel.add(getRoleList(roleNames), null);
+		}
+		return rolePanel ;
+	}
+
+	/**
+	 * This method initializes nameTextField	
 	 * 	
 	 * @return javax.swing.JTextField	
 	 */
-	private JTextField getJTextField ()
+	private JTextField getNameTextField ()
 	{
-		if (jTextField == null)
+		if (nameTextField == null)
 		{
-			jTextField = new JTextField() ;
-			jTextField.setPreferredSize(new java.awt.Dimension(200,20));
+			nameTextField = new JTextField() ;
+			nameTextField.setPreferredSize(new Dimension(150,30));
 		}
-		return jTextField ;
+		return nameTextField ;
 	}
 
 	/**
-	 * This method initializes jPanel2	
+	 * This method initializes descriptionTextArea	
 	 * 	
-	 * @return javax.swing.JPanel	
+	 * @return javax.swing.JTextArea	
 	 */
-	private JPanel getJPanel2 ()
+	private JTextArea getDescriptionTextArea ()
 	{
-		if (jPanel2 == null)
+		if (descriptionTextArea == null)
 		{
-			jLabel1 = new JLabel();
-			jLabel1.setText("Rôle de l'activité : ");
-			jPanel2 = new JPanel() ;
-			jPanel2.add(jLabel1, null);
-			jPanel2.add(getJList(), null);
+			descriptionTextArea = new JTextArea() ;
+			descriptionTextArea.setPreferredSize(new Dimension(200,90));
 		}
-		return jPanel2 ;
+		return descriptionTextArea ;
 	}
 
 	/**
-	 * This method initializes jList	
+	 * This method initializes roleList	
 	 * 	
 	 * @return javax.swing.JList	
 	 */
-	private JList getJList ()
+	private JList getRoleList (Vector <String> roleNames)
 	{
-		if (jList == null)
+		if (roleList == null)
 		{
-			jList = new JList() ;
-			jList.setPreferredSize(new java.awt.Dimension(125,22));
+			
+			roleList = new JList(roleNames) ;
+			
 		}
-		return jList ;
+		return roleList ;
+	}
+
+	/**
+	 * This method initializes okButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getOkButton ()
+	{
+		if (okButton == null)
+		{
+			okButton = new JButton(Bundle.getText("TaskDescriptorAdderDialogOk")) ;
+		}
+		return okButton ;
+	}
+
+	/**
+	 * This method initializes cancelButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getCancelButton ()
+	{
+		if (cancelButton == null)
+		{
+			cancelButton = new JButton(Bundle.getText("TaskDescriptorAdderDialogCancel")) ;
+		}
+		return cancelButton ;
 	}
 
 }

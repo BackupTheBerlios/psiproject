@@ -5,8 +5,6 @@ import java.util.Locale ;
 
 import javax.swing.event.EventListenerList ;
 
-import process.Preferences ;
-
 /**
  * LocalController : TODO type description
  * 

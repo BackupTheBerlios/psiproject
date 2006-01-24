@@ -3,15 +3,18 @@ package ui.dialog ;
 
 import java.awt.BorderLayout ;
 import java.awt.Component ;
-import java.awt.Dimension;
+import java.awt.Dimension ;
 import java.awt.GridLayout ;
+import java.io.File ;
 import java.util.Locale ;
 
+import javax.swing.BoxLayout ;
 import javax.swing.DefaultListCellRenderer ;
 import javax.swing.JButton ;
 import javax.swing.JCheckBox ;
 import javax.swing.JComboBox ;
 import javax.swing.JDialog ;
+import javax.swing.JFileChooser ;
 import javax.swing.JFrame ;
 import javax.swing.JLabel ;
 import javax.swing.JList ;
@@ -21,11 +24,9 @@ import javax.swing.JTextField ;
 import javax.swing.SwingUtilities ;
 import javax.swing.UIManager ;
 import javax.swing.UIManager.LookAndFeelInfo ;
-
 import process.Preferences ;
-import ui.window.MainFrame;
 import ui.resource.Bundle ;
-import ui.resource.LocaleController;
+import ui.resource.LocaleController ;
 
 /**
  * PreferenceDialog : TODO type description
@@ -41,7 +42,6 @@ public class PreferenceDialog extends JDialog
 	 */
 	private static final long serialVersionUID = -2419928875825666824L ;
 
-	
 	private JDialog jDialog = null ;
 
 	private JTabbedPane jTabbedPaneOnglets = null ;
@@ -106,18 +106,25 @@ public class PreferenceDialog extends JDialog
 	private JButton jButtonPreferenceOK = null ;
 
 	private JButton jButtonPreferenceCancel = null ;
+	
+	private LocaleController ControllerLocale = null;
 
 	@ SuppressWarnings ("deprecation")
 	public PreferenceDialog (JFrame parent)
 	{
 		super(parent) ;
+		pref = Preferences.getInstance() ;
+		ControllerLocale = LocaleController.getInstance();
+		
 		this.setLayout(new BorderLayout()) ;
-		// this.setVisible(true);
 		this.setSize(500, 300) ;
 		this.add(getJTabbedPaneOnglets(), BorderLayout.CENTER) ;
 		this.add(getJPanelValider(), BorderLayout.SOUTH) ;
-
+		this.setTitle(Bundle.getText("PreferenceDialogTitle"));
+		this.setResizable(false);
+		
 		show() ;
+		pack() ;
 		jDialog = this ;
 	}
 
@@ -160,18 +167,22 @@ public class PreferenceDialog extends JDialog
 			jPanelGeneralChoixLangue.add(jLabelChoixLangue) ;
 
 			jComboBoxChoixLangue = new JComboBox() ;
-			jComboBoxChoixLangue.addItem(Bundle.getText("JPanelPreferenceGeneralLanguageEnglish"));
-			jComboBoxChoixLangue.addItem(Bundle.getText("JPanelPreferenceGeneralLanguageFrench"));
-			
-			if (Locale.getDefault().toString().equals("fr_FR"))
-				
+			jComboBoxChoixLangue.addItem(Bundle.getText("JPanelPreferenceGeneralLanguageEnglish")) ;
+			jComboBoxChoixLangue.addItem(Bundle.getText("JPanelPreferenceGeneralLanguageFrench")) ;
+
+			if (pref.getLocale().equals("FR"))
+
 				jComboBoxChoixLangue.setSelectedItem(Bundle.getText("JPanelPreferenceGeneralLanguageFrench")) ;
 			else
 				jComboBoxChoixLangue.setSelectedItem(Bundle.getText("JPanelPreferenceGeneralLanguageEnglish")) ;
-			
+
 			jPanelGeneralChoixLangue.add(jComboBoxChoixLangue) ;
 		}
 
+		JLabel fix = new JLabel();
+		jPanelGeneralChoixLangue.add(fix);
+		fix.setPreferredSize(new Dimension(145, 20)) ;
+		
 		jPanelGeneralChoixLangue.setVisible(true) ;
 		return jPanelGeneralChoixLangue ;
 	}
@@ -189,6 +200,11 @@ public class PreferenceDialog extends JDialog
 			jPanelGeneralDefautLangage.add(jLabelDefautLangage) ;
 
 		}
+		
+		JLabel fix = new JLabel();
+		jPanelGeneralDefautLangage.add(fix);
+		fix.setPreferredSize(new Dimension(145, 20)) ;
+		
 		jPanelGeneralDefautLangage.setVisible(true) ;
 		return jPanelGeneralDefautLangage ;
 	}
@@ -207,6 +223,11 @@ public class PreferenceDialog extends JDialog
 			jPanelGeneralLook.add(jComboBoxLook) ;
 
 		}
+		
+		JLabel fix = new JLabel();
+		jPanelGeneralLook.add(fix);
+		fix.setPreferredSize(new Dimension(130, 20)) ;
+		
 		jPanelGeneralLook.setVisible(true) ;
 		return jPanelGeneralLook ;
 	}
@@ -216,15 +237,16 @@ public class PreferenceDialog extends JDialog
 	// Travail methods
 	public JPanel getJPanelTravail ()
 	{
+
 		if (jPanelTravail == null)
 		{
 			jPanelTravail = new JPanel() ;
-			jPanelTravail.setLayout(new GridLayout(4, 1)) ;
-
+			jPanelTravail.setLayout(new BoxLayout(jPanelTravail, BoxLayout.Y_AXIS)) ;
 			jPanelTravail.add(getJPanelTravailRepertoireTravail()) ;
 			jPanelTravail.add(getJPanelTravailRepertoireExport()) ;
 			jPanelTravail.add(getJPanelTravailDernierProjet()) ;
 			jPanelTravail.add(getJPanelTravailAide()) ;
+
 		}
 		jPanelTravail.setVisible(true) ;
 		return jPanelTravail ;
@@ -240,14 +262,28 @@ public class PreferenceDialog extends JDialog
 			jPanelTravailRepertoireTravail.add(jLabelRepertoireTravail) ;
 
 			jTextFieldRepertoireTravail = new JTextField() ;
-			jTextFieldRepertoireTravail.setPreferredSize(new Dimension(100,20));
+			jTextFieldRepertoireTravail.setPreferredSize(new Dimension(100, 20)) ;
 			jPanelTravailRepertoireTravail.add(jTextFieldRepertoireTravail) ;
-			
 
 			jButtonRepertoireTravailChoisir = new JButton() ;
 			jButtonRepertoireTravailChoisir.setText(Bundle.getText("JPanelPreferenceTravailParcourirButton")) ;
-			jButtonRepertoireTravailChoisir.setPreferredSize(new Dimension(100,20));
+			jButtonRepertoireTravailChoisir.setPreferredSize(new Dimension(100, 20)) ;
 			jPanelTravailRepertoireTravail.add(jButtonRepertoireTravailChoisir) ;
+
+			jButtonRepertoireTravailChoisir.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+					JFileChooser jf = new JFileChooser(new File(pref.getWorkDirectory())) ;
+					jf.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY) ;
+					jf.setApproveButtonText(Bundle.getText("JFileChooserOK")) ;
+
+					if (jf.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+					{
+						jTextFieldRepertoireTravail.setText(jf.getSelectedFile().getAbsolutePath()) ;
+					}
+				}
+			}) ;
 		}
 		jPanelTravailRepertoireTravail.setVisible(true) ;
 		return jPanelTravailRepertoireTravail ;
@@ -263,15 +299,28 @@ public class PreferenceDialog extends JDialog
 			jPanelTravailRepertoireExport.add(jLabelRepertoireExport) ;
 
 			jTextFieldRepertoireExport = new JTextField() ;
-			jTextFieldRepertoireExport.setPreferredSize(new Dimension(100,20));
+			jTextFieldRepertoireExport.setPreferredSize(new Dimension(100, 20)) ;
 			jPanelTravailRepertoireExport.add(jTextFieldRepertoireExport) ;
-			
-			
 
 			jButtonRepertoireExportChoisir = new JButton() ;
 			jButtonRepertoireExportChoisir.setText(Bundle.getText("JPanelPreferenceTravailParcourirButton")) ;
-			jButtonRepertoireExportChoisir.setPreferredSize(new Dimension(100,20));
+			jButtonRepertoireExportChoisir.setPreferredSize(new Dimension(100, 20)) ;
 			jPanelTravailRepertoireExport.add(jButtonRepertoireExportChoisir) ;
+
+			jButtonRepertoireExportChoisir.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+					JFileChooser jf = new JFileChooser(new File(pref.getExportDirectory())) ;
+					jf.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY) ;
+					jf.setApproveButtonText(Bundle.getText("JFileChooserOK")) ;
+
+					if (jf.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+					{
+						jTextFieldRepertoireExport.setText(jf.getSelectedFile().getAbsolutePath()) ;
+					}
+				}
+			}) ;
 		}
 		jPanelTravailRepertoireExport.setVisible(true) ;
 		return jPanelTravailRepertoireExport ;
@@ -290,8 +339,8 @@ public class PreferenceDialog extends JDialog
 			jPanelTravailDernierProjet.add(jLabelDernierProjet) ;
 
 		}
-		jPanelTravailRepertoireExport.setVisible(true) ;
-		return jPanelTravailRepertoireExport ;
+		jPanelTravailDernierProjet.setVisible(true) ;
+		return jPanelTravailDernierProjet ;
 	}
 
 	public JPanel getJPanelTravailAide ()
@@ -300,15 +349,18 @@ public class PreferenceDialog extends JDialog
 		{
 			jPanelTravailAide = new JPanel() ;
 			jLabelAide = new JLabel() ;
+			JLabel fix = new JLabel() ;
 			jLabelAide.setText(Bundle.getText("JPanelPreferenceTravailHelpLabel")) ;
 			jCheckBoxAide = new JCheckBox() ;
 
 			jPanelTravailAide.add(jCheckBoxAide) ;
 			jPanelTravailAide.add(jLabelAide) ;
+			jPanelTravailAide.add(fix) ;
+			fix.setPreferredSize(new Dimension(145, 20)) ;
 
 		}
-		jPanelTravailRepertoireExport.setVisible(true) ;
-		return jPanelTravailRepertoireExport ;
+		jPanelTravailAide.setVisible(true) ;
+		return jPanelTravailAide ;
 	}
 
 	// End Travail methods
@@ -334,7 +386,7 @@ public class PreferenceDialog extends JDialog
 					LookAndFeelInfo tempLAFInfo = (LookAndFeelInfo) (jComboBoxLook.getSelectedItem()) ;
 					try
 					{
-						
+
 						UIManager.setLookAndFeel(tempLAFInfo.getClassName()) ;
 						SwingUtilities.updateComponentTreeUI(jDialog) ;
 						SwingUtilities.updateComponentTreeUI(jDialog.getParent()) ;
@@ -343,37 +395,55 @@ public class PreferenceDialog extends JDialog
 					{
 						exc.printStackTrace() ;
 					}
-					
-					// TRAITEMENT DE LA LANGUE
-					//On regarde la langue choisie et on change la Locale
-			        if(jComboBoxChoixLangue.getSelectedItem().toString().compareTo(Bundle.getText("JPanelPreferenceGeneralLanguageFrench")) == 0)
-			        {
-			        	
-			        	Bundle.setCurrentLocale(Locale.FRENCH);
-			        	//MainFrame.ControllerLocale.fireLocaleChanged();
-			        	if (jCheckBoxDefautLangage.isSelected())
-			        	{
-			        		//MainFrame.localPrefs.setLocale("FR");
-			        	}
-			        		
-			        	
-			        }
-			        else if(jComboBoxChoixLangue.getSelectedItem().toString().compareTo(Bundle.getText("JPanelPreferenceGeneralLanguageEnglish")) == 0)
-			        {
-			        	
-			        	Bundle.setCurrentLocale(Locale.ENGLISH);
-			        	//MainFrame.ControllerLocale.fireLocaleChanged();
-			        	if (jCheckBoxDefautLangage.isSelected())
-			        	{
-			        		
-			        		//MainFrame.localPrefs.setLocale("EN");
-			        		
-			        	}
-			            
-			        }
-			       
-					dispose() ;
 
+					// TRAITEMENT DE LA LANGUE
+					// On regarde la langue choisie et on change la Locale
+					if (jComboBoxChoixLangue.getSelectedItem().toString().compareTo(Bundle.getText("JPanelPreferenceGeneralLanguageFrench")) == 0)
+					{
+
+						Bundle.setCurrentLocale(Locale.FRENCH) ;
+						ControllerLocale.fireLocaleChanged() ;
+						if (jCheckBoxDefautLangage.isSelected())
+						{
+							pref.setLocale("FR") ;
+						}
+
+					}
+					else if (jComboBoxChoixLangue.getSelectedItem().toString().compareTo(Bundle.getText("JPanelPreferenceGeneralLanguageEnglish")) == 0)
+					{
+
+						Bundle.setCurrentLocale(Locale.ENGLISH) ;
+						ControllerLocale.fireLocaleChanged() ;
+						if (jCheckBoxDefautLangage.isSelected())
+						{
+							pref.setLocale("EN") ;
+						}
+
+					}
+
+					// TRAITEMENT DES REPERTOIRES
+					if (! (jTextFieldRepertoireTravail.getText()).equals("") && (jTextFieldRepertoireTravail.getText() != null))
+					{
+						pref.setWorkDirectory(jTextFieldRepertoireTravail.getText()) ;
+					}
+
+					if (! (jTextFieldRepertoireExport.getText()).equals("") && (jTextFieldRepertoireExport.getText() != null))
+					{
+						pref.setExportDirectory(jTextFieldRepertoireExport.getText()) ;
+					}
+
+					// TRAITEMENT DU DERNIER PROJET
+					if (jCheckBoxDernierProjet.isSelected())
+					{
+						pref.setLoadLastProject(true);
+					}
+
+					// TRAITEMENT DE L'AIDE AU DEMARRAGE
+					if (jCheckBoxAide.isSelected())
+					{
+						pref.setLoadHelp(true);
+					}
+					dispose() ;
 				}
 			}) ;
 

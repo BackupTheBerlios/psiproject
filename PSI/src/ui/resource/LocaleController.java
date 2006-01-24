@@ -51,7 +51,7 @@ public class LocaleController
      * @param newLocale Nouvelle Locale
      */    
     public void changeLocale (Locale newLocale) { 
-        //Locale.setDefault(newLocale); 
+        Locale.setDefault(newLocale); 
         Bundle.setCurrentLocale(newLocale);
         fireLocaleChanged(); 
     }

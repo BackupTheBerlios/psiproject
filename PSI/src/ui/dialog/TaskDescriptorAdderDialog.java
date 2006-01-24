@@ -78,6 +78,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 			if(element instanceof RoleDescriptor)
 			{	
 				RoleDescriptor r = (RoleDescriptor)element;
+				roles.add(r);
 				System.out.println(r.getName());
 				roleNames.add(((RoleDescriptor)element).getName());
 			}
@@ -109,17 +110,18 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 	    
 		if ("ok".equals(e.getActionCommand()))
 		{
-			//finds an generates an index (hightest index in the activity indices)
+			//finds and generates an index (hightest index in the activity indices)
+				
 			Iterator it1 = bdeCollection.iterator();
+			int max =0;
+			int index;
+			String nwIndex;
 			while(it1.hasNext())
 			{
 				BreakdownElement bdElement =(BreakdownElement)it1.next();
-				int max =0;
-				int index;
-				String nwIndex;
+				
 				if (bdElement instanceof TaskDescriptor)
 				{
-					
 					TaskDescriptor task =(TaskDescriptor)bdElement;
 					try
 					{
@@ -133,17 +135,29 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 					{
 						max = index;
 					}
-					
+				
 				}
-				Integer intmax= new Integer(max);
-				nwIndex="_"+intmax.toString()+"_"+"act";
+			}
+			Integer intmax= new Integer(max);
+			nwIndex="_"+intmax.toString()+"_"+"act";
 				
-				//Creating a new task from values entered
-				
-				
+			//getting the roles that have been selected and storing them in a collection
+			Collection <RoleDescriptor> selectedRoles =null;
+			int[] selectedIndices = roleList.getSelectedIndices();
+			for(int i=0;i<selectedIndices.length;i++)
+			{
+				selectedRoles.add(roles.get(i));
 			}
 			
-	    } 
+			//creatig a new task from the values entered
+			TaskDescriptor nwTask = new TaskDescriptor(nwIndex,nameTextField.getText(),descriptionTextArea.getText(),parentActivity.getDescriptor().getId());
+			nwTask.setPrimaryPerformers(selectedRoles);
+			//BreakdownElement nwBreakdownElement= new BreakdownElement(nwTask);
+			
+			//adding the new Task in the parent Activity
+			//(parentActivity.getNestedElements()).add(nwBreakdownElement);
+				
+		} 
 	    else
 	    {
 	    	System.out.println("dispose");
@@ -159,7 +173,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 	 */
 	private void initialize (Vector <String> roleNames)
 	{
-		this.setSize(400, 300) ;
+		this.setSize(400, 450) ;
 		this.setContentPane(getJContentPane(roleNames)) ;
 	}
 
@@ -287,7 +301,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 		if (nameTextField == null)
 		{
 			nameTextField = new JTextField() ;
-			nameTextField.setPreferredSize(new Dimension(150,30));
+			nameTextField.setPreferredSize(new Dimension(200,30));
 		}
 		return nameTextField ;
 	}
@@ -302,7 +316,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 		if (descriptionTextArea == null)
 		{
 			descriptionTextArea = new JTextArea() ;
-			descriptionTextArea.setPreferredSize(new Dimension(200,90));
+			descriptionTextArea.setPreferredSize(new Dimension(300,90));
 		}
 		return descriptionTextArea ;
 	}

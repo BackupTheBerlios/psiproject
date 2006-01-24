@@ -170,12 +170,12 @@ public class PreferenceDialog extends JDialog
 			jComboBoxChoixLangue.addItem(Bundle.getText("JPanelPreferenceGeneralLanguageEnglish")) ;
 			jComboBoxChoixLangue.addItem(Bundle.getText("JPanelPreferenceGeneralLanguageFrench")) ;
 
-			if (pref.getLocale().equals("FR"))
-
+			if (!(pref.getLocale().equals("EN")))
+			{
 				jComboBoxChoixLangue.setSelectedItem(Bundle.getText("JPanelPreferenceGeneralLanguageFrench")) ;
-			else
-				jComboBoxChoixLangue.setSelectedItem(Bundle.getText("JPanelPreferenceGeneralLanguageEnglish")) ;
-
+				
+			}
+			
 			jPanelGeneralChoixLangue.add(jComboBoxChoixLangue) ;
 		}
 
@@ -443,7 +443,9 @@ public class PreferenceDialog extends JDialog
 					{
 						pref.setLoadHelp(true);
 					}
+					pref.save();
 					dispose() ;
+					
 				}
 			}) ;
 

@@ -152,7 +152,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 			//getting the roles that have been selected and storing them in a collection
 			Collection <RoleDescriptor> selectedRoles =null;
 			int[] selectedIndices = roleList.getSelectedIndices();
-			for(int i=0;i<selectedIndices.length;i++)
+			for(int i=0;i<selectedIndices.length -1;i++)
 			{
 				selectedRoles.add(roles.get(i));
 			}

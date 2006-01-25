@@ -29,7 +29,6 @@ import ui.window.MainFrame;
 
 import model.spem2.Activity;
 import model.spem2.BreakdownElement;
-import model.spem2.DeliveryProcess;
 import model.spem2.RoleDescriptor;
 import model.spem2.TaskDescriptor;
 
@@ -61,6 +60,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 	private Vector <String> roleNames =new Vector();
 	Collection <BreakdownElement> bdeCollection;
 	Activity parentActivity;
+	private MainFrame main;
 
 	/**
 	 * This is the default constructor
@@ -69,6 +69,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 	{
 		super() ;
 		parentActivity = _activity;
+		main = _mainFrame;
 		//retrieving roles preset in the process and adding them to the list model
 		Collection <BreakdownElement> bdeCollection =_mainFrame.getProject().getProcess().getNestedElements();
 		Iterator it = bdeCollection.iterator();
@@ -79,7 +80,6 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 			{	
 				RoleDescriptor r = (RoleDescriptor)element;
 				roles.add(r);
-				System.out.println(r.getName());
 				roleNames.add(((RoleDescriptor)element).getName());
 			}
 		}
@@ -152,16 +152,14 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 			//creatig a new task from the values entered
 			TaskDescriptor nwTask = new TaskDescriptor(nwIndex,nameTextField.getText(),descriptionTextArea.getText(),parentActivity.getDescriptor().getId());
 			nwTask.setPrimaryPerformers(selectedRoles);
-			//BreakdownElement nwBreakdownElement= new BreakdownElement(nwTask);
-			
+					
 			//adding the new Task in the parent Activity
-			//(parentActivity.getNestedElements()).add(nwBreakdownElement);
+			(parentActivity.getNestedElements()).add(nwTask);
 				
 		} 
 	    else
 	    {
-	    	System.out.println("dispose");
-	        TaskDescriptorAdderDialog.this.dispose();
+	          TaskDescriptorAdderDialog.this.dispose();
 	    }
 	} 
 
@@ -173,7 +171,11 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 	 */
 	private void initialize (Vector <String> roleNames)
 	{
-		this.setSize(400, 450) ;
+		this.setSize(400,350) ;
+		int posX =(main.getBounds().x)+(main.getBounds().width/3);
+		int posY =(main.getBounds().y)+(main.getBounds().height/3);
+		this.setLocation(posX,posY);
+		this.isModal();
 		this.setContentPane(getJContentPane(roleNames)) ;
 	}
 
@@ -330,9 +332,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 	{
 		if (roleList == null)
 		{
-			
 			roleList = new JList(roleNames) ;
-			
 		}
 		return roleList ;
 	}
@@ -347,6 +347,9 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 		if (okButton == null)
 		{
 			okButton = new JButton(Bundle.getText("TaskDescriptorAdderDialogOk")) ;
+			JButton  cancButon = getCancelButton();
+			okButton.setPreferredSize(cancButon.getPreferredSize());
+			
 		}
 		return okButton ;
 	}

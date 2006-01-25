@@ -74,6 +74,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 	public TaskDescriptorAdderDialog (MainFrame _mainFrame, Activity _activity)
 	{
 		super() ;
+		
 		parentActivity = _activity;
 		main = _mainFrame;
 		//retrieving roles preset in the process and adding them to the list model
@@ -113,12 +114,13 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 	 */
 	public void actionPerformed(ActionEvent e) 
 	{
-	    
+		Collection <BreakdownElement> bdCollection = main.getProject().getProcess().getNestedElements();
 		if ("ok".equals(e.getActionCommand()))
 		{
 			//finds and generates an index (hightest index in the activity indices)
 				
-			Iterator it1 = bdeCollection.iterator();
+			Iterator it1 = bdCollection.iterator();
+			//bdeCollection.iterator();
 			int max =0;
 			int index;
 			String nwIndex;

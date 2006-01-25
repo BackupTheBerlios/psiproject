@@ -17,7 +17,9 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
@@ -150,12 +152,15 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 			nwIndex="_"+intmax.toString()+"_"+"act";
 				
 			//getting the roles that have been selected and storing them in a collection
-			Collection <RoleDescriptor> selectedRoles =null;
+			Collection <RoleDescriptor> selectedRoles = new ArrayList <RoleDescriptor>();
+			
 			int[] selectedIndices = roleList.getSelectedIndices();
-			for(int i=0;i<selectedIndices.length -1;i++)
+			for(int i=0;i<selectedIndices.length;i++)
 			{
-				selectedRoles.add(roles.get(i));
+				selectedRoles.add(roles.get(selectedIndices[i]));	
 			}
+			
+			
 			
 			//creatig a new task from the values entered
 			TaskDescriptor nwTask = new TaskDescriptor(nwIndex,nameTextField.getText(),descriptionTextArea.getText(),parentActivity.getDescriptor().getId());

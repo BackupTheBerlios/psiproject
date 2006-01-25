@@ -2,12 +2,14 @@
 package ui.dialog ;
 
 import java.awt.BorderLayout ;
+import java.awt.Component;
 import java.awt.Dimension;
 
 import javax.swing.JPanel ;
 import javax.swing.JDialog ;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 
@@ -42,6 +44,10 @@ import model.spem2.TaskDescriptor;
 public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5607615210803598425L ;
 	private JPanel jContentPane = null ;
 	private JPanel southPanel = null;
 	private JPanel centralPanel = null;
@@ -97,7 +103,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 		cancelButton.setActionCommand("cancel");
 		okButton.addActionListener(this);
 		cancelButton.addActionListener(this);
-		
+		pack();
 		this.setVisible(true);
 	}
 
@@ -203,11 +209,16 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 	 */
 	private JPanel getSouthPanel ()
 	{
+		JLabel jl = null;
 		if (southPanel == null)
 		{
 			southPanel = new JPanel() ;
 			southPanel.add(getOkButton(), null);
 			southPanel.add(getCancelButton(), null);
+			jl = new JLabel();
+			southPanel.add(jl);
+			jl.setPreferredSize(new Dimension(46,20));
+			
 		}
 		return southPanel ;
 	}
@@ -246,6 +257,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 			namePanel = new JPanel() ;
 			namePanel.setLayout(flowLayout);
 			namePanel.add(nameLabel, null);
+			nameLabel.setPreferredSize(new Dimension(80,20));
 			namePanel.add(getNameTextField(), null);
 		}
 		return namePanel ;
@@ -267,7 +279,9 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 			descriptionPanel = new JPanel() ;
 			descriptionPanel.setLayout(flowLayout1);
 			descriptionPanel.add(descriptionLabel, null);
+			descriptionLabel.setPreferredSize(new Dimension(80,20));
 			descriptionPanel.add(getDescriptionTextArea(), null);
+			
 		}
 		return descriptionPanel ;
 	}
@@ -288,6 +302,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 			rolePanel = new JPanel() ;
 			rolePanel.setLayout(flowLayout);
 			rolePanel.add(roleLabel, null);
+			roleLabel.setPreferredSize(new Dimension(80,20));
 			rolePanel.add(getRoleList(roleNames), null);
 		}
 		return rolePanel ;
@@ -303,7 +318,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 		if (nameTextField == null)
 		{
 			nameTextField = new JTextField() ;
-			nameTextField.setPreferredSize(new Dimension(200,30));
+			nameTextField.setPreferredSize(new Dimension(300,20));
 		}
 		return nameTextField ;
 	}
@@ -313,14 +328,17 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 	 * 	
 	 * @return javax.swing.JTextArea	
 	 */
-	private JTextArea getDescriptionTextArea ()
+	private JScrollPane getDescriptionTextArea ()
 	{
+		JScrollPane js = null;
 		if (descriptionTextArea == null)
 		{
 			descriptionTextArea = new JTextArea() ;
-			descriptionTextArea.setPreferredSize(new Dimension(300,90));
+			js = new JScrollPane(descriptionTextArea);
+			js.setPreferredSize(new Dimension(300,60));
+			//descriptionTextArea.setPreferredSize(new Dimension(300,90));
 		}
-		return descriptionTextArea ;
+		return js ;
 	}
 
 	/**
@@ -328,13 +346,16 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 	 * 	
 	 * @return javax.swing.JList	
 	 */
-	private JList getRoleList (Vector <String> roleNames)
+	private JScrollPane getRoleList (Vector <String> roleNames)
 	{
+		JScrollPane js = null;
 		if (roleList == null)
 		{
 			roleList = new JList(roleNames) ;
+			js = new JScrollPane(roleList);
+			js.setPreferredSize(new Dimension(100,100));
 		}
-		return roleList ;
+		return js ;
 	}
 
 	/**
@@ -347,10 +368,11 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 		if (okButton == null)
 		{
 			okButton = new JButton(Bundle.getText("TaskDescriptorAdderDialogOk")) ;
-			JButton  cancButon = getCancelButton();
-			okButton.setPreferredSize(cancButon.getPreferredSize());
+			//JButton  cancButon = getCancelButton();
+			okButton.setPreferredSize(new Dimension(80,20));
 			
 		}
+		
 		return okButton ;
 	}
 
@@ -364,6 +386,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 		if (cancelButton == null)
 		{
 			cancelButton = new JButton(Bundle.getText("TaskDescriptorAdderDialogCancel")) ;
+			cancelButton.setPreferredSize(new Dimension(80,20));
 		}
 		return cancelButton ;
 	}

@@ -133,7 +133,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 					TaskDescriptor task =(TaskDescriptor)bdElement;
 					try
 					{
-						index =Integer.parseInt(task.getId().split("_")[0]);
+						index =Integer.parseInt(task.getId().split("_")[1]);
 					}
 					catch (PatternSyntaxException ex)
 					{
@@ -169,6 +169,7 @@ public class TaskDescriptorAdderDialog extends JDialog implements ActionListener
 	    {
 	          TaskDescriptorAdderDialog.this.dispose();
 	    }
+		dispose();
 	} 
 
 	

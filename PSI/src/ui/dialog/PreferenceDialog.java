@@ -444,6 +444,7 @@ public class PreferenceDialog extends JDialog
 						pref.setLoadHelp(true);
 					}
 					pref.save();
+					
 					dispose() ;
 					
 				}

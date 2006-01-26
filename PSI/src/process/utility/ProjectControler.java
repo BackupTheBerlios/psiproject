@@ -30,11 +30,19 @@ import org.xml.sax.SAXParseException ;
 import process.exception.FileParseException ;
 import process.exception.FileSaveException ;
 import model.Component ;
+import model.Guide ;
+import model.GuideType ;
 import model.HumanResource ;
+import model.Interface ;
+import model.Presentation;
 import model.Project ;
+import model.spem2.Activity ;
 import model.spem2.BreakdownElement ;
 import model.spem2.DeliveryProcess ;
+import model.spem2.ProductType;
 import model.spem2.RoleDescriptor ;
+import model.spem2.TaskDescriptor ;
+import model.spem2.WorkProductDescriptor ;
 
 /**
  * ProjectControler : Loads, saves project information
@@ -143,7 +151,7 @@ public class ProjectControler
 				for (int i = 0; i < localAttrCount; i++ )
 				{
 					localAttrNode = localAttributes.item(i) ;
-					if (localAttrNode.getNodeName().equalsIgnoreCase("uid"))
+					if (localAttrNode.getNodeName().equalsIgnoreCase("projectID"))
 					{
 						localAttrTarget-- ;
 						localProject.setId(localAttrNode.getNodeValue()) ;
@@ -275,7 +283,7 @@ public class ProjectControler
 	}
 
 	/**
-	 * Saves the project in domino format TODO : packages handling
+	 * Saves the project in domino format, PSI also uses this format as save files
 	 * 
 	 * @author Conde Mickael K.
 	 * @version 1.0
@@ -298,29 +306,45 @@ public class ProjectControler
 			 * Initialisation
 			 */
 			BreakdownElement localElement ;
+			Collection <BreakdownElement> localNested ;
+			Iterator <BreakdownElement> localIterator ;
+			BreakdownElement localTempElement ;
 			ArrayList <Component> localComponents = new ArrayList <Component>() ;
-			ArrayList <RoleDescriptor> localRoles = new ArrayList <RoleDescriptor>() ;
-			// ArrayList <Component> localComponents = new ArrayList <Component>() ;
+			HumanResource localTempResource ;
+
+			// The following variables represents buffers for various elements (for optimisation in
+			// loops)
+			Iterator <BreakdownElement> internIterator ;
+			Iterator <WorkProductDescriptor> productIterator ;
+			Iterator <TaskDescriptor> taskIterator ;
+			Iterator <RoleDescriptor> roleIterator ;
+			Iterator <Interface> interfaceIterator ;
+			Iterator <Guide> guideIterator ;
+			Iterator <HumanResource> resourceIterator ;
+			String productsInfo = "" ;
+			String productsIds = "" ;
+
+			String rolesInfo = "" ;
+			String rolesIds = "" ;
+
+			String activitiesInfo = "" ;
+			String activitiesIds = "" ;
+
+			String productTypesInfo = "" ;
+			String taskDescsInfo = "" ;
+			String interfacesInfo = "" ;
+			String presentationsInfo = "" ;
+			String guidesInfo = "" ;
+			String guideTypesInfo = "" ;
 
 			// Initializing components
-			Iterator <BreakdownElement> localIterator = _project.getProcess().getNestedElements().iterator() ;
+			localIterator = _project.getProcess().getNestedElements().iterator() ;
 			while (localIterator.hasNext())
 			{
 				localElement = localIterator.next() ;
 				if (localElement instanceof Component)
 				{
 					localComponents.add((Component) localElement) ;
-				}
-			}
-			
-			// Initializing roles
-			localIterator = _project.getProcess().getNestedElements().iterator() ;
-			while (localIterator.hasNext())
-			{
-				localElement = localIterator.next() ;
-				if (localElement instanceof RoleDescriptor)
-				{
-					localRoles.add((RoleDescriptor) localElement) ;
 				}
 			}
 
@@ -335,7 +359,9 @@ public class ProjectControler
 			// Starting process
 			localOSW.write("<exportExecution>\n") ;
 
-			// Process info
+			/*
+			 * Process info
+			 */
 			localOSW.write("<processus>\n") ;
 			localOSW.write("<id>" + localProcess.getDescriptor().getId() + "</id>\n" + "<nom>" + localProcess.getDescriptor().getName() + "</nom>\n"
 					+ "<nomAuteur>" + localProcess.getAuthorFullName() + "</nomAuteur>\n" + "<emailAuteur>" + localProcess.getAuthorMail() + "</emailAuteur>\n"
@@ -360,7 +386,8 @@ public class ProjectControler
 				localOSW.write("</liste_composantId>\n") ;
 			}
 
-			// Packages within a process
+			// Packages within a process to be implemented later ?
+			localOSW.write("<liste_paquetagePresentationId/>\n") ;
 			localOSW.write("</processus>\n") ;
 
 			// Listing all components
@@ -375,47 +402,780 @@ public class ProjectControler
 				{
 					localOSW.write("<composant>\n") ;
 					localOSW.write("<id>" + localComponents.get(i).getDescriptor().getId() + "</id>\n") ;
-					localOSW.write("<nom>"+ localComponents.get(i).getDescriptor().getName() + "</nom>\n") ;
-					localOSW.write("<version>" + localComponents.get(i).getVersion()+ "</version>\n") ;
-					localOSW.write("<nomAuteur>" + localComponents.get(i).getAuthorFullName() + "</nomAuteur>\n");
-					localOSW.write("<emailAuteur>"+ localComponents.get(i).getAuthorMail() + "</emailAuteur>\n") ;
-					localOSW.write("<datePlacement>"+ localComponents.get(i).getDate() + "</datePlacement>\n") ;
-					localOSW.write("<description>"+ localComponents.get(i).getDescriptor().getDescription() + "</description>\n") ;
-					localOSW.write("<cheminDiagrammeFlots>"+ localComponents.get(i).getFlowDiagramPath() + "</cheminDiagrammeFlots>\n") ;
+					localOSW.write("<nom>" + localComponents.get(i).getDescriptor().getName() + "</nom>\n") ;
+					localOSW.write("<version>" + localComponents.get(i).getVersion() + "</version>\n") ;
+					localOSW.write("<nomAuteur>" + localComponents.get(i).getAuthorFullName() + "</nomAuteur>\n") ;
+					localOSW.write("<emailAuteur>" + localComponents.get(i).getAuthorMail() + "</emailAuteur>\n") ;
+					localOSW.write("<datePlacement>" + localComponents.get(i).getDate() + "</datePlacement>\n") ;
+					localOSW.write("<description>" + localComponents.get(i).getDescriptor().getDescription() + "</description>\n") ;
+					localOSW.write("<cheminDiagrammeFlots>" + localComponents.get(i).getFlowDiagramPath() + "</cheminDiagrammeFlots>\n") ;
+
+					localNested = localComponents.get(i).getNestedElements() ;
+					localIterator = localNested.iterator() ;
+
+					// Generating strings that will contain data
+					while (localIterator.hasNext())
+					{
+						localTempElement = localIterator.next() ;
+						// For roles
+						if (localTempElement instanceof RoleDescriptor)
+						{
+							rolesIds = rolesIds + "<roleId>" + ((RoleDescriptor) localTempElement).getId() + "</roleId>\n" ;
+
+						} // End if instanceof role
+
+						// For products
+						else if (localTempElement instanceof WorkProductDescriptor)
+						{
+							productsIds = productsIds + "<produitId>" + ((WorkProductDescriptor) localTempElement).getId() + "</produitId>\n" ;
+
+						} // End of product
+
+						// For activities
+						else if (localTempElement instanceof Activity)
+						{
+							activitiesIds = activitiesIds + "<definitionTravailId>" + ((Activity) localTempElement).getDescriptor().getId()
+									+ "</definitionTravailId>\n" ;
+						}
+					}
+
 					// Roles
+					if (rolesIds.equals(""))
+					{
+						localOSW.write("<liste_roleId/>\n") ;
+					}
+
+					else
+					{
+						localOSW.write("<liste_roleId>\n" + rolesIds + "</liste_roleId>\n") ;
+					}
+
 					// Products
+					if (productsIds.equals(""))
+					{
+						localOSW.write("<liste_produitId/>\n") ;
+					}
+
+					else
+					{
+						localOSW.write("<liste_produitId>\n" + productsIds + "</liste_produitId>\n") ;
+					}
+
 					// Work definitions (activities)
-					localOSW.write("<liste_definitionTravailId/>\n") ;
+					if (productsIds.equals(""))
+					{
+						localOSW.write("<liste_definitionTravailId/>\n") ;
+					}
+
+					else
+					{
+						localOSW.write("<liste_definitionTravailId>\n" + activitiesIds + "</liste_definitionTravailId>\n") ;
+					}
+
+					// Additional component info
+					if (localComponents.get(i).getRequiredInterface() == null)
+					{
+						localOSW.write("<interfaceRequise/>\n") ;
+					}
+					else
+					{
+						localOSW.write("<interfaceRequise>" + localComponents.get(i).getRequiredInterface().getId() + "</interfaceRequise>\n") ;
+					}
+
+					if (localComponents.get(i).getGivenInterface() == null)
+					{
+						localOSW.write("<interfaceFournie/>\n") ;
+					}
+					else
+					{
+						localOSW.write("<interfaceFournie>" + localComponents.get(i).getGivenInterface().getId() + "</interfaceFournie>\n") ;
+					}
+
+					if (localComponents.get(i).getPresentationElement() == null)
+					{
+						localOSW.write("<elementPresentationId/>\n") ;
+					}
+					else
+					{
+						localOSW.write("<elementPresentationId>" + localComponents.get(i).getPresentationElement().getId() + "</elementPresentationId>\n") ;
+					}
+
 					localOSW.write("</composant>\n") ;
 				}
 				localOSW.write("</liste_composant>\n") ;
+			} // End of components
+
+			// Generating general data
+			localIterator = _project.getProcess().getNestedElements().iterator() ;
+			while (localIterator.hasNext())
+			{
+				localElement = localIterator.next() ;
+				// For roles
+				if (localElement instanceof RoleDescriptor)
+				{
+					rolesInfo = rolesInfo + "<role>\n" ;
+					rolesInfo = rolesInfo + "<id>" + ((RoleDescriptor) localElement).getId() + "</id>\n" ;
+					rolesInfo = rolesInfo + "<nom>" + ((RoleDescriptor) localElement).getName() + "</nom>\n" ;
+					rolesInfo = rolesInfo + "<agregatComposant>" + ((RoleDescriptor) localElement).getParentId() + "</agregatComposant>\n" ;
+
+					// Products in roles
+					if ( ((RoleDescriptor) localElement).getProducts().size() == 0)
+					{
+						rolesInfo = rolesInfo + "<liste_responsabiliteProduit/>\n" ;
+					}
+
+					else
+					{
+						rolesInfo = rolesInfo + "<liste_responsabiliteProduit>\n" ;
+						productIterator = ((RoleDescriptor) localElement).getProducts().iterator() ;
+						while (productIterator.hasNext())
+						{
+							rolesInfo = rolesInfo + "<responsabiliteProduit>" + productIterator.next().getId() + "</responsabiliteProduit>\n" ;
+						}
+						rolesInfo = rolesInfo + "</liste_responsabiliteProduit>\n" ;
+					}
+
+					// Tasks (activities) in roles
+					if ( ((RoleDescriptor) localElement).getPrimaryTasks().size() == 0)
+					{
+						rolesInfo = rolesInfo + "<liste_participationActivite/>\n" ;
+					}
+
+					else
+					{
+						rolesInfo = rolesInfo + "<liste_participationActivite>\n" ;
+						taskIterator = ((RoleDescriptor) localElement).getPrimaryTasks().iterator() ;
+						while (taskIterator.hasNext())
+						{
+							rolesInfo = rolesInfo + "<participationActivite>" + taskIterator.next().getId() + "</participationActivite>\n" ;
+						}
+						rolesInfo = rolesInfo + "</liste_participationActivite>\n" ;
+					}
+
+					if ( ((RoleDescriptor) localElement).getPresentationElement() == null)
+					{
+						rolesInfo = rolesInfo + "<elementPresentationId/>" ;
+					}
+					else
+					{
+						rolesInfo = rolesInfo + "<elementPresentationId>" + ((RoleDescriptor) localElement).getPresentationElement().getId()
+								+ "</elementPresentationId>\n" ;
+					}
+
+					rolesInfo = rolesInfo + "</role>\n" ;
+				} // End if instanceof role
+
+				// For products
+				else if (localElement instanceof WorkProductDescriptor)
+				{
+					productsInfo = productsInfo + "<produit>\n" ;
+					productsInfo = productsInfo + "<id>" + ((WorkProductDescriptor) localElement).getId() + "</id>\n" ;
+					productsInfo = productsInfo + "<nom>" + ((WorkProductDescriptor) localElement).getName() + "</nom>\n" ;
+					productsInfo = productsInfo + "<agregatComposant>" + ((WorkProductDescriptor) localElement).getParentId() + "</agregatComposant>\n" ;
+					if ( ((WorkProductDescriptor) localElement).getResponsible() == null)
+					{
+						productsInfo = productsInfo + "<responsabiliteRole/>" ;
+					}
+					else
+					{
+						productsInfo = productsInfo + "<responsabiliteRole>" + ((WorkProductDescriptor) localElement).getResponsible().getId()
+								+ "</responsabiliteRole>\n" ;
+					}
+					if ( ((WorkProductDescriptor) localElement).getProductType() == null)
+					{
+						productsInfo = productsInfo + "<typeProduitId/>" ;
+					}
+					else
+					{
+						productsInfo = productsInfo + "<typeProduitId>" + ((WorkProductDescriptor) localElement).getProductType().getId()
+								+ "</typeProduitId>\n" ;
+					}
+
+					// Interfaces in products
+					if ( ((WorkProductDescriptor) localElement).getInterfaces().size() == 0)
+					{
+						productsInfo = productsInfo + "<liste_interfaceId/>\n" ;
+					}
+
+					else
+					{
+						productsInfo = productsInfo + "<liste_interfaceId>\n" ;
+						interfaceIterator = ((WorkProductDescriptor) localElement).getInterfaces().iterator() ;
+						while (interfaceIterator.hasNext())
+						{
+							productsInfo = productsInfo + "<interfaceId>" + interfaceIterator.next().getId() + "</interfaceId>\n" ;
+						}
+						productsInfo = productsInfo + "</liste_interfaceId>\n" ;
+					}
+
+					// States : not implemented
+					productsInfo = productsInfo + "<liste_etatId/>" ;
+
+					// Tasks : in and out
+					if ( ((WorkProductDescriptor) localElement).getUsingTasks().size() == 0)
+					{
+						productsInfo = productsInfo + "<liste_entreeActivite/>\n" ;
+					}
+
+					else
+					{
+						productsInfo = productsInfo + "<liste_entreeActivite>\n" ;
+						taskIterator = ((WorkProductDescriptor) localElement).getUsingTasks().iterator() ;
+						while (taskIterator.hasNext())
+						{
+							productsInfo = productsInfo + "<entreeActivite>" + taskIterator.next().getId() + "</entreeActivite>\n" ;
+						}
+						productsInfo = productsInfo + "</liste_entreeActivite>\n" ;
+					}
+
+					if ( ((WorkProductDescriptor) localElement).getProducingTasks().size() == 0)
+					{
+						productsInfo = productsInfo + "<liste_sortieActivite/>\n" ;
+					}
+
+					else
+					{
+						productsInfo = productsInfo + "<liste_sortieActivite>\n" ;
+						taskIterator = ((WorkProductDescriptor) localElement).getProducingTasks().iterator() ;
+						while (taskIterator.hasNext())
+						{
+							productsInfo = productsInfo + "<sortieActivite>" + taskIterator.next().getId() + "</sortieActivite>\n" ;
+						}
+						productsInfo = productsInfo + "</liste_sortieActivite>\n" ;
+					}
+
+					if ( ((WorkProductDescriptor) localElement).getPresentationElement() == null)
+					{
+						productsInfo = productsInfo + "<elementPresentationId/>" ;
+					}
+					else
+					{
+						productsInfo = productsInfo + "<elementPresentationId>" + ((WorkProductDescriptor) localElement).getPresentationElement().getId()
+								+ "</elementPresentationId>\n" ;
+					}
+
+					productsInfo = productsInfo + "</produit>\n" ;
+				} // End of product
+
+				// For activities
+				else if (localElement instanceof Activity)
+				{
+					activitiesInfo = activitiesInfo + "<definitionTravail>\n" ;
+					activitiesInfo = activitiesInfo + "<id>" + ((Activity) localElement).getDescriptor().getId() + "</id>\n" ;
+					activitiesInfo = activitiesInfo + "<nom>" + ((Activity) localElement).getDescriptor().getName() + "</nom>\n" ;
+					if ( ((Activity) localElement).getActivityDiagramPath().equals(""))
+					{
+						activitiesInfo = activitiesInfo + "<cheminDiagrammeActivites/>" ;
+					}
+					else
+					{
+						activitiesInfo = activitiesInfo + "<cheminDiagrammeActivites>" + ((Activity) localElement).getActivityDiagramPath()
+								+ "</cheminDiagrammeActivites>\n" ;
+					}
+					if ( ((Activity) localElement).getFlowDiagramPath().equals(""))
+					{
+						activitiesInfo = activitiesInfo + "<cheminDiagrammeFlots/>" ;
+					}
+					else
+					{
+						activitiesInfo = activitiesInfo + "<cheminDiagrammeFlots>" + ((Activity) localElement).getFlowDiagramPath()
+								+ "</cheminDiagrammeFlots>\n" ;
+					}
+
+					// Tasks
+					if ( ((Activity) localElement).getNestedElements().size() == 0)
+					{
+						activitiesInfo = activitiesInfo + "<liste_activiteId/>\n" ;
+					}
+
+					else
+					{
+						activitiesInfo = activitiesInfo + "<liste_activiteId>\n" ;
+						internIterator = ((Activity) localElement).getNestedElements().iterator() ;
+						while (internIterator.hasNext())
+						{
+							localTempElement = internIterator.next() ;
+							if (localTempElement instanceof TaskDescriptor)
+							{
+								activitiesInfo = activitiesInfo + "<activite>" + ((TaskDescriptor) localTempElement).getId() + "</activite>\n" ;
+							}
+						}
+						activitiesInfo = activitiesInfo + "</liste_activiteId>\n" ;
+					}
+
+					if ( ((Activity) localElement).getPresentationElement() == null)
+					{
+						activitiesInfo = activitiesInfo + "<elementPresentationId/>" ;
+					}
+					else
+					{
+						activitiesInfo = activitiesInfo + "<elementPresentationId>" + ((Activity) localElement).getPresentationElement().getId()
+								+ "</elementPresentationId>\n" ;
+					}
+
+					activitiesInfo = activitiesInfo + "</definitionTravail>\n" ;
+				} // End activities
+				
+				// For task descriptors
+				else if (localElement instanceof TaskDescriptor)
+				{
+					taskDescsInfo = taskDescsInfo + "<activite>\n" ;
+					taskDescsInfo = taskDescsInfo + "<id>" + ((TaskDescriptor) localElement).getId() + "</id>\n" ;
+					taskDescsInfo = taskDescsInfo + "<nom>" + ((TaskDescriptor) localElement).getName() + "</nom>\n" ;
+
+					// Role : we take the first ...
+					if ( ((TaskDescriptor) localElement).getPrimaryPerformers().size() == 0)
+					{
+						taskDescsInfo = taskDescsInfo + "<participationRole/>\n" ;
+					}
+
+					else
+					{
+						roleIterator = ((TaskDescriptor) localElement).getPrimaryPerformers().iterator() ;
+						taskDescsInfo = taskDescsInfo + "<participationRole>" + roleIterator.next().getId() + "</participationRole>\n" ;
+					}
+					
+					// Activity
+					if ( ((TaskDescriptor) localElement).getParentId().equals(""))
+					{
+						taskDescsInfo = taskDescsInfo + "<agregatDefinitionTravail/>" ;
+					}
+					else
+					{
+						taskDescsInfo = taskDescsInfo + "<agregatDefinitionTravail>" + ((TaskDescriptor) localElement).getParentId() + "</agregatDefinitionTravail>\n" ;
+					}					
+					
+					
+					// Products
+					if ( ((TaskDescriptor) localElement).getInputProducts().size() == 0)
+					{
+						taskDescsInfo = taskDescsInfo + "<liste_entreeProduit/>\n" ;
+					}
+
+					else
+					{
+						taskDescsInfo = taskDescsInfo + "<liste_entreeProduit>\n" ;
+						productIterator = ((TaskDescriptor) localElement).getInputProducts().iterator() ;
+						while (productIterator.hasNext())
+						{
+							taskDescsInfo = taskDescsInfo + "<entreeProduit>" + productIterator.next().getId() + "</entreeProduit>\n" ;
+						}
+						taskDescsInfo = taskDescsInfo + "</liste_entreeProduit>\n" ;
+					}
+					
+					if ( ((TaskDescriptor) localElement).getOutputProducts().size() == 0)
+					{
+						taskDescsInfo = taskDescsInfo + "<liste_sortieProduit/>\n" ;
+					}
+
+					else
+					{
+						taskDescsInfo = taskDescsInfo + "<liste_sortieProduit>\n" ;
+						productIterator = ((TaskDescriptor) localElement).getOutputProducts().iterator() ;
+						while (productIterator.hasNext())
+						{
+							taskDescsInfo = taskDescsInfo + "<sortieProduit>" + productIterator.next().getId() + "</sortieProduit>\n" ;
+						}
+						taskDescsInfo = taskDescsInfo + "</liste_sortieProduit>\n" ;
+					}
+					
+					if ( ((TaskDescriptor) localElement).getPresentationElement() == null)
+					{
+						taskDescsInfo = taskDescsInfo + "<elementPresentationId/>" ;
+					}
+					else
+					{
+						taskDescsInfo = taskDescsInfo + "<elementPresentationId>" + ((TaskDescriptor) localElement).getPresentationElement().getId()
+								+ "</elementPresentationId>\n" ;
+					}
+
+					taskDescsInfo = taskDescsInfo + "</activite>\n" ;
+				} // End taskDescs
+				
+				// For interfaces
+				else if (localElement instanceof Interface)
+				{
+					interfacesInfo = interfacesInfo + "<interface>\n" ;
+					interfacesInfo = interfacesInfo + "<id>" + ((Interface) localElement).getId() + "</id>\n" ;
+
+					if ( ((Interface) localElement).getRequiredForComponent() == null)
+					{
+						interfacesInfo = interfacesInfo + "<interfaceRequiseComposant/>" ;
+					}
+					else
+					{
+						interfacesInfo = interfacesInfo + "<interfaceRequiseComposant>" + ((Interface) localElement).getRequiredForComponent().getDescriptor().getId() + "</interfaceRequiseComposant>\n" ;
+					}					
+					
+					if ( ((Interface) localElement).getGivenForComponent() == null)
+					{
+						interfacesInfo = interfacesInfo + "<interfaceFournieComposant/>" ;
+					}
+					else
+					{
+						interfacesInfo = interfacesInfo + "<interfaceFournieComposant>" + ((Interface) localElement).getGivenForComponent().getDescriptor().getId() + "</interfaceFournieComposant>\n" ;
+					}
+					
+					// Products
+					if ( ((Interface) localElement).getProducts().size() == 0)
+					{
+						interfacesInfo = interfacesInfo + "<liste_interfaceProduit/>\n" ;
+					}
+
+					else
+					{
+						interfacesInfo = interfacesInfo + "<liste_interfaceProduit>\n" ;
+						productIterator = ((Interface) localElement).getProducts().iterator() ;
+						while (productIterator.hasNext())
+						{
+							interfacesInfo = interfacesInfo + "<interfaceProduit>" + productIterator.next().getId() + "</interfaceProduit>\n" ;
+						}
+						interfacesInfo = interfacesInfo + "</liste_interfaceProduit>\n" ;
+					} 
+
+					interfacesInfo = interfacesInfo + "</interface>\n" ;
+				} // End interfaces
+				
+				//	 For product types
+				else if (localElement instanceof ProductType)
+				{
+					productTypesInfo = productTypesInfo + "<typeProduit>\n" ;
+					productTypesInfo = productTypesInfo + "<id>" + ((ProductType) localElement).getId() + "</id>\n" ;
+					productTypesInfo = productTypesInfo + "<nom>" + ((ProductType) localElement).getName() + "</nom>\n" ;
+					productTypesInfo = productTypesInfo + "</typeProduit>\n" ;
+				} // End product types
+				
+				// For states
+				
+				// For presentation packages
+				
+				// For presentation elements
+				else if (localElement instanceof Presentation)
+				{
+					presentationsInfo = presentationsInfo + "<elementPresentation>\n" ;
+					presentationsInfo = presentationsInfo + "<id>" + ((Presentation) localElement).getId() + "</id>\n" ;
+					presentationsInfo = presentationsInfo + "<nom>" + ((Presentation) localElement).getName() + "</nom>\n" ;
+					
+					// Icon
+					if ( ((Presentation) localElement).getIconPath().equals(""))
+					{
+						presentationsInfo = presentationsInfo + "<cheminIcone/>" ;
+					}
+					else
+					{
+						presentationsInfo = presentationsInfo + "<cheminIcone>" + ((Presentation) localElement).getIconPath() + "</cheminIcone>\n" ;
+					}
+					
+					// Content
+					if ( ((Presentation) localElement).getContentPath().equals(""))
+					{
+						presentationsInfo = presentationsInfo + "<cheminContenu/>" ;
+					}
+					else
+					{
+						presentationsInfo = presentationsInfo + "<cheminContenu>" + ((Presentation) localElement).getContentPath() + "</cheminContenu>\n" ;
+					}
+					
+					// Description
+					if ( ((Presentation) localElement).getDescription().equals(""))
+					{
+						presentationsInfo = presentationsInfo + "<description/>" ;
+					}
+					else
+					{
+						presentationsInfo = presentationsInfo + "<description>" + ((Presentation) localElement).getDescription() + "</description>\n" ;
+					}
+					
+					// Page
+					if ( ((Presentation) localElement).getPagePath().equals(""))
+					{
+						presentationsInfo = presentationsInfo + "<cheminPage/>" ;
+					}
+					else
+					{
+						presentationsInfo = presentationsInfo + "<cheminPage>" + ((Presentation) localElement).getPagePath() + "</cheminPage>\n" ;
+					}
+					
+					// Guides
+					if ( ((Presentation) localElement).getGuides().size() == 0)
+					{
+						presentationsInfo = presentationsInfo + "<liste_guideId/>\n" ;
+					}
+
+					else
+					{
+						presentationsInfo = presentationsInfo + "<liste_guideId>\n" ;
+						guideIterator = ((Presentation) localElement).getGuides().iterator() ;
+						while (guideIterator.hasNext())
+						{
+							presentationsInfo = presentationsInfo + "<guideId>" + guideIterator.next().getId() + "</guideId>\n" ;
+						}
+						presentationsInfo = presentationsInfo + "</liste_guideId>\n" ;
+					}
+
+					presentationsInfo = presentationsInfo + "</elementPresentation>\n" ;
+				} // End presentation
+
+				// For guides
+				else if (localElement instanceof Guide)
+				{
+					guidesInfo = guidesInfo + "<guide>\n" ;
+					guidesInfo = guidesInfo + "<id>" + ((Guide) localElement).getId() + "</id>\n" ;
+					guidesInfo = guidesInfo + "<nom>" + ((Guide) localElement).getName() + "</nom>\n" ;
+					if ( ((Guide) localElement).getType() == null)
+					{
+						guidesInfo = guidesInfo + "<typeGuideId/>" ;
+					}
+					else
+					{
+						guidesInfo = guidesInfo + "<typeGuideId>" + ((Guide) localElement).getType().getId() + "</typeGuideId>\n" ;
+					}
+
+					if ( ((Guide) localElement).getPresentationElement() == null)
+					{
+						guidesInfo = guidesInfo + "<elementPresentationId/>" ;
+					}
+					else
+					{
+						guidesInfo = guidesInfo + "<elementPresentationId>" + ((Guide) localElement).getPresentationElement().getId()
+								+ "</elementPresentationId>\n" ;
+					}
+					 
+
+					guidesInfo = guidesInfo + "</guide>\n" ;
+				} // End guides
+
+				// For guide types
+				else if (localElement instanceof GuideType)
+				{
+					guideTypesInfo = guideTypesInfo + "<typeGuide>\n" ;
+					guideTypesInfo = guideTypesInfo + "<id>" + ((GuideType) localElement).getId() + "</id>\n" ;
+					guideTypesInfo = guideTypesInfo + "<nom>" + ((GuideType) localElement).getName() + "</nom>\n" ;
+					guideTypesInfo = guideTypesInfo + "</typeGuide>\n" ;
+				} // End guideTypes
 			}
-			
+
 			// Listing all roles
-			int localRolesSize = localRoles.size() ;
-			if (localRolesSize == 0)
+			if (rolesInfo.equals(""))
 			{
 				localOSW.write("<liste_role/>\n") ;
 			}
 			else
 			{
-				localOSW.write("<liste_role>\n") ;
-				for (int i = 0; i < localRolesSize; i++ )
-				{
-					localOSW.write("<role>\n") ;
-					localOSW.write("<id>" + localRoles.get(i).getId() + "</id>\n") ;
-					localOSW.write("<nom>"+ localRoles.get(i).getName() + "</nom>\n") ;
-					localOSW.write("<agregatComposant>"+ localRoles.get(i).getParentId() + "</agregatComposant>\n") ;
-					localOSW.write("<liste_responsabiliteProduit>\n") ;
-					localOSW.write("</role>\n") ;
-				}
-				localOSW.write("</liste_role>\n") ;
+				localOSW.write("<liste_role>\n" + rolesInfo + "</liste_role>\n") ;
+			}
+
+			// Listing products
+			if (productsInfo.equals(""))
+			{
+				localOSW.write("<liste_produit/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<liste_produit>\n" + productsInfo + "</liste_produit>\n") ;
+			}
+
+			// Listing work definitions
+			if (activitiesInfo.equals(""))
+			{
+				localOSW.write("<liste_definitionTravail/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<liste_definitionTravail>\n" + activitiesInfo + "</liste_definitionTravail>\n") ;
+			}
+
+			// Listing tasks descriptors
+			if (taskDescsInfo.equals(""))
+			{
+				localOSW.write("<liste_activite/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<liste_activite>\n" + taskDescsInfo + "</liste_activite>\n") ;
+			}
+			
+			// Listing interfaces
+			if (interfacesInfo.equals(""))
+			{
+				localOSW.write("<liste_interface/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<liste_interface>\n" + interfacesInfo + "</liste_interface>\n") ;
+			}
+			
+			// Listing product types
+			if (productTypesInfo.equals(""))
+			{
+				localOSW.write("<liste_typeProduit/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<liste_typeProduit>\n" + productTypesInfo + "</liste_typeProduit>\n") ;
+			}
+
+			// Listing states
+			localOSW.write("<liste_etat/>\n") ;
+
+			// Listing package presentations
+			localOSW.write("<liste_paquetagePresentation/>\n") ;
+			
+			// Listing presentations
+			if (presentationsInfo.equals(""))
+			{
+				localOSW.write("<liste_elementPresentation/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<liste_elementPresentation>\n" + presentationsInfo + "</liste_elementPresentation>\n") ;
+			}
+			
+			// Listing guides
+			if (guidesInfo.equals(""))
+			{
+				localOSW.write("<liste_guide/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<liste_guide>\n" + guidesInfo + "</liste_guide>\n") ;
+			}
+
+			// Listing guide types
+			if (guideTypesInfo.equals(""))
+			{
+				localOSW.write("<liste_typeGuide/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<liste_typeGuide>\n" + guideTypesInfo + "</liste_typeGuide>\n") ;
 			}
 
 			// Ending process
 			localOSW.write("</exportExecution>\n") ;
 
-			// Project's objects
+			/*
+			 * Project's objects
+			 */
+			localOSW.write("<elementProjet>\n") ;
+			// General info
+			localOSW.write("<projet>\n") ;
+			localOSW.write("<id>" + _project.getId() + "</id>\n") ;
+			localOSW.write("<nom>" + _project.getName() + "</nom>\n") ;
+			if (_project.getDescription().equals(""))
+			{
+				localOSW.write("<description/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<description>" + _project.getDescription() + "</description>\n") ;
+			}
+			localOSW.write("<dateDebut>" + _project.getStartDate() + "</dateDebut>\n") ;
+			localOSW.write("<dateFin>" + _project.getFinishDate() + "</dateFin>\n") ;
+			localOSW.write("</projet>\n") ;
+
+			// Members
+			if (_project.getResources().size() == 0)
+			{
+				localOSW.write("<listeMembres/>\n") ;
+			}
+			else
+			{
+				resourceIterator = _project.getResources().iterator() ;
+				localOSW.write("<listeMembres>\n") ;
+				while (resourceIterator.hasNext())
+				{
+					localTempResource = resourceIterator.next() ;
+					localOSW.write("<eltMembre>\n") ;
+					localOSW.write("<id>" + localTempResource.getId() + "</id>\n") ;
+					localOSW.write("<nom>" + localTempResource.getFullName() + "</nom>\n") ;
+					localOSW.write("</eltMembre>\n") ;
+				}
+				localOSW.write("</listeMembres>\n") ;
+
+			}
+
+			// Iterations : TODO how it works
+			localOSW.write("<listeIterations/>\n") ;
+
+			// Tasks : TODO but could be task descriptors
+			localOSW.write("<listeTaches/>\n") ;
+
+			// Artefacts : TODO implementation
+			localOSW.write("<listeArtefacts/>\n") ;
+
+			localOSW.write("</elementProjet>\n") ;
+
+			/*
+			 * Links between projects elements
+			 */
+			localOSW.write("<lienProjet>\n") ;
+			// Between iterations and tasks
+			localOSW.write("<listeIterationTache/>\n") ;
+
+			// Between members and artifacts
+			localOSW.write("<listeMembreArtefact/>\n") ;
+
+			// Between members and tasks
+			localOSW.write("<listeMembreTache/>\n") ;
+
+			// Between tasks and artifacts in
+			localOSW.write("<listeTacheArtefact_Entree/>\n") ;
+
+			// Between tasks and artifacts in
+			localOSW.write("<listeTacheArtefact_Sortie/>\n") ;
+			localOSW.write("</lienProjet>\n") ;
+
+			/*
+			 * Links between project and process
+			 */
+			localOSW.write("<lienProjetProcessus>\n") ;
+			// Between artifacts and products
+			localOSW.write("<listeProduitArtefact/>\n") ;
+
+			// Between tasks and "tasks" ?
+			localOSW.write("<listeActiviteTache/>\n") ;
+
+			// Between members and roles
+			if (_project.getResources().size() == 0)
+			{
+				localOSW.write("<MembreRole/>\n") ;
+			}
+
+			else
+			{
+				resourceIterator = _project.getResources().iterator() ;
+				localOSW.write("<MembreRole>\n") ;
+				while (resourceIterator.hasNext())
+				{
+					localTempResource = resourceIterator.next() ;
+					localOSW.write("<listeMembre>\n") ;
+					localOSW.write("<Membre>\n") ;
+					localOSW.write("<id>" + localTempResource.getId() + "</id>\n") ;
+
+					if (localTempResource.getPerformingRoles().size() == 0)
+					{
+						localOSW.write("<listeRole/>\n") ;
+					}
+
+					else
+					{
+						roleIterator = localTempResource.getPerformingRoles().iterator() ;
+						localOSW.write("<listeRole>\n") ;
+						while (roleIterator.hasNext())
+						{
+							localOSW.write("<id>" + roleIterator.next().getId() + "</id>\n") ;
+						}
+						localOSW.write("</listeRole>\n") ;
+
+					}
+					localOSW.write("</Membre>\n") ;
+					localOSW.write("</listeMembre>\n") ;
+				}
+				localOSW.write("</MembreRole>\n") ;
+			}
+
+			localOSW.write("</lienProjetProcessus>\n") ;
 
 			// Ending project
 			localOSW.write("</exportProjet>\n") ;

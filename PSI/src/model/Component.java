@@ -45,6 +45,16 @@ public class Component extends Activity
 	 * 
 	 */
 	private Collection <String> responsabilityDiagramPaths ;
+	
+	/**
+	 * 
+	 */
+	private Interface givenInterface ;
+	
+	/**
+	 * 
+	 */
+	private Interface requiredInterface ;	
 
 	/**
 	 * Constructor
@@ -215,4 +225,43 @@ public class Component extends Activity
 		this.authorMail = _authorMail ;
 	}
 
+	/**
+	 * Getter
+	 *
+	 * @return Returns the givenInterface.
+	 */
+	public Interface getGivenInterface ()
+	{
+		return this.givenInterface ;
+	}
+
+	/**
+	 * Setter
+	 *
+	 * @param _givenInterface The givenInterface to set.
+	 */
+	public void setGivenInterface (Interface _givenInterface)
+	{
+		this.givenInterface = _givenInterface ;
+	}
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the requiredInterface.
+	 */
+	public Interface getRequiredInterface ()
+	{
+		return this.requiredInterface ;
+	}
+
+	/**
+	 * Setter
+	 *
+	 * @param _requiredInterface The requiredInterface to set.
+	 */
+	public void setRequiredInterface (Interface _requiredInterface)
+	{
+		this.requiredInterface = _requiredInterface ;
+	}
 }

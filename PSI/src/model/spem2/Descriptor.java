@@ -13,28 +13,7 @@ package model.spem2 ;
  * 
  */
 public interface Descriptor extends BreakdownElement
-{
-
-	/**
-	 * Gets the isSynchronizedWithSource property of the Descriptor
-	 * 
-	 * @author Condé Mickaël K.
-	 * @version 1.0
-	 * 
-	 * @return the isSynchronizedWithSource property
-	 */
-	public boolean isSynchronizedWithSource () ;
-
-	/**
-	 * Sets the isSynchronizedWithSource property associated to the Descriptor
-	 * 
-	 * @author Condé Mickaël K.
-	 * @version 1.0
-	 * 
-	 * @param _isSynchronizedWithSource
-	 */
-	public void setSynchronizedWithSource (boolean _isSynchronizedWithSource) ;
-
+{	
 	/**
 	 * Returns the identifier of the current element
 	 * 
@@ -93,26 +72,6 @@ public interface Descriptor extends BreakdownElement
 	 * 
 	 * @param _description
 	 */
-	public void setDescription (String _description) ;
+	public void setDescription (String _description) ;	
 	
-	/**
-	 * Gets the parent ID of the current element
-	 * 
-	 * @author Condé Mickaël K.
-	 * @version 1.0
-	 * 
-	 * @return
-	 */
-	public String getParentId () ;
-
-	/**
-	 * Sets the parent ID with a new value
-	 * 
-	 * @author Condé Mickaël K.
-	 * @version 1.0
-	 * 
-	 * @param _description
-	 */
-	public void setParentId (String _parentId) ;
-
 }

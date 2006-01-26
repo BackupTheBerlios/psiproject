@@ -5,6 +5,8 @@ import java.util.ArrayList ;
 import java.util.Collection ;
 import java.util.Observable ;
 
+import model.Presentation;
+
 /**
  * TaskDescriptor : a task within a project
  * 
@@ -45,32 +47,12 @@ public class TaskDescriptor extends Observable implements Descriptor
 	 * The real work actualy performed
 	 */
 	private PlanningData realData ;
-
+	
 	/**
-	 * Is the element planed or not
+	 * 
 	 */
-	private boolean isPlanned ;
-
-	/**
-	 * Has the element multiple occurences or not
-	 */
-	private boolean hasMultipleOccurences ;
-
-	/**
-	 * Is the element optional or not
-	 */
-	private boolean isOptional ;
-
-	/**
-	 * Is the element synchronized with source or not
-	 */
-	private boolean isSynchronizedWithSource ;
-
-	/**
-	 * The prefix of the element
-	 */
-	private String prefix ;
-
+	private Presentation presentationElement ;
+	
 	/**
 	 * Main performers of the task
 	 */
@@ -79,12 +61,12 @@ public class TaskDescriptor extends Observable implements Descriptor
 	/**
 	 * Additional performers of the task
 	 */
-	private Collection <RoleDescriptor> additionalPerformers ;
+	private Collection <WorkProductDescriptor> inputProducts ;
 
 	/**
 	 * Assisting performers of the task
 	 */
-	private Collection <RoleDescriptor> assistingPerformers ;
+	private Collection <WorkProductDescriptor> outputProducts ;
 
 	/**
 	 * Constructor
@@ -104,97 +86,14 @@ public class TaskDescriptor extends Observable implements Descriptor
 		this.parentId = _parentId ;
 
 		primaryPerformers = new ArrayList <RoleDescriptor>() ;
-		additionalPerformers = new ArrayList <RoleDescriptor>() ;
-		assistingPerformers = new ArrayList <RoleDescriptor>() ;
+		inputProducts = new ArrayList <WorkProductDescriptor>() ;
+		outputProducts = new ArrayList <WorkProductDescriptor>() ;
 
 		this.planningData = new PlanningData() ;
 		this.realData = new PlanningData() ;
 	}
 
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the hasMultipleOccurences.
-	 */
-	public boolean hasMultipleOccurences ()
-	{
-		return this.hasMultipleOccurences ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _hasMultipleOccurences
-	 *            The hasMultipleOccurences to set.
-	 */
-	public void setMultipleOccurences (boolean _hasMultipleOccurences)
-	{
-		this.hasMultipleOccurences = _hasMultipleOccurences ;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the isOptional.
-	 */
-	public boolean isOptional ()
-	{
-		return this.isOptional ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _isOptional
-	 *            The isOptional to set.
-	 */
-	public void setOptional (boolean _isOptional)
-	{
-		this.isOptional = _isOptional ;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the isPlanned.
-	 */
-	public boolean isPlanned ()
-	{
-		return this.isPlanned ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _isPlanned
-	 *            The isPlanned to set.
-	 */
-	public void setPlanned (boolean _isPlanned)
-	{
-		this.isPlanned = _isPlanned ;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the isSynchronizedWithSource.
-	 */
-	public boolean isSynchronizedWithSource ()
-	{
-		return this.isSynchronizedWithSource ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _isSynchronizedWithSource
-	 *            The isSynchronizedWithSource to set.
-	 */
-	public void setSynchronizedWithSource (boolean _isSynchronizedWithSource)
-	{
-		this.isSynchronizedWithSource = _isSynchronizedWithSource ;
-	}
-
+	
 	/**
 	 * Getter
 	 * 
@@ -235,28 +134,7 @@ public class TaskDescriptor extends Observable implements Descriptor
 	public void setRealData (PlanningData _realData)
 	{
 		this.realData = _realData ;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the prefix.
-	 */
-	public String getPrefix ()
-	{
-		return this.prefix ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _prefix
-	 *            The prefix to set.
-	 */
-	public void setPrefix (String _prefix)
-	{
-		this.prefix = _prefix ;
-	}
+	}	
 
 	/**
 	 * Getter
@@ -321,27 +199,7 @@ public class TaskDescriptor extends Observable implements Descriptor
 		this.name = _name ;
 	}
 
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the additionalPerformers.
-	 */
-	public Collection <RoleDescriptor> getAdditionalPerformers ()
-	{
-		return this.additionalPerformers ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _additionalPerformers
-	 *            The additionalPerformers to set.
-	 */
-	public void setAdditionalPerformers (Collection <RoleDescriptor> _additionalPerformers)
-	{
-		this.additionalPerformers = _additionalPerformers ;
-	}
-
+	
 	/**
 	 * Getter
 	 * 
@@ -362,28 +220,7 @@ public class TaskDescriptor extends Observable implements Descriptor
 	{
 		this.primaryPerformers = _primaryPerformers ;
 	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the assistingPerformers.
-	 */
-	public Collection <RoleDescriptor> getAssistingPerformers ()
-	{
-		return this.assistingPerformers ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _assistingPerformers
-	 *            The assistingPerformers to set.
-	 */
-	public void setAssistingPerformers (Collection <RoleDescriptor> _assistingPerformers)
-	{
-		this.assistingPerformers = _assistingPerformers ;
-	}
-
+	
 	/**
 	 * Getter
 	 * 
@@ -403,6 +240,68 @@ public class TaskDescriptor extends Observable implements Descriptor
 	public void setParentId (String _parentId)
 	{
 		this.parentId = _parentId ;
+	}
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the inputProducts.
+	 */
+	public Collection <WorkProductDescriptor> getInputProducts ()
+	{
+		return this.inputProducts ;
+	}
+
+	/**
+	 * Setter
+	 *
+	 * @param _inputProducts The inputProducts to set.
+	 */
+	public void setInputProducts (Collection <WorkProductDescriptor> _inputProducts)
+	{
+		this.inputProducts = _inputProducts ;
+	}
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the outputProducts.
+	 */
+	public Collection <WorkProductDescriptor> getOutputProducts ()
+	{
+		return this.outputProducts ;
+	}
+
+	/**
+	 * Setter
+	 *
+	 * @param _outputProducts The outputProducts to set.
+	 */
+	public void setOutputProducts (Collection <WorkProductDescriptor> _outputProducts)
+	{
+		this.outputProducts = _outputProducts ;
+	}
+
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the presentationElement.
+	 */
+	public Presentation getPresentationElement ()
+	{
+		return this.presentationElement ;
+	}
+
+
+	/**
+	 * Setter
+	 *
+	 * @param _presentationElement The presentationElement to set.
+	 */
+	public void setPresentationElement (Presentation _presentationElement)
+	{
+		this.presentationElement = _presentationElement ;
 	}
 
 }

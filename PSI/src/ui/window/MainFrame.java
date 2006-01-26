@@ -2,7 +2,6 @@
 package ui.window ;
 
 import java.awt.HeadlessException ;
-import java.awt.MouseInfo;
 import java.awt.event.ActionEvent ;
 import java.awt.event.ActionListener ;
 import java.awt.event.MouseAdapter ;
@@ -15,6 +14,7 @@ import ui.misc.LogPanel ;
 import ui.misc.RoleDescriptorPanel ;
 import ui.misc.TaskDescriptorPanel ;
 import ui.resource.Bundle ;
+import ui.tree.MainTree;
 import ui.tree.ActivityTreeNode ;
 import ui.tree.ProjectTreeNode ;
 import ui.tree.RoleDescriptorTreeNode ;
@@ -51,7 +51,7 @@ import process.utility.ProjectControler ;
 /**
  * MainFrame : PSI main window
  * 
- * @author Cond? Mickael K.
+ * @author Conde Mickael K.
  * @version 1.0
  * 
  */
@@ -103,7 +103,7 @@ public class MainFrame extends JFrame
 
 	private JMenu exportFileMenu = null ;
 
-	private JTree projectTree = null ;
+	private MainTree projectTree = null ;
 
 	private JSplitPane rightSplitPane = null ;
 
@@ -851,10 +851,7 @@ public class MainFrame extends JFrame
 	{
 		if (projectTree == null)
 		{
-			DefaultMutableTreeNode localNode = new DefaultMutableTreeNode(Bundle.getText("MainFrameTreeDefault")) ;
-			DefaultTreeModel localDTM = new DefaultTreeModel(localNode) ;
-			projectTree = new JTree(localDTM) ;
-
+			projectTree = new MainTree() ;
 			/*
 			 * Popup classes for jtree
 			 */
@@ -989,6 +986,76 @@ public class MainFrame extends JFrame
 			exportDominoFileMenuItem = new JMenuItem() ;
 			exportDominoFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExportDomino")) ;
 			exportDominoFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExportDominoMn").charAt(0)) ;
+			exportDominoFileMenuItem.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+					/*
+					 * Setting up a specific JFileChooser
+					 */
+					JFileChooser localFileChooser = new JFileChooser() ;
+					localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileExportProjectTitle")) ;
+					localFileChooser.setAcceptAllFileFilterUsed(false) ;
+					localFileChooser.setApproveButtonText(Bundle.getText("MainFrameFileExportProjectButton")) ;
+					File localDirectory = new File(Preferences.getInstance().getExportDirectory()) ;
+					if (localDirectory != null)
+					{
+						localFileChooser.setCurrentDirectory(localDirectory) ;
+					}
+					localFileChooser.setFileFilter(new FileFilter()
+					{
+						/*
+						 * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
+						 */
+						public boolean accept (File _file)
+						{
+							String localFileName = _file.getName() ;
+							String localFileExtension = localFileName.substring(localFileName.lastIndexOf(".") + 1) ;
+							return (_file.isDirectory() || (_file.isFile() && _file.canRead() && localFileExtension.equalsIgnoreCase("xml"))) ;
+						}
+
+						/*
+						 * @see javax.swing.filechooser.FileFilter#getDescription()
+						 */
+						public String getDescription ()
+						{
+							return Bundle.getText("MainFrameFileDominoFileDescription") ;
+						}
+					}) ;
+					localFileChooser.showSaveDialog(MainFrame.this) ;
+
+					/*
+					 * Working on a selected file
+					 */
+					File localFile = null ;
+					if ( (localFile = localFileChooser.getSelectedFile()) != null)
+					{
+						// Adding extension if necessary
+						if (!localFile.getName().endsWith(".xml"))
+						{
+							localFile = new File(localFile.getAbsolutePath() + ".xml") ;
+						}
+
+						// Checking if the file already exists before saving
+						if (!localFile.exists()
+								|| JOptionPane.showConfirmDialog(MainFrame.this, Bundle.getText("MainFrameFileSaveConfirm"), "PSI", JOptionPane.YES_NO_OPTION,
+										JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+						{
+							try
+							{
+								ProjectControler.save(currentProject, localFile) ;
+								actionSave.setEnabled(false) ;
+								statusPanel.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectExportedToDomino"))) ;
+
+							}
+							catch (FileSaveException exc)
+							{
+								JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileExportError"), "PSI", JOptionPane.ERROR_MESSAGE) ;
+							}
+						}
+					}
+				}
+			}) ;
 		}
 		return exportDominoFileMenuItem ;
 	}

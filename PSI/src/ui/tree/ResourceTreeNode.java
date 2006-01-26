@@ -1,9 +1,9 @@
 
 package ui.tree ;
 
-import javax.swing.tree.DefaultMutableTreeNode ;
+import javax.swing.tree.DefaultMutableTreeNode;
 
-import model.HumanResource ;
+import model.HumanResource;
 
 /**
  * ResourceTreeNode : tree like representation of a Human Resource
@@ -28,7 +28,7 @@ public class ResourceTreeNode extends DefaultMutableTreeNode
 		super() ;
 
 		this.resource = _resource ;
-		this.setUserObject(resource.getFullName()) ;
+		this.setUserObject(resource) ;
 	}
 
 	/**
@@ -52,4 +52,5 @@ public class ResourceTreeNode extends DefaultMutableTreeNode
 		this.resource = _resource ;
 	}
 
+	
 }

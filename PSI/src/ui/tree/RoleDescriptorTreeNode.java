@@ -1,9 +1,9 @@
 
 package ui.tree ;
 
-import javax.swing.tree.DefaultMutableTreeNode ;
+import javax.swing.tree.DefaultMutableTreeNode;
 
-import model.spem2.RoleDescriptor ;
+import model.spem2.RoleDescriptor;
 
 /**
  * RoleDescriptorTreeNode : A tree representation of a role
@@ -55,4 +55,5 @@ public class RoleDescriptorTreeNode extends DefaultMutableTreeNode
 		this.role = _role ;
 	}
 
+	
 }

@@ -5,6 +5,8 @@ import java.util.ArrayList ;
 import java.util.Collection ;
 import java.util.Observable;
 
+import model.Presentation;
+
 /**
  * Activity : the first non abstract class/interface. Represents a basic process activity.
  * 
@@ -14,34 +16,6 @@ import java.util.Observable;
  */
 public class Activity extends Observable implements WorkBreakdownElement, WorkDefinition
 {
-	/**
-	 * Is the element repeatable or can be executed more than once in one project or not. For
-	 * example, an iteration which is a WorkBreakdownElement is repeatable whereas a phase is not.
-	 */
-	private boolean isRepeatable ;
-
-	/**
-	 * Is the element ongoing or not.
-	 */
-	private boolean isOngoing ;
-
-	/**
-	 * Is the element event driven or not.
-	 */
-	private boolean isEventDriven ;
-
-	/**
-	 * The planification data for this element
-	 * 
-	 * @see PlanningData
-	 */
-	private PlanningData planningData ;
-
-	/**
-	 * The actual data for this element
-	 */
-	private PlanningData realData ;
-
 	/**
 	 * The descriptor of the activity
 	 */
@@ -61,6 +35,11 @@ public class Activity extends Observable implements WorkBreakdownElement, WorkDe
 	 * 
 	 */
 	private String activityDiagramPath ;
+	
+	/**
+	 * 
+	 */
+	private Presentation presentationElement ;
 
 	/**
 	 * An activity is composed of Breakdown Elements
@@ -101,178 +80,7 @@ public class Activity extends Observable implements WorkBreakdownElement, WorkDe
 		this.activityDiagramPath = _activityDiagramPath ;
 	}
 
-	/**
-	 * @see model.spem2.BreakdownElement#getPrefix()
-	 */
-	public String getPrefix ()
-	{
-		return descriptor.getPrefix() ;
-	}
-
-	/**
-	 * @see model.spem2.BreakdownElement#hasMultipleOccurences()
-	 */
-	public boolean hasMultipleOccurences ()
-	{
-		return descriptor.hasMultipleOccurences() ;
-	}
-
-	/**
-	 * @see model.spem2.BreakdownElement#isOptional()
-	 */
-	public boolean isOptional ()
-	{
-		return descriptor.isOptional() ;
-	}
-
-	/**
-	 * @see model.spem2.BreakdownElement#isPlanned()
-	 */
-	public boolean isPlanned ()
-	{
-		return descriptor.isPlanned() ;
-	}
-
-	/**
-	 * @see model.spem2.BreakdownElement#setMultipleOccurences(boolean)
-	 */
-	public void setMultipleOccurences (boolean _hasMultipleOccurences)
-	{
-		descriptor.setMultipleOccurences(_hasMultipleOccurences) ;
-
-	}
-
-	/**
-	 * @see model.spem2.BreakdownElement#setOptional(boolean)
-	 */
-	public void setOptional (boolean _isOptional)
-	{
-		descriptor.setOptional(_isOptional) ;
-	}
-
-	/**
-	 * @see model.spem2.BreakdownElement#setPlanned(boolean)
-	 */
-	public void setPlanned (boolean _isPlanned)
-	{
-		descriptor.setPlanned(_isPlanned) ;
-
-	}
-
-	/**
-	 * @see model.spem2.BreakdownElement#setPrefix(java.lang.String)
-	 */
-	public void setPrefix (String _prefix)
-	{
-		descriptor.setPrefix(_prefix) ;
-
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the isEventDriven.
-	 */
-	public boolean isEventDriven ()
-	{
-		return this.isEventDriven ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _isEventDriven
-	 *            The isEventDriven to set.
-	 */
-	public void setEventDriven (boolean _isEventDriven)
-	{
-		this.isEventDriven = _isEventDriven ;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the isOngoing.
-	 */
-	public boolean isOngoing ()
-	{
-		return this.isOngoing ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _isOngoing
-	 *            The isOngoing to set.
-	 */
-	public void setOngoing (boolean _isOngoing)
-	{
-		this.isOngoing = _isOngoing ;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the isRepeatable.
-	 */
-	public boolean isRepeatable ()
-	{
-		return this.isRepeatable ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _isRepeatable
-	 *            The isRepeatable to set.
-	 */
-	public void setRepeatable (boolean _isRepeatable)
-	{
-		this.isRepeatable = _isRepeatable ;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the planningData.
-	 */
-	public PlanningData getPlanningData ()
-	{
-		return this.planningData ;
-	}
-
-	/**
-	 * Getter
-	 * 
-	 * @return Returns the realData.
-	 */
-	public PlanningData getRealData ()
-	{
-		return this.realData ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _planningData
-	 *            The planningData to set.
-	 */
-	public void setPlanningData (PlanningData _planningData)
-	{
-		this.planningData = _planningData ;
-	}
-
-	/**
-	 * Setter
-	 * 
-	 * @param _realData
-	 *            The realData to set.
-	 */
-	public void setRealData (PlanningData _realData)
-	{
-		this.realData = _realData ;
-	}
-
+	
 	/**
 	 * Getter
 	 * 
@@ -376,5 +184,25 @@ public class Activity extends Observable implements WorkBreakdownElement, WorkDe
 	public void setInterfaceDiagramPath (String _interfaceDiagramPath)
 	{
 		this.interfaceDiagramPath = _interfaceDiagramPath ;
+	}
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the presentationElement.
+	 */
+	public Presentation getPresentationElement ()
+	{
+		return this.presentationElement ;
+	}
+
+	/**
+	 * Setter
+	 *
+	 * @param _presentationElement The presentationElement to set.
+	 */
+	public void setPresentationElement (Presentation _presentationElement)
+	{
+		this.presentationElement = _presentationElement ;
 	}
 }

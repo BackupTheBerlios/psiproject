@@ -1,10 +1,15 @@
 
 package model ;
 
+import java.awt.datatransfer.DataFlavor ;
+import java.awt.datatransfer.Transferable ;
+import java.awt.datatransfer.UnsupportedFlavorException ;
+import java.io.IOException ;
 import java.util.ArrayList ;
 import java.util.Collection ;
 
 import model.spem2.RoleDescriptor ;
+import model.spem2.TaskDescriptor;
 
 /**
  * HumanResource : a member working on a project
@@ -13,7 +18,7 @@ import model.spem2.RoleDescriptor ;
  * @version 1.0
  * 
  */
-public class HumanResource
+public class HumanResource implements Transferable
 {
 	/**
 	 * The member's unique ID during a project
@@ -30,7 +35,16 @@ public class HumanResource
 	 */
 	private String email ;
 
+	/**
+	 * Drag and drop capability
+	 */
+	public static DataFlavor RESOURCE_FLAVOR = new DataFlavor(HumanResource.class, "Human Resource") ;;
+	
+	private static DataFlavor[] flavors = {RESOURCE_FLAVOR} ;
+
 	private Collection <RoleDescriptor> performingRoles ;
+	
+	private Collection <TaskDescriptor> performingTasks ;
 
 	/**
 	 * Constructor
@@ -46,6 +60,7 @@ public class HumanResource
 		this.fullName = _fullName ;
 
 		performingRoles = new ArrayList <RoleDescriptor>() ;
+		performingTasks = new ArrayList <TaskDescriptor>() ;
 	}
 
 	/**
@@ -144,5 +159,68 @@ public class HumanResource
 	{
 		this.performingRoles = _performingRoles ;
 	}
+
+	/**
+	 * @see java.awt.datatransfer.Transferable#getTransferData(java.awt.datatransfer.DataFlavor)
+	 */
+	public Object getTransferData (DataFlavor _df) throws UnsupportedFlavorException, IOException
+	{
+		if (_df.equals(RESOURCE_FLAVOR))
+		{
+			return this ;
+		}
+		else
+		{
+			throw new UnsupportedFlavorException(_df) ;
+		}
+
+	}
+
+	/**
+	 * @see java.awt.datatransfer.Transferable#getTransferDataFlavors()
+	 */
+	public DataFlavor[] getTransferDataFlavors ()
+	{
+		return flavors ;
+	}
+
+	/**
+	 * @see java.awt.datatransfer.Transferable#isDataFlavorSupported(java.awt.datatransfer.DataFlavor)
+	 */
+	public boolean isDataFlavorSupported (DataFlavor _df)
+	{
+		return _df.equals(RESOURCE_FLAVOR) ;
+	}
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@ Override
+	public String toString ()
+	{
+		return fullName ;
+	}
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the performingTasks.
+	 */
+	public Collection <TaskDescriptor> getPerformingTasks ()
+	{
+		return this.performingTasks ;
+	}
+
+	/**
+	 * Setter
+	 *
+	 * @param _performingTasks The performingTasks to set.
+	 */
+	public void setPerformingTasks (Collection <TaskDescriptor> _performingTasks)
+	{
+		this.performingTasks = _performingTasks ;
+	}
+	
+	
 
 }

@@ -19,11 +19,17 @@ import org.xml.sax.SAXException ;
 import org.xml.sax.SAXParseException ;
 
 import model.Component ;
+import model.Guide ;
+import model.GuideType ;
+import model.Interface ;
+import model.Presentation ;
 import model.spem2.Activity ;
 import model.spem2.BreakdownElement ;
 import model.spem2.DeliveryProcess ;
+import model.spem2.ProductType ;
 import model.spem2.RoleDescriptor ;
 import model.spem2.TaskDescriptor ;
+import model.spem2.WorkProductDescriptor ;
 import process.exception.FileParseException ;
 
 /**
@@ -112,6 +118,10 @@ public class ProcessControler
 				String localInterfaceDiagramPath = "" ;
 				String localFlowDiagramPath = "" ;
 				String localActivitiesDiagramPath = "" ;
+				String localResponsible = "" ;
+				String localPresentationElementId = " " ;
+
+				int localArrayCounter = 0 ;
 
 				// Work breakdowns elements
 				ArrayList <BreakdownElement> localNested = new ArrayList <BreakdownElement>() ;
@@ -207,7 +217,7 @@ public class ProcessControler
 							localAuthorMail = "" ;
 						}
 					}
-					
+
 					/*
 					 * Getting the date of export
 					 */
@@ -222,11 +232,12 @@ public class ProcessControler
 							localDate = "" ;
 						}
 					}
-					
+
 					/*
 					 * Getting the generation path
 					 */
-					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE && localPAttribList.item(i).getNodeName().equalsIgnoreCase("cheminGeneration"))
+					if (localPAttribList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localPAttribList.item(i).getNodeName().equalsIgnoreCase("cheminGeneration"))
 					{
 						try
 						{
@@ -236,11 +247,400 @@ public class ProcessControler
 						{
 							localGenerationPath = "" ;
 						}
-					}					
+					}
 				}
 
-				DeliveryProcess localProcess = new DeliveryProcess(localID, localName, localDescription, localAuthorName, localAuthorMail, localDate, localGenerationPath) ;
+				DeliveryProcess localProcess = new DeliveryProcess(localID, localName, localDescription, localAuthorName, localAuthorMail, localDate,
+						localGenerationPath) ;
 
+				
+				/*
+				 * Guide types [optional]
+				 */
+				NodeList localGuideTypesListRoot = localDocument.getElementsByTagName("liste_typeGuide") ;
+				// if (localGuideTypesListRoot.getLength() != 1 ||
+				// localGuideTypesListRoot.item(0).getChildNodes().getLength() == 0) {
+				// System.out.println("hu") ;throw new FileParseException() ; }
+				NodeList localGuideTypesList = localGuideTypesListRoot.item(0).getChildNodes() ;
+				Node localGuideType ;
+
+				localChildMax = localGuideTypesList.getLength() ;
+				for (int i = 0; i < localChildMax; i++ )
+				{
+					if (localGuideTypesList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localGuideTypesList.item(i).getNodeName().equalsIgnoreCase("typeGuide"))
+					{
+						localGuideType = localGuideTypesList.item(i) ;
+						localChildList = localGuideType.getChildNodes() ;
+						localChildCount = localChildList.getLength() ;
+						localName = "" ;
+						localID = "" ;
+
+						for (int j = 0; j < localChildCount; j++ )
+						{
+							/*
+							 * The identifier
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							{
+								try
+								{
+									localID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localID = "" ;
+								}
+							}
+
+							/*
+							 * The name
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
+							{
+								try
+								{
+									localName = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localName = "" ;
+								}
+							}
+
+						} // End For j
+
+						localNested.add(new GuideType(localID, localName)) ;
+
+					} // End If
+				} // End for i
+
+				/*
+				 * Guides [optional]
+				 */
+				// Temp variables
+				Node localGuide ;
+				String localGuideTypeId ;
+				Guide localTempGuide ;
+
+				NodeList localGuidesListRoot = localDocument.getElementsByTagName("liste_guide") ;
+				NodeList localGuidesList = localGuidesListRoot.item(0).getChildNodes() ;
+
+				localChildMax = localGuidesList.getLength() ;
+				for (int i = 0; i < localChildMax; i++ )
+				{
+					if (localGuidesList.item(i).getNodeType() == Node.ELEMENT_NODE && localGuidesList.item(i).getNodeName().equalsIgnoreCase("guide"))
+					{
+						localGuide = localGuidesList.item(i) ;
+						localChildList = localGuide.getChildNodes() ;
+						localChildCount = localChildList.getLength() ;
+						localName = "" ;
+						localID = "" ;
+						localGuideTypeId = "" ;
+
+						for (int j = 0; j < localChildCount; j++ )
+						{
+							/*
+							 * The identifier
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							{
+								try
+								{
+									localID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localID = "" ;
+								}
+							}
+
+							/*
+							 * The name
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
+							{
+								try
+								{
+									localName = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localName = "" ;
+								}
+							}
+
+							/*
+							 * The type
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("typeGuideId"))
+							{
+								try
+								{
+									localGuideTypeId = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localGuideTypeId = "" ;
+								}
+							}
+
+						} // End For j
+
+						localTempGuide = new Guide(localID, localName) ;
+
+						// Looking for guide types
+						for (int j = 0; j < localNested.size(); j++ )
+						{
+							if (localNested.get(j) instanceof GuideType && ((GuideType) localNested.get(j)).getId().equals(localGuideTypeId))
+							{
+								localTempGuide.setType((GuideType) localNested.get(j)) ;
+								break ;
+							}
+						}
+
+						localNested.add(localTempGuide) ;
+
+					} // End If
+				} // End for i
+
+				/*
+				 * Product types [optional]
+				 */
+				NodeList localProductTypesListRoot = localDocument.getElementsByTagName("liste_typeProduit") ;
+				NodeList localProductTypesList = localProductTypesListRoot.item(0).getChildNodes() ;
+				Node localProductType ;
+
+				localChildMax = localProductTypesList.getLength() ;
+				for (int i = 0; i < localChildMax; i++ )
+				{
+					if (localProductTypesList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localProductTypesList.item(i).getNodeName().equalsIgnoreCase("typeProduit"))
+					{
+						localProductType = localProductTypesList.item(i) ;
+						localChildList = localProductType.getChildNodes() ;
+						localChildCount = localChildList.getLength() ;
+						localName = "" ;
+						localID = "" ;
+
+						for (int j = 0; j < localChildCount; j++ )
+						{
+							/*
+							 * The identifier
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							{
+								try
+								{
+									localID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localID = "" ;
+								}
+							}
+
+							/*
+							 * The name
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
+							{
+								try
+								{
+									localName = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localName = "" ;
+								}
+							}
+
+						} // End For j
+
+						localNested.add(new ProductType(localID, localName)) ;
+
+					} // End If
+				} // End for i
+
+				/*
+				 * Presentation elements
+				 */
+				// Temp variables
+				String localIconPath ;
+				String localPagePath ;
+				String localContentPath ;
+				Presentation localTempPresentationElement ;
+				ArrayList <String> localGuidesCollection = new ArrayList <String>() ;
+
+				NodeList localPresentationElementsListRoot = localDocument.getElementsByTagName("liste_elementPresentation") ;
+				if (localPresentationElementsListRoot.getLength() != 1 || localPresentationElementsListRoot.item(0).getChildNodes().getLength() == 0) { throw new FileParseException() ; }
+				NodeList localPresentationElementsList = localPresentationElementsListRoot.item(0).getChildNodes() ;
+				Node localPresentationElement ;
+				NodeList localGuidesIdentifiers ;
+
+				localChildMax = localPresentationElementsList.getLength() ;
+				for (int i = 0; i < localChildMax; i++ )
+				{
+					if (localPresentationElementsList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localPresentationElementsList.item(i).getNodeName().equalsIgnoreCase("elementPresentation"))
+					{
+						localPresentationElement = localPresentationElementsList.item(i) ;
+						localChildList = localPresentationElement.getChildNodes() ;
+						localChildCount = localChildList.getLength() ;
+						localID = "" ;
+						localIconPath = "" ;
+						localPagePath = "" ;
+						localContentPath = "" ;
+						localName = "" ;
+						localDescription = "" ;
+						localGuidesCollection.clear() ;
+
+						for (int j = 0; j < localChildCount; j++ )
+						{
+							/*
+							 * The identifier
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							{
+								try
+								{
+									localID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localID = "" ;
+								}
+							}
+
+							/*
+							 * The name
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
+							{
+								try
+								{
+									localName = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localName = "" ;
+								}
+							}
+
+							/*
+							 * The description
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("description"))
+							{
+								try
+								{
+									localDescription = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localDescription = "" ;
+								}
+							}
+
+							/*
+							 * The icon path
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("cheminIcone"))
+							{
+								try
+								{
+									localIconPath = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localIconPath = "" ;
+								}
+							}
+
+							/*
+							 * The content path
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("cheminContenu"))
+							{
+								try
+								{
+									localContentPath = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localContentPath = "" ;
+								}
+							}
+
+							/*
+							 * The page path
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("cheminPage"))
+							{
+								try
+								{
+									localPagePath = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localPagePath = "" ;
+								}
+							}
+
+							/*
+							 * Nested guides
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("liste_guideId"))
+							{
+								try
+								{
+									localGuidesIdentifiers = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localGuidesIdentifiers.getLength(); k++ )
+									{
+										if (localGuidesIdentifiers.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localGuidesIdentifiers.item(k).getNodeName().equalsIgnoreCase("guideId"))
+										{
+											localGuidesCollection.add(localGuidesIdentifiers.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+
+						} // End For j
+
+						localTempPresentationElement = new Presentation(localID, localName, localDescription, localIconPath, localContentPath, localPagePath) ;
+
+						// Linking with guides
+						localArrayCounter = localGuidesCollection.size() ;
+						for (int j = 0; j < localNested.size(); j++ )
+						{
+							if (localNested.get(j) instanceof Guide && localGuidesCollection.contains( ((Guide) localNested.get(j)).getId()))
+							{
+								localTempPresentationElement.getGuides().add((Guide) localNested.get(j)) ;
+								((Guide) localNested.get(j)).setPresentationElement(localTempPresentationElement) ;
+								localArrayCounter-- ;
+							}
+							if (localArrayCounter == 0)
+							{
+								break ;
+							}
+						}
+
+						localNested.add(localTempPresentationElement) ;
+
+					} // End If
+				} // End for i
+				
 				/*
 				 * Tasks (TaskDescriptor)
 				 */
@@ -248,6 +648,7 @@ public class ProcessControler
 				if (localTasksListRoot.getLength() != 1 || localTasksListRoot.item(0).getChildNodes().getLength() == 0) { throw new FileParseException() ; }
 				NodeList localTasksList = localTasksListRoot.item(0).getChildNodes() ;
 				Node localTask ;
+				TaskDescriptor localTempTaskDescriptor ;
 
 				localChildMax = localTasksList.getLength() ;
 				for (int i = 0; i < localChildMax; i++ )
@@ -261,6 +662,7 @@ public class ProcessControler
 						localID = "" ;
 						localDescription = "" ;
 						localParentId = "" ;
+						localPresentationElementId = "" ;
 
 						for (int j = 0; j < localChildCount; j++ )
 						{
@@ -309,10 +711,38 @@ public class ProcessControler
 									localParentId = "" ;
 								}
 							}
+							
+							/*
+							 * The presentation element
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("elementPresentationId"))
+							{
+								try
+								{
+									localPresentationElementId = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localPresentationElementId = "" ;
+								}
+							}
 
 						} // End For j
+						
+						// Setting the presentation element
+						localTempTaskDescriptor = new TaskDescriptor(localID, localName, localDescription, localParentId) ;
+						
+						for (int j = 0; j < localNested.size(); j++ )
+						{
+							if (localNested.get(j) instanceof Presentation
+									&& ((Presentation) localNested.get(j)).getId().equals(localPresentationElementId))
+							{
+								localTempTaskDescriptor.setPresentationElement((Presentation) localNested.get(j)) ;
+							}
+						}
 
-						localNested.add(new TaskDescriptor(localID, localName, localDescription, localParentId)) ;
+						localNested.add(localTempTaskDescriptor) ;
 
 					} // End If
 				} // End for i
@@ -346,6 +776,7 @@ public class ProcessControler
 						localParentId = "" ;
 						localFlowDiagramPath = "" ;
 						localActivitiesDiagramPath = "" ;
+						localPresentationElementId = "" ;
 						localTasksCollection.clear() ;
 
 						for (int j = 0; j < localChildCount; j++ )
@@ -429,6 +860,22 @@ public class ProcessControler
 							}
 
 							/*
+							 * The presentation element
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("elementPresentationId"))
+							{
+								try
+								{
+									localPresentationElementId = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localPresentationElementId = "" ;
+								}
+							}
+
+							/*
 							 * Nested activities
 							 */
 							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
@@ -457,21 +904,18 @@ public class ProcessControler
 						localTempActivity = new Activity(localID, localName, localDescription, localParentId, "", localFlowDiagramPath,
 								localActivitiesDiagramPath) ;
 
-						// Replacing the IDs by objects
+						// Replacing the IDs by objects and to the presentation element
 						for (int j = 0; j < localNested.size(); j++ )
 						{
-							if (localNested.get(j) instanceof TaskDescriptor)
+							if (localNested.get(j) instanceof TaskDescriptor && localTasksCollection.contains(((TaskDescriptor) localNested.get(j)).getId()))
 							{
-								for (int k = 0; k < localTasksCollection.size(); k++ )
-								{
-									if ( ((TaskDescriptor) localNested.get(j)).getParentId().equals(localID))
-									{
-										if (!localTempActivity.getNestedElements().contains(localNested.get(j)))
-										{
-											localTempActivity.getNestedElements().add(localNested.get(j)) ;
-										}
-									}
-								}
+								localTempActivity.getNestedElements().add(localNested.get(j)) ;
+							}
+
+							else if (localNested.get(j) instanceof Presentation
+									&& ((Presentation) localNested.get(j)).getId().equals(localPresentationElementId))
+							{
+								localTempActivity.setPresentationElement((Presentation) localNested.get(j)) ;
 							}
 						}
 
@@ -479,10 +923,6 @@ public class ProcessControler
 
 					} // End If
 				} // End for i
-
-				/*
-				 * Products (may be implemented in the future)
-				 */
 
 				/*
 				 * Roles (RoleDescriptor)
@@ -508,6 +948,7 @@ public class ProcessControler
 						localID = "" ;
 						localDescription = "" ;
 						localParentId = "" ;
+						localPresentationElementId = "" ;
 						localTasksCollection.clear() ;
 
 						for (int j = 0; j < localChildCount; j++ )
@@ -559,6 +1000,22 @@ public class ProcessControler
 							}
 
 							/*
+							 * The presentation element
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("elementPresentationId"))
+							{
+								try
+								{
+									localPresentationElementId = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localPresentationElementId = "" ;
+								}
+							}
+
+							/*
 							 * Performed activities
 							 */
 							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
@@ -589,19 +1046,23 @@ public class ProcessControler
 						// Links between roles and activities
 						for (int j = 0; j < localNested.size(); j++ )
 						{
-							if (localNested.get(j) instanceof TaskDescriptor)
+							if (localNested.get(j) instanceof TaskDescriptor && localTasksCollection.contains( ((TaskDescriptor) localNested.get(j)).getId()))
 							{
-								for (int k = 0; k < localTasksCollection.size(); k++ )
-								{
-									if (localTasksCollection.contains( ((TaskDescriptor) localNested.get(j)).getId())
-											&& !localTempRole.getPrimaryTasks().contains(localTasksCollection.get(k)))
-									{
-										// Adding tasks into roles
-										localTempRole.getPrimaryTasks().add((TaskDescriptor) localNested.get(j)) ;
-										// And then adding role link into task
-										((TaskDescriptor)localNested.get(j)).getPrimaryPerformers().add(localTempRole) ;
-									}
-								}
+								// Adding tasks into roles
+								localTempRole.getPrimaryTasks().add((TaskDescriptor) localNested.get(j)) ;
+								// And then adding role link into task
+								((TaskDescriptor) localNested.get(j)).getPrimaryPerformers().add(localTempRole) ;
+
+							}
+						}
+
+						// The presentation element
+						for (int j = 0; j < localNested.size(); j++ )
+						{
+							if (localNested.get(j) instanceof Presentation && ((Presentation) localNested.get(j)).getId().equals(localPresentationElementId))
+							{
+								localTempRole.setPresentationElement((Presentation) localNested.get(j)) ;
+								break ;
 							}
 						}
 
@@ -612,20 +1073,356 @@ public class ProcessControler
 				} // End for i
 
 				/*
+				 * Products
+				 */
+				WorkProductDescriptor localTempProduct ;
+				ArrayList <String> localProducingTasksCollection = new ArrayList <String>() ;
+				ArrayList <String> localUsingTasksCollection = new ArrayList <String>() ;
+
+				// Parsing
+				NodeList localProductsListRoot = localDocument.getElementsByTagName("liste_produit") ;
+				if (localProductsListRoot.getLength() != 1 || localProductsListRoot.item(0).getChildNodes().getLength() == 0) { throw new FileParseException() ; }
+				NodeList localProductsList = localProductsListRoot.item(0).getChildNodes() ;
+				Node localProduct ;
+				String localProductTypeId ;
+
+				localChildMax = localProductsList.getLength() ;
+				for (int i = 0; i < localChildMax; i++ )
+				{
+					if (localProductsList.item(i).getNodeType() == Node.ELEMENT_NODE && localProductsList.item(i).getNodeName().equalsIgnoreCase("produit"))
+					{
+						localProduct = localProductsList.item(i) ;
+						localChildList = localProduct.getChildNodes() ;
+						localChildCount = localChildList.getLength() ;
+						localName = "" ;
+						localID = "" ;
+						localDescription = "" ;
+						localParentId = "" ;
+						localResponsible = "" ;
+						localPresentationElementId = "" ;
+						localProductTypeId = "" ;
+						localProducingTasksCollection.clear() ;
+						localUsingTasksCollection.clear() ;
+
+						for (int j = 0; j < localChildCount; j++ )
+						{
+							/*
+							 * The identifier
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							{
+								try
+								{
+									localID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localID = "" ;
+								}
+							}
+
+							/*
+							 * The name
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
+							{
+								try
+								{
+									localName = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localName = "" ;
+								}
+							}
+
+							/*
+							 * The parent component
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("agregatComposant"))
+							{
+								try
+								{
+									localParentId = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localParentId = "" ;
+								}
+							}
+
+							/*
+							 * The responsible role (only one in this implementation)
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("responsabiliteRole"))
+							{
+								try
+								{
+									localResponsible = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localResponsible = "" ;
+								}
+							}
+
+							/*
+							 * The presentation element
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("elementPresentationId"))
+							{
+								try
+								{
+									localPresentationElementId = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localPresentationElementId = "" ;
+								}
+							}
+
+							/*
+							 * The product type
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("typeProduitId"))
+							{
+								try
+								{
+									localProductTypeId = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localProductTypeId = "" ;
+								}
+							}
+
+							/*
+							 * Concerned tasks
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("liste_entreeActivite"))
+							{
+								try
+								{
+									localTasksIdentifiers = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localTasksIdentifiers.getLength(); k++ )
+									{
+										if (localTasksIdentifiers.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localTasksIdentifiers.item(k).getNodeName().equalsIgnoreCase("entreeActivite"))
+										{
+											localUsingTasksCollection.add(localTasksIdentifiers.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("liste_sortieActivite"))
+							{
+								try
+								{
+									localTasksIdentifiers = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localTasksIdentifiers.getLength(); k++ )
+									{
+										if (localTasksIdentifiers.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localTasksIdentifiers.item(k).getNodeName().equalsIgnoreCase("sortieActivite"))
+										{
+											localProducingTasksCollection.add(localTasksIdentifiers.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+
+						} // End For j
+
+						localTempProduct = new WorkProductDescriptor(localID, localName, localDescription, localParentId) ;
+
+						// Links between Products and tasks
+						for (int j = 0; j < localNested.size(); j++ )
+						{
+							if (localNested.get(j) instanceof TaskDescriptor
+									&& localUsingTasksCollection.contains( ((TaskDescriptor) localNested.get(j)).getId()))
+							{
+								// Adding tasks into Products
+								localTempProduct.getUsingTasks().add((TaskDescriptor) localNested.get(j)) ;
+								// And then adding Product link into task
+								((TaskDescriptor) localNested.get(j)).getOutputProducts().add(localTempProduct) ;
+
+							}
+						}
+
+						for (int j = 0; j < localNested.size(); j++ )
+						{
+							if (localNested.get(j) instanceof TaskDescriptor
+									&& localProducingTasksCollection.contains( ((TaskDescriptor) localNested.get(j)).getId()))
+							{
+								// Adding tasks into Products
+								localTempProduct.getProducingTasks().add((TaskDescriptor) localNested.get(j)) ;
+								// And then adding Product link into task
+								((TaskDescriptor) localNested.get(j)).getInputProducts().add(localTempProduct) ;
+
+							}
+						}
+
+						// The responsible
+						for (int j = 0; j < localNested.size(); j++ )
+						{
+							if (localNested.get(j) instanceof RoleDescriptor && localResponsible.equals( ((RoleDescriptor) localNested.get(j)).getId()))
+							{
+								// Setting responsibe
+								localTempProduct.setResponsible((RoleDescriptor) localNested.get(j)) ;
+								// And then adding Product link into task
+								((RoleDescriptor) localNested.get(j)).getProducts().add(localTempProduct) ;
+								break ;
+							}
+						}
+
+						// The presentation element
+						for (int j = 0; j < localNested.size(); j++ )
+						{
+							if (localNested.get(j) instanceof Presentation && ((Presentation) localNested.get(j)).getId().equals(localPresentationElementId))
+							{
+								localTempProduct.setPresentationElement((Presentation) localNested.get(j)) ;
+								break ;
+							}
+						}
+
+						// The type
+						for (int j = 0; j < localNested.size(); j++ )
+						{
+							if (localNested.get(j) instanceof ProductType && ((ProductType) localNested.get(j)).getId().equals(localProductTypeId))
+							{
+								localTempProduct.setProductType((ProductType) localNested.get(j)) ;
+								break ;
+							}
+						}
+
+						localNested.add(localTempProduct) ;
+
+					} // End If
+
+				} // End for i
+
+				/*
+				 * Interfaces [optional]
+				 */
+				// Temp variables
+				Interface localTempInterface ;
+				ArrayList <String> localProductsCollection = new ArrayList <String>() ;
+
+				NodeList localInterfacesListRoot = localDocument.getElementsByTagName("liste_interface") ;
+				NodeList localInterfacesList = localInterfacesListRoot.item(0).getChildNodes() ;
+				NodeList localProductsIdentifiers ;
+				Node localInterface ;
+
+				localChildMax = localInterfacesList.getLength() ;
+				for (int i = 0; i < localChildMax; i++ )
+				{
+					if (localInterfacesList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localInterfacesList.item(i).getNodeName().equalsIgnoreCase("interface"))
+					{
+						localInterface = localInterfacesList.item(i) ;
+						localChildList = localInterface.getChildNodes() ;
+						localChildCount = localChildList.getLength() ;
+						localID = "" ;
+						localProductsCollection.clear() ;
+
+						for (int j = 0; j < localChildCount; j++ )
+						{
+							/*
+							 * The identifier
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							{
+								try
+								{
+									localID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localID = "" ;
+								}
+							}
+
+							/*
+							 * The products
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("liste_interfaceProduit"))
+							{
+								try
+								{
+									localProductsIdentifiers = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localProductsIdentifiers.getLength(); k++ )
+									{
+										if (localProductsIdentifiers.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localProductsIdentifiers.item(k).getNodeName().equalsIgnoreCase("interfaceProduit"))
+										{
+											localProductsCollection.add(localProductsIdentifiers.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+
+						} // End For j
+
+						localTempInterface = new Interface(localID, "") ;
+						// Linking with products, the link with components will be done in component
+						// parsing
+						for (int j = 0; j < localNested.size(); j++ )
+						{
+							if (localNested.get(j) instanceof WorkProductDescriptor
+									&& localProductsCollection.contains( ((WorkProductDescriptor) localNested.get(j)).getId()))
+							{
+								// Adding interface into products
+								localTempInterface.getProducts().add((WorkProductDescriptor) localNested.get(j)) ;
+
+								// And then back linking
+								((WorkProductDescriptor) localNested.get(j)).getInterfaces().add(localTempInterface) ;
+
+							}
+						}
+
+						localNested.add(localTempInterface) ;
+
+					} // End If
+				} // End for i
+
+				/*
 				 * The goddamn freaking components
 				 */
 				// Temp variables
 				String localVersion ;
 				String localGenOrder ;
+				String localGivenInterface ;
+				String localRequiredInterface ;
 				Component localTempComponent ;
 				Node localComponent ;
 				NodeList localRolesIdentifiers ;
 				NodeList localActivitiesIdentifiers ;
+				NodeList localRespPaths ;
 				// NodeList localWorkIdentifiers ;
 				ArrayList <String> localResponsabilityDiagramPaths ;
 				// Identifiers
 				ArrayList <String> localRolesCollection = new ArrayList <String>() ;
 				ArrayList <String> localActivitiesCollection = new ArrayList <String>() ;
+				ArrayList <String> localRespPathsCollection = new ArrayList <String>() ;
 
 				// Parsing
 				NodeList localComponentsListRoot = localDocument.getElementsByTagName("liste_composant") ;
@@ -649,9 +1446,14 @@ public class ProcessControler
 						localInterfaceDiagramPath = "" ;
 						localFlowDiagramPath = "" ;
 						localGenOrder = "" ;
+						localGivenInterface = "" ;
+						localRequiredInterface = "" ;
+						localPresentationElementId = "" ;
 						localResponsabilityDiagramPaths = null ;
 						localRolesCollection.clear() ;
+						localProductsCollection.clear() ;
 						localActivitiesCollection.clear() ;
+						localRespPathsCollection.clear() ;
 
 						for (int j = 0; j < localChildCount; j++ )
 						{
@@ -733,6 +1535,38 @@ public class ProcessControler
 							}
 
 							/*
+							 * The given interface
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("interfaceRequise"))
+							{
+								try
+								{
+									localRequiredInterface = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localRequiredInterface = "" ;
+								}
+							}
+
+							/*
+							 * The required interface
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("interfaceFournie"))
+							{
+								try
+								{
+									localGivenInterface = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localGivenInterface = "" ;
+								}
+							}
+
+							/*
 							 * The version
 							 */
 							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("version"))
@@ -751,7 +1585,7 @@ public class ProcessControler
 							 * The date of publication
 							 */
 							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("dateExport"))
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("datePlacement"))
 							{
 								try
 								{
@@ -796,12 +1630,44 @@ public class ProcessControler
 							}
 
 							/*
-							 * The responsability diagram paths TODO
+							 * The presentation element
 							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("elementPresentationId"))
+							{
+								try
+								{
+									localPresentationElementId = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localPresentationElementId = "" ;
+								}
+							}
+
 							/*
-							 * if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE &&
-							 * localChildList.item(j).getNodeName().equalsIgnoreCase("version")) { }
+							 * The responsability diagrams
 							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("liste_cheminDiagrammeResponsabilites"))
+							{
+								try
+								{
+									localRespPaths = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localRespPaths.getLength(); k++ )
+									{
+										if (localRespPaths.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localRespPaths.item(k).getNodeName().equalsIgnoreCase("cheminDiagrammeResponsabilites"))
+										{
+											localRespPathsCollection.add(localRespPaths.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
 
 							/*
 							 * The roles
@@ -830,6 +1696,26 @@ public class ProcessControler
 							/*
 							 * The products
 							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("liste_produitId"))
+							{
+								try
+								{
+									localProductsIdentifiers = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localProductsIdentifiers.getLength(); k++ )
+									{
+										if (localProductsIdentifiers.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localProductsIdentifiers.item(k).getNodeName().equalsIgnoreCase("produitId"))
+										{
+											localProductsCollection.add(localProductsIdentifiers.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
 
 							/*
 							 * The work definitions
@@ -877,6 +1763,20 @@ public class ProcessControler
 								}
 							}
 
+							else if (localNested.get(j) instanceof WorkProductDescriptor)
+							{
+								for (int k = 0; k < localProductsCollection.size(); k++ )
+								{
+									if ( ((WorkProductDescriptor) localNested.get(j)).getParentId().equals(localID))
+									{
+										if (!localTempComponent.getNestedElements().contains(localNested.get(j)))
+										{
+											localTempComponent.getNestedElements().add(localNested.get(j)) ;
+										}
+									}
+								}
+							}
+
 							else if (localNested.get(j) instanceof Activity)
 							{
 								for (int k = 0; k < localRolesCollection.size(); k++ )
@@ -888,6 +1788,26 @@ public class ProcessControler
 											localTempComponent.getNestedElements().add(localNested.get(j)) ;
 										}
 									}
+								}
+							}
+
+							else if (localNested.get(j) instanceof Presentation
+									&& ((Presentation) localNested.get(j)).getId().equals(localPresentationElementId))
+							{
+								localTempComponent.setPresentationElement((Presentation) localNested.get(j)) ;
+							}
+
+							else if (localNested.get(j) instanceof Interface)
+							{
+								if ( ((Interface) localNested.get(j)).getId().equals(localGivenInterface))
+								{
+									localTempComponent.setGivenInterface((Interface) localNested.get(j)) ;
+									((Interface) localNested.get(j)).setGivenForComponent(localTempComponent) ;
+								}
+								else if ( ((Interface) localNested.get(j)).getId().equals(localRequiredInterface))
+								{
+									localTempComponent.setRequiredInterface((Interface) localNested.get(j)) ;
+									((Interface) localNested.get(j)).setRequiredForComponent(localTempComponent) ;
 								}
 							}
 						}

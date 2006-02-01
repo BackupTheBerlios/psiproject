@@ -10,7 +10,7 @@ import java.util.Collection ;
 import java.util.Observable;
 
 import model.spem2.RoleDescriptor ;
-import model.spem2.TaskDescriptor;
+import model.spem2.TaskDefinition;
 
 /**
  * HumanResource : a member working on a project
@@ -45,7 +45,7 @@ public class HumanResource extends Observable implements Transferable
 
 	private Collection <RoleDescriptor> performingRoles ;
 	
-	private Collection <TaskDescriptor> performingTasks ;
+	private Collection <TaskDefinition> performingTasks ;
 
 	/**
 	 * Constructor
@@ -61,7 +61,7 @@ public class HumanResource extends Observable implements Transferable
 		this.fullName = _fullName ;
 
 		performingRoles = new ArrayList <RoleDescriptor>() ;
-		performingTasks = new ArrayList <TaskDescriptor>() ;
+		performingTasks = new ArrayList <TaskDefinition>() ;
 	}
 
 	/**
@@ -207,7 +207,7 @@ public class HumanResource extends Observable implements Transferable
 	 *
 	 * @return Returns the performingTasks.
 	 */
-	public Collection <TaskDescriptor> getPerformingTasks ()
+	public Collection <TaskDefinition> getPerformingTasks ()
 	{
 		return this.performingTasks ;
 	}
@@ -217,7 +217,7 @@ public class HumanResource extends Observable implements Transferable
 	 *
 	 * @param _performingTasks The performingTasks to set.
 	 */
-	public void setPerformingTasks (Collection <TaskDescriptor> _performingTasks)
+	public void setPerformingTasks (Collection <TaskDefinition> _performingTasks)
 	{
 		this.performingTasks = _performingTasks ;
 	}

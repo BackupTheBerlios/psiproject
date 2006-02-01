@@ -248,7 +248,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 					_evt.getDropTargetContext().dropComplete(true) ;
 				}
 
-				else if (localTargetNode instanceof TaskDescriptorTreeNode)
+				/*else if (localTargetNode instanceof TaskDescriptorTreeNode)
 				{
 					Collection <RoleDescriptor> localRoles = ((TaskDescriptorTreeNode) localTargetNode).getTask().getPrimaryPerformers() ;
 					Iterator <RoleDescriptor> localIterator = localRoles.iterator() ;
@@ -266,7 +266,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 							break ;
 						}
 					}
-				}
+				}*/
 			}
 		}
 		catch (UnsupportedFlavorException exc)

@@ -67,6 +67,11 @@ public class TaskDescriptor extends Observable implements Descriptor
 	 * Assisting performers of the task
 	 */
 	private Collection <WorkProductDescriptor> outputProducts ;
+	
+	/**
+	 * Proper tasks
+	 */
+	private Collection <TaskDefinition> tasks ;
 
 	/**
 	 * Constructor
@@ -85,9 +90,10 @@ public class TaskDescriptor extends Observable implements Descriptor
 		this.description = _description ;
 		this.parentId = _parentId ;
 
-		primaryPerformers = new ArrayList <RoleDescriptor>() ;
-		inputProducts = new ArrayList <WorkProductDescriptor>() ;
-		outputProducts = new ArrayList <WorkProductDescriptor>() ;
+		this.primaryPerformers = new ArrayList <RoleDescriptor>() ;
+		this.inputProducts = new ArrayList <WorkProductDescriptor>() ;
+		this.outputProducts = new ArrayList <WorkProductDescriptor>() ;
+		this.tasks = new ArrayList <TaskDefinition>() ;
 
 		this.planningData = new PlanningData() ;
 		this.realData = new PlanningData() ;
@@ -302,6 +308,28 @@ public class TaskDescriptor extends Observable implements Descriptor
 	public void setPresentationElement (Presentation _presentationElement)
 	{
 		this.presentationElement = _presentationElement ;
+	}
+
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the tasks.
+	 */
+	public Collection <TaskDefinition> getTasks ()
+	{
+		return this.tasks ;
+	}
+
+
+	/**
+	 * Setter
+	 *
+	 * @param _tasks The tasks to set.
+	 */
+	public void setTasks (Collection <TaskDefinition> _tasks)
+	{
+		this.tasks = _tasks ;
 	}
 
 }

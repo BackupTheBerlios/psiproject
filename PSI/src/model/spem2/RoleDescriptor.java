@@ -247,4 +247,18 @@ public class RoleDescriptor extends Observable implements Descriptor
 		this.presentationElement = _presentationElement ;
 	}
 
+	
+	/**
+	 * @see java.util.Observable#setChanged()
+	 */
+	@ Override
+	public synchronized void setChanged ()
+	{
+		super.setChanged() ;
+	}
+
+	
+	
+	
+	
 }

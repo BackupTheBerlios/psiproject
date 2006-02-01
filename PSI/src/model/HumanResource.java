@@ -7,6 +7,7 @@ import java.awt.datatransfer.UnsupportedFlavorException ;
 import java.io.IOException ;
 import java.util.ArrayList ;
 import java.util.Collection ;
+import java.util.Observable;
 
 import model.spem2.RoleDescriptor ;
 import model.spem2.TaskDescriptor;
@@ -18,7 +19,7 @@ import model.spem2.TaskDescriptor;
  * @version 1.0
  * 
  */
-public class HumanResource implements Transferable
+public class HumanResource extends Observable implements Transferable
 {
 	/**
 	 * The member's unique ID during a project
@@ -219,6 +220,16 @@ public class HumanResource implements Transferable
 	public void setPerformingTasks (Collection <TaskDescriptor> _performingTasks)
 	{
 		this.performingTasks = _performingTasks ;
+	}
+
+	
+	/**
+	 * @see java.util.Observable#setChanged()
+	 */
+	@ Override
+	public synchronized void setChanged ()
+	{
+		super.setChanged() ;
 	}
 	
 	

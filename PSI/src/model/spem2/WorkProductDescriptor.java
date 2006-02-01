@@ -3,6 +3,7 @@ package model.spem2 ;
 
 import java.util.ArrayList ;
 import java.util.Collection ;
+import java.util.Observable;
 
 import model.Interface ;
 import model.Presentation ;
@@ -14,7 +15,7 @@ import model.Presentation ;
  * @version 1.0
  * 
  */
-public class WorkProductDescriptor implements Descriptor
+public class WorkProductDescriptor extends Observable implements Descriptor
 {
 	/**
 	 * The unique identifier of the element
@@ -62,6 +63,11 @@ public class WorkProductDescriptor implements Descriptor
 	 * The additional tasks of the role
 	 */
 	private Collection <TaskDescriptor> producingTasks ;
+	
+	/**
+	 * 
+	 */
+	private Collection <Artifact> artifacts ;
 
 	/**
 	 * The assisting tasks of the role
@@ -90,9 +96,10 @@ public class WorkProductDescriptor implements Descriptor
 		this.description = _description ;
 		this.parentId = _parentId ;
 
-		usingTasks = new ArrayList <TaskDescriptor>() ;
-		producingTasks = new ArrayList <TaskDescriptor>() ;
-		interfaces = new ArrayList <Interface>() ;
+		this.usingTasks = new ArrayList <TaskDescriptor>() ;
+		this.producingTasks = new ArrayList <TaskDescriptor>() ;
+		this.interfaces = new ArrayList <Interface>() ;
+		this.artifacts = new ArrayList <Artifact>() ;
 	}
 
 	/**
@@ -322,6 +329,26 @@ public class WorkProductDescriptor implements Descriptor
 	public void setProductType (ProductType _productType)
 	{
 		this.productType = _productType ;
+	}
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the artifacts.
+	 */
+	public Collection <Artifact> getArtifacts ()
+	{
+		return this.artifacts ;
+	}
+
+	/**
+	 * Setter
+	 *
+	 * @param _artifacts The artifacts to set.
+	 */
+	public void setArtifacts (Collection <Artifact> _artifacts)
+	{
+		this.artifacts = _artifacts ;
 	}
 
 }

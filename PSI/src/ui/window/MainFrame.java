@@ -1,52 +1,39 @@
 
 package ui.window ;
 
-import java.awt.HeadlessException ;
-import java.awt.event.ActionEvent ;
-import java.awt.event.ActionListener ;
-import java.awt.event.MouseAdapter ;
-import java.awt.event.MouseEvent ;
-import java.io.File ;
+import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
+import java.io.File;
 
-import ui.dialog.PreferenceDialog ;
-import ui.dialog.TaskDescriptorAdderDialog;
-import ui.misc.LogPanel ;
-import ui.misc.RoleDescriptorPanel ;
-import ui.misc.TaskDescriptorPanel ;
-import ui.resource.Bundle ;
+import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTree;
+import javax.swing.KeyStroke;
+import javax.swing.WindowConstants;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.DefaultTreeModel;
+
+import model.LogInformation;
+import model.Project;
+import process.Preferences;
+import process.exception.FileParseException;
+import process.exception.FileSaveException;
+import process.utility.ProcessControler;
+import process.utility.ProjectControler;
+import ui.dialog.PreferenceDialog;
+import ui.misc.LogPanel;
+import ui.misc.MainTabbedPane;
+import ui.resource.Bundle;
 import ui.tree.MainTree;
-import ui.tree.ActivityTreeNode ;
-import ui.tree.ProjectTreeNode ;
-import ui.tree.RoleDescriptorTreeNode ;
-import ui.tree.TaskDescriptorTreeNode ;
-
-import javax.swing.AbstractAction ;
-import javax.swing.JFileChooser ;
-import javax.swing.JFrame ;
-import javax.swing.JOptionPane ;
-import javax.swing.JPopupMenu ;
-import javax.swing.JSplitPane ;
-import javax.swing.JMenuBar ;
-import javax.swing.JMenu ;
-import javax.swing.KeyStroke ;
-import javax.swing.WindowConstants ;
-
-import javax.swing.JMenuItem ;
-import javax.swing.JTree ;
-import javax.swing.JTabbedPane ;
-import javax.swing.filechooser.FileFilter ;
-import javax.swing.tree.DefaultMutableTreeNode ;
-import javax.swing.tree.DefaultTreeModel ;
-import javax.swing.tree.TreePath ;
-
-import model.LogInformation ;
-import model.Project ;
-
-import process.Preferences ;
-import process.exception.FileParseException ;
-import process.exception.FileSaveException ;
-import process.utility.ProcessControler ;
-import process.utility.ProjectControler ;
+import ui.tree.ProjectTreeNode;
 
 /**
  * MainFrame : PSI main window
@@ -67,7 +54,7 @@ public class MainFrame extends JFrame
 	 */
 	private JSplitPane mainSplitPane = null ;
 
-	private JMenuBar mainJMenuBar = null ;
+	private JMenuBar mainMenuBar = null ;
 
 	private JMenu fileMenu = null ;
 
@@ -106,18 +93,17 @@ public class MainFrame extends JFrame
 	private MainTree projectTree = null ;
 
 	private JSplitPane rightSplitPane = null ;
+	
+	private JScrollPane treeScrollPane = null ;
 
-	private JTabbedPane mainContainer = null ;
+	//private JTabbedPane mainContainer = null ;
 
 	private JTabbedPane logContainer = null ;
 
-	private LogPanel statusPanel = null ;
-
+	
 	private Project currentProject = null ;
 
 	private boolean projectModified = false ;
-
-	private JPopupMenu activityPopupMenu = null ;
 
 	/*
 	 * Here are defined actions which can be performed by the user. Abstract Actions are used to
@@ -180,7 +166,7 @@ public class MainFrame extends JFrame
 	{
 		super() ;
 		initialize() ;
-		statusPanel.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageAppStarted"))) ;
+		LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageAppStarted"))) ;
 	}
 
 	/**
@@ -193,7 +179,7 @@ public class MainFrame extends JFrame
 		this.setSize(new java.awt.Dimension(localPrefs.getWidth(), localPrefs.getHeight())) ;
 		this.setName("mainFrame") ;
 		this.setContentPane(getMainSplitPane()) ;
-		this.setJMenuBar(getMainJMenuBar()) ;
+		this.setJMenuBar(getMainMenuBar()) ;
 		this.setTitle("Project Supervising Indicators") ;
 		this.setLocation(localPrefs.getXPosition(), localPrefs.getYPosition()) ;
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE) ;
@@ -207,7 +193,7 @@ public class MainFrame extends JFrame
 
 		this.addWindowListener(new java.awt.event.WindowAdapter()
 		{
-			/*
+			/**
 			 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
 			 */
 			public void windowClosing (java.awt.event.WindowEvent e)
@@ -218,7 +204,7 @@ public class MainFrame extends JFrame
 
 		this.addComponentListener(new java.awt.event.ComponentAdapter()
 		{
-			/*
+			/**
 			 * @see java.awt.event.ComponentListener#componentResized(java.awt.event.ComponentEvent)
 			 */
 			public void componentResized (java.awt.event.ComponentEvent e)
@@ -227,7 +213,7 @@ public class MainFrame extends JFrame
 				Preferences.getInstance().setHeight(e.getComponent().getHeight()) ;
 			}
 
-			/*
+			/**
 			 * @see java.awt.event.ComponentListener#componentMoved(java.awt.event.ComponentEvent)
 			 */
 			public void componentMoved (java.awt.event.ComponentEvent e)
@@ -241,7 +227,7 @@ public class MainFrame extends JFrame
 	/**
 	 * Handling the closing of the window
 	 * 
-	 * @author Cond? Mickael K.
+	 * @author Conde Mickael K.
 	 * @version 1.0
 	 * 
 	 */
@@ -274,7 +260,7 @@ public class MainFrame extends JFrame
 	/**
 	 * Creates new project from a open workbench file
 	 * 
-	 * @author Cond? Mickael K.
+	 * @author Conde Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param e
@@ -336,7 +322,7 @@ public class MainFrame extends JFrame
 				{
 					((DefaultTreeModel) getProjectTree().getModel()).setRoot(new ProjectTreeNode(currentProject)) ;
 					actionImport.setEnabled(true) ;
-					statusPanel.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectCreated") + " : " + currentProject.getName())) ;
+					LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectCreated") + " : " + currentProject.getName())) ;
 				}
 			}
 			catch (FileParseException exc)
@@ -410,7 +396,7 @@ public class MainFrame extends JFrame
 
 					// Updating UI
 					((DefaultTreeModel) getProjectTree().getModel()).setRoot(new ProjectTreeNode(currentProject)) ;
-					statusPanel.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProcessImported") + " : "
+					LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProcessImported") + " : "
 							+ currentProject.getProcess().getDescriptor().getName())) ;
 				}
 			}
@@ -459,7 +445,7 @@ public class MainFrame extends JFrame
 		{
 			ProjectControler.save(currentProject, localFile) ;
 			actionSave.setEnabled(false) ;
-			statusPanel.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved"))) ;
+			LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved"))) ;
 
 		}
 		catch (FileSaveException exc)
@@ -535,7 +521,7 @@ public class MainFrame extends JFrame
 					ProjectControler.save(currentProject, localFile) ;
 					actionSave.setEnabled(false) ;
 					Preferences.getInstance().setLastProject(localFile.getAbsolutePath()) ;
-					statusPanel.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved"))) ;
+					LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved"))) ;
 
 				}
 				catch (FileSaveException exc)
@@ -557,7 +543,7 @@ public class MainFrame extends JFrame
 		{
 			mainSplitPane = new JSplitPane() ;
 			mainSplitPane.setOneTouchExpandable(true) ;
-			mainSplitPane.setLeftComponent(getProjectTree()) ;
+			mainSplitPane.setLeftComponent(getTreeScrollPane()) ;
 			mainSplitPane.setRightComponent(getRightSplitPane()) ;
 			mainSplitPane.setDividerLocation(Preferences.getInstance().getTreeWidth()) ;
 			mainSplitPane.addPropertyChangeListener("lastDividerLocation", new java.beans.PropertyChangeListener()
@@ -576,16 +562,16 @@ public class MainFrame extends JFrame
 	 * 
 	 * @return javax.swing.JMenuBar
 	 */
-	private JMenuBar getMainJMenuBar ()
+	private JMenuBar getMainMenuBar ()
 	{
-		if (mainJMenuBar == null)
+		if (mainMenuBar == null)
 		{
-			mainJMenuBar = new JMenuBar() ;
-			mainJMenuBar.add(getFileMenu()) ;
-			mainJMenuBar.add(getEditMenu()) ;
-			mainJMenuBar.add(getAboutMenu()) ;
+			mainMenuBar = new JMenuBar() ;
+			mainMenuBar.add(getFileMenu()) ;
+			mainMenuBar.add(getEditMenu()) ;
+			mainMenuBar.add(getAboutMenu()) ;
 		}
-		return mainJMenuBar ;
+		return mainMenuBar ;
 	}
 
 	/**
@@ -848,95 +834,11 @@ public class MainFrame extends JFrame
 	 * @return javax.swing.JTree
 	 */
 	private JTree getProjectTree ()
-	{
+	{                          
 		if (projectTree == null)
 		{
-			projectTree = new MainTree() ;
-			/*
-			 * Popup classes for jtree
-			 */
-			class ActivityListener extends MouseAdapter implements ActionListener
-			{
-				private int localLocation =0;
-				/**
-				 * Constructor
-				 * 
-				 */
-				public ActivityListener ()
-				{
-					super() ;
-
-					JMenuItem localItem = new JMenuItem(Bundle.getText("MainFramePopupMenuAdd")) ;
-					activityPopupMenu = new JPopupMenu() ;
-					localItem.addActionListener(new java.awt.event.ActionListener()
-					{
-						public void actionPerformed (java.awt.event.ActionEvent e)
-						{
-							System.out.println((((ActivityTreeNode)MainFrame.this.projectTree.getPathForRow(localLocation).getLastPathComponent()).getActivity()).getDescriptor().getName());
-							new TaskDescriptorAdderDialog(MainFrame.this,((ActivityTreeNode)MainFrame.this.projectTree.getPathForRow(localLocation).getLastPathComponent()).getActivity());
-						}
-					}) ;
-
-					activityPopupMenu.add(localItem) ;
-
-				}
-
-				/**
-				 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-				 */
-				public void actionPerformed (ActionEvent _e)
-				{
-					// TODO Auto-generated method stub
-
-				}
-
-				/**
-				 * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
-				 */
-				@ Override
-				public void mouseReleased (MouseEvent _e)
-				{
-					if (_e.isPopupTrigger())
-					{
-						localLocation = MainFrame.this.projectTree.getRowForLocation(_e.getX(), _e.getY()) ;
-						TreePath localPath = MainFrame.this.projectTree.getPathForRow(localLocation) ;
-						
-						if (MainFrame.this.projectTree.getPathForRow(localLocation).getLastPathComponent() instanceof ActivityTreeNode)
-						{
-							MainFrame.this.projectTree.setSelectionPath(localPath) ;
-							activityPopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;
-						}					
-					}
-				}
-			}
-
-			projectTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener()
-			{
-				public void valueChanged (javax.swing.event.TreeSelectionEvent e)
-				{
-					DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) projectTree.getLastSelectedPathComponent() ;
-
-					/*
-					 * Task descriptors => displaying estimations
-					 */
-					if (localNode instanceof TaskDescriptorTreeNode)
-					{
-						getMainContainer().add(new TaskDescriptorPanel( ((TaskDescriptorTreeNode) localNode).getTask()),
-								((TaskDescriptorTreeNode) localNode).getTask().getName()) ;
-					}
-
-					/*
-					 * Role descriptors => displaying role infos
-					 */
-					else if (localNode instanceof RoleDescriptorTreeNode)
-					{
-						getMainContainer().add(new RoleDescriptorPanel( ((RoleDescriptorTreeNode) localNode).getRole()),
-								((RoleDescriptorTreeNode) localNode).getRole().getName()) ;
-					}
-
-				}
-			}) ;
-			projectTree.addMouseListener(new ActivityListener()) ;			
+			projectTree = new MainTree(currentProject) ;			
+					
 		}
 		return projectTree ;
 	}
@@ -1045,7 +947,7 @@ public class MainFrame extends JFrame
 							{
 								ProjectControler.save(currentProject, localFile) ;
 								actionSave.setEnabled(false) ;
-								statusPanel.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectExportedToDomino"))) ;
+								LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectExportedToDomino"))) ;
 
 							}
 							catch (FileSaveException exc)
@@ -1115,25 +1017,27 @@ public class MainFrame extends JFrame
 					}
 				}
 			}) ;
-			rightSplitPane.setTopComponent(getMainContainer()) ;
+			rightSplitPane.setTopComponent(MainTabbedPane.getInstance()) ;
 			rightSplitPane.setBottomComponent(getLogContainer()) ;
 
 		}
 		return rightSplitPane ;
 	}
 
+	
+	
 	/**
-	 * This method initializes mainContainer
-	 * 
-	 * @return javax.swing.JTabbedPane
+	 * This method initializes treeScrollPane
+	 *
+	 * @return javax.swing.JScrollPane.
 	 */
-	private JTabbedPane getMainContainer ()
+	public JScrollPane getTreeScrollPane ()
 	{
-		if (mainContainer == null)
+		if (treeScrollPane == null)
 		{
-			mainContainer = new JTabbedPane() ;
+			treeScrollPane = new JScrollPane(getProjectTree()) ;			
 		}
-		return mainContainer ;
+		return treeScrollPane ;
 	}
 
 	/**
@@ -1146,24 +1050,12 @@ public class MainFrame extends JFrame
 		if (logContainer == null)
 		{
 			logContainer = new JTabbedPane() ;
-			logContainer.add(Bundle.getText("MainFrameLogTab"), getStatusPanel()) ;
+			logContainer.add(Bundle.getText("MainFrameLogTab"), LogPanel.getInstance()) ;
 		}
 		return logContainer ;
 	}
 
-	/**
-	 * This method initializes statusPanel
-	 * 
-	 * @return javax.swing.JPanel
-	 */
-	private LogPanel getStatusPanel ()
-	{
-		if (statusPanel == null)
-		{
-			statusPanel = new LogPanel() ;
-		}
-		return statusPanel ;
-	}
+	
 
 	public Project getProject ()
 	{

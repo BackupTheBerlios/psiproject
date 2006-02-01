@@ -14,8 +14,9 @@ import ui.resource.Bundle ;
 
 /**
  * LogPanel : This is the container of the table containing the log entries
+ * Implements singleton
  * 
- * @author Condé Mickael K.
+ * @author Conde Mickael K.
  * @version 1.0
  * 
  */
@@ -42,12 +43,17 @@ public class LogPanel extends JPanel
 	 * The table model that will be used by the logTable
 	 */
 	private LogTableModel logTableModel ;
+	
+	/**
+	 * The single instance
+	 */
+	private static LogPanel instance = null ;
 
 	/**
 	 * Constructor
 	 * 
 	 */
-	public LogPanel ()
+	private LogPanel ()
 	{
 		/*
 		 * NOTES : in this constructor we create a table with a table model which is defined in this
@@ -210,5 +216,21 @@ public class LogPanel extends JPanel
 			fireTableRowsDeleted(0, 0) ;
 		}
 
+	}
+
+	
+	/**
+	 * Getter
+	 *
+	 * @return Returns the instance.
+	 */
+	public static LogPanel getInstance ()
+	{
+		if (instance == null)
+		{
+			instance = new LogPanel() ;
+		}
+		
+		return instance ;
 	}
 }

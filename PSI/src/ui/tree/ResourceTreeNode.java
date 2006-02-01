@@ -1,9 +1,12 @@
 
 package ui.tree ;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import java.util.Observable;
+import java.util.Observer;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import model.HumanResource;
+import model.spem2.RoleDescriptor;
 
 /**
  * ResourceTreeNode : tree like representation of a Human Resource
@@ -12,7 +15,7 @@ import model.HumanResource;
  * @version 1.0
  * 
  */
-public class ResourceTreeNode extends DefaultMutableTreeNode
+public class ResourceTreeNode extends DefaultMutableTreeNode implements Observer
 {
 	private static final long serialVersionUID = -2206326976916871308L ;
 
@@ -28,6 +31,7 @@ public class ResourceTreeNode extends DefaultMutableTreeNode
 		super() ;
 
 		this.resource = _resource ;
+		this.resource.addObserver(this) ;
 		this.setUserObject(resource) ;
 	}
 
@@ -50,6 +54,38 @@ public class ResourceTreeNode extends DefaultMutableTreeNode
 	public void setResource (HumanResource _resource)
 	{
 		this.resource = _resource ;
+	}
+
+	
+	/**
+	 * Updating the roles and tasks defs for the resource
+	 * 
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 */
+	public void update (Observable _observable, Object _object)
+	{
+		if (_object != null && _object instanceof RoleDescriptor)
+		{
+			RoleDescriptor tempRole = (RoleDescriptor)_object ;
+			// If adding
+			if (resource.getPerformingRoles().contains(_object))
+			{
+				this.add(new RoleDescriptorTreeNode(tempRole)) ;
+			}
+			
+			// Else deleting
+			else
+			{
+				int localChildCount = getChildCount() ;
+				for(int i = 0 ; i < localChildCount ; i++)
+				{
+					if (((RoleDescriptorTreeNode)getChildAt(i)).getRole().getId().equals(tempRole.getId()))
+					{
+						remove(i) ;
+					}
+				}
+			}
+		}
 	}
 
 	

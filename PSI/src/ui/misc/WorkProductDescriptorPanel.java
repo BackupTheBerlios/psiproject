@@ -421,6 +421,7 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 			idTextField = new JTextField(30) ;
 			idTextField.setText(product.getId()) ;
 			idTextField.setMaximumSize(new java.awt.Dimension(400, 20)) ;
+			idTextField.setBackground(java.awt.Color.white);
 			idTextField.setEditable(false) ;
 		}
 		return idTextField ;
@@ -438,6 +439,7 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 			nameTextField = new JTextField(30) ;
 			nameTextField.setText(product.getName()) ;
 			nameTextField.setMaximumSize(new java.awt.Dimension(400, 20)) ;
+			nameTextField.setBackground(java.awt.Color.white);
 			nameTextField.setEditable(false) ;
 		}
 		return nameTextField ;
@@ -458,6 +460,7 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 				typeTextField.setText(product.getProductType().getName()) ;
 			}
 			typeTextField.setMaximumSize(new java.awt.Dimension(400, 20)) ;
+			typeTextField.setBackground(java.awt.Color.white);
 			typeTextField.setEditable(false) ;
 		}
 		return typeTextField ;

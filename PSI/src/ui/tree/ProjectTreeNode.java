@@ -46,7 +46,7 @@ public class ProjectTreeNode extends DefaultMutableTreeNode
 		// Resources information
 		if (project.getResources() != null)
 		{
-			DefaultMutableTreeNode localRessourcesRoot = new DefaultMutableTreeNode(Bundle.getText("MainFrameTreeResources")) ;
+			DefaultMutableTreeNode localRessourcesRoot = new DefaultMutableTreeNode(Bundle.getText("MainTreeNodeResources")) ;
 			Iterator <HumanResource> localIterator = project.getResources().iterator() ;
 			while (localIterator.hasNext())
 			{

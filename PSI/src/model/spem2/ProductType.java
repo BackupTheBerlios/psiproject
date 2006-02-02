@@ -28,7 +28,7 @@ public class ProductType implements Descriptor
 	public ProductType (String _id, String _name)
 	{
 		super() ;
-		// TODO Auto-generated constructor stub
+
 		this.id = _id ;
 		this.name = _name ;
 	}

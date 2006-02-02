@@ -15,11 +15,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.tree.DefaultTreeModel;
 
 import model.LogInformation;
 import model.Project;
@@ -33,7 +31,6 @@ import ui.misc.LogPanel;
 import ui.misc.MainTabbedPane;
 import ui.resource.Bundle;
 import ui.tree.MainTree;
-import ui.tree.ProjectTreeNode;
 
 /**
  * MainFrame : PSI main window
@@ -176,12 +173,11 @@ public class MainFrame extends JFrame
 	private void initialize ()
 	{
 		Preferences localPrefs = Preferences.getInstance() ;
-		this.setSize(new java.awt.Dimension(localPrefs.getWidth(), localPrefs.getHeight())) ;
 		this.setName("mainFrame") ;
 		this.setContentPane(getMainSplitPane()) ;
 		this.setJMenuBar(getMainMenuBar()) ;
 		this.setTitle("Project Supervising Indicators") ;
-		this.setLocation(localPrefs.getXPosition(), localPrefs.getYPosition()) ;
+		this.setBounds(localPrefs.getXPosition(), localPrefs.getYPosition(), localPrefs.getWidth(), localPrefs.getHeight()) ;
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE) ;
 
 		/*
@@ -222,6 +218,7 @@ public class MainFrame extends JFrame
 				Preferences.getInstance().setYPosition(e.getComponent().getY()) ;
 			}
 		}) ;
+		
 	}
 
 	/**
@@ -234,7 +231,7 @@ public class MainFrame extends JFrame
 	private void actionExit ()
 	{
 		Preferences.getInstance().save() ;
-
+		
 		if (projectModified)
 		{
 			int localChoice = JOptionPane.showConfirmDialog(this, Bundle.getText("MainFrameConfirmExitMessage"), "PSI", JOptionPane.YES_NO_CANCEL_OPTION,
@@ -242,7 +239,7 @@ public class MainFrame extends JFrame
 
 			if (localChoice == JOptionPane.YES_OPTION)
 			{
-				// actionSave(new ActionEvent()) ;
+				actionSave() ;
 				System.exit(0) ;
 			}
 
@@ -319,8 +316,8 @@ public class MainFrame extends JFrame
 			{
 				currentProject = ProjectControler.create(localFile) ;
 				if (currentProject != null)
-				{
-					((DefaultTreeModel) getProjectTree().getModel()).setRoot(new ProjectTreeNode(currentProject)) ;
+				{					
+					getProjectTree().loadProject(currentProject) ;
 					actionImport.setEnabled(true) ;
 					LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectCreated") + " : " + currentProject.getName())) ;
 				}
@@ -395,7 +392,7 @@ public class MainFrame extends JFrame
 					actionSaveAs.setEnabled(true) ;
 
 					// Updating UI
-					((DefaultTreeModel) getProjectTree().getModel()).setRoot(new ProjectTreeNode(currentProject)) ;
+					getProjectTree().loadProject(currentProject) ;
 					LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProcessImported") + " : "
 							+ currentProject.getProcess().getDescriptor().getName())) ;
 				}
@@ -433,11 +430,22 @@ public class MainFrame extends JFrame
 	 */
 	private void actionSave (ActionEvent evt)
 	{
+		actionSave() ;
+	}
+	
+	/**
+	 * Saves the current project (quick save)
+	 * 
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 */
+	private void actionSave ()
+	{
 		File localFile = new File(Preferences.getInstance().getLastProject()) ;
 
 		if (!localFile.exists())
 		{
-			actionSaveAs(evt) ;
+			actionSaveAs() ;
 			return ;
 		}
 
@@ -464,6 +472,17 @@ public class MainFrame extends JFrame
 	 *            the Action Event that caused the action
 	 */
 	private void actionSaveAs (ActionEvent evt)
+	{
+		actionSaveAs() ;
+	}
+	
+	/**
+	 * Saves the current project [under another name]
+	 * 
+	 * @author Cond? Mickael K.
+	 * @version 1.0
+	 */
+	private void actionSaveAs ()
 	{
 		/*
 		 * Setting up a specific JFileChooser
@@ -833,29 +852,16 @@ public class MainFrame extends JFrame
 	 * 
 	 * @return javax.swing.JTree
 	 */
-	private JTree getProjectTree ()
+	private MainTree getProjectTree ()
 	{                          
 		if (projectTree == null)
 		{
-			projectTree = new MainTree(currentProject) ;			
+			projectTree = new MainTree(currentProject, this) ;			
 					
 		}
 		return projectTree ;
 	}
-
-	/**
-	 * 
-	 * TODO Method description
-	 * 
-	 * @author l3isi4
-	 * @version 1.0
-	 * 
-	 * @return
-	 */
-	public Project getCurrentProject ()
-	{
-		return this.currentProject ;
-	}
+	
 
 	/**
 	 * This method initializes exportFileMenu

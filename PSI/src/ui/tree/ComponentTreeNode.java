@@ -12,6 +12,7 @@ import model.Component ;
 import model.spem2.Activity;
 import model.spem2.BreakdownElement ;
 import model.spem2.RoleDescriptor ;
+import model.spem2.WorkProductDescriptor;
 
 /**
  * ComponentTreeNode : A tree representation of a component
@@ -39,8 +40,10 @@ public class ComponentTreeNode extends DefaultMutableTreeNode
 		this.component = _component ;
 		this.setUserObject(component.getDescriptor().getName()) ;
 
-		DefaultMutableTreeNode localWDNode = new DefaultMutableTreeNode(Bundle.getText("MainFrameTreeWorkDefinitions")) ;
-		DefaultMutableTreeNode localRoleNode = new DefaultMutableTreeNode(Bundle.getText("MainFrameTreeRoles")) ;
+		DefaultMutableTreeNode localWDNode = new DefaultMutableTreeNode(Bundle.getText("MainTreeNodeWorkDefinitions")) ;
+		DefaultMutableTreeNode localRoleNode = new DefaultMutableTreeNode(Bundle.getText("MainTreeNodeRoles")) ;
+		DefaultMutableTreeNode localProductsNode = new DefaultMutableTreeNode(Bundle.getText("MainTreeNodeWorkProducts")) ;
+		
 		Collection <BreakdownElement> localNested = component.getNestedElements() ;
 		BreakdownElement localElement ;
 		Iterator <BreakdownElement> localIterator = localNested.iterator() ;
@@ -58,10 +61,16 @@ public class ComponentTreeNode extends DefaultMutableTreeNode
 			{
 				localWDNode.add(new ActivityTreeNode((Activity) localElement)) ;
 			}
+			
+			else if (localElement instanceof WorkProductDescriptor)
+			{
+				localProductsNode.add(new WorkProductDescriptorTreeNode((WorkProductDescriptor) localElement)) ;
+			}
 		}
 
 		this.add(localWDNode) ;
 		this.add(localRoleNode) ;
+		this.add(localProductsNode) ;
 	}
 
 	/**

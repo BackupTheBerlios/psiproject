@@ -332,4 +332,15 @@ public class TaskDescriptor extends Observable implements Descriptor
 		this.tasks = _tasks ;
 	}
 
+
+	
+	/**
+	 * @see java.util.Observable#setChanged()
+	 */
+	@ Override
+	public synchronized void setChanged ()
+	{
+		super.setChanged() ;
+	}
+
 }

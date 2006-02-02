@@ -351,4 +351,14 @@ public class WorkProductDescriptor extends Observable implements Descriptor
 		this.artifacts = _artifacts ;
 	}
 
+	
+	/**
+	 * @see java.util.Observable#setChanged()
+	 */
+	@ Override
+	public synchronized void setChanged ()
+	{
+		super.setChanged() ;
+	}
+
 }

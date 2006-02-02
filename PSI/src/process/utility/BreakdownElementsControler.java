@@ -1,8 +1,16 @@
 
 package process.utility ;
 
+import java.util.Calendar ;
+import java.util.Iterator ;
+
 import model.HumanResource ;
+import model.spem2.Artifact ;
 import model.spem2.RoleDescriptor ;
+import model.spem2.TaskDefinition;
+import model.spem2.TaskDescriptor ;
+import model.spem2.WorkProductDescriptor ;
+import process.exception.DuplicateElementException ;
 
 /**
  * BreakdownElementsControler : utility class to create associations and more between model elements
@@ -16,7 +24,7 @@ public class BreakdownElementsControler
 {
 	/**
 	 * Links roles and human resources : by editing the proper collections
-	 *
+	 * 
 	 * @author Conde Mickael K.
 	 * @version 1.0
 	 * 
@@ -35,6 +43,68 @@ public class BreakdownElementsControler
 			_resource.setChanged() ;
 			_resource.notifyObservers(_role) ;
 		}
+	}
+
+	/**
+	 * Adds a new artifact into a product
+	 * 
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _product
+	 * @param _name
+	 * @param _description
+	 * @throws DuplicateElementException
+	 */
+	public static void addArtefactIntoWorkProductDescriptor (WorkProductDescriptor _product, String _name, String _description)
+			throws DuplicateElementException
+	{
+		// Checking if this name exists
+		Iterator <Artifact> localIterator = _product.getArtifacts().iterator() ;
+		while (localIterator.hasNext())
+		{
+			if (localIterator.next().getName().equals(_name)) { throw new DuplicateElementException() ; }
+		}
+
+		// Generating new ID
+		Calendar localCalendar = Calendar.getInstance() ;
+		String localID = "_" + localCalendar.get(Calendar.MILLISECOND) + localCalendar.get(Calendar.DAY_OF_MONTH) + localCalendar.get(Calendar.MONTH)
+				+ localCalendar.get(Calendar.YEAR) + localCalendar.get(Calendar.HOUR) + localCalendar.get(Calendar.MINUTE) + localCalendar.get(Calendar.SECOND)
+				+ "_artf" ;
+		Artifact localArtifact = new Artifact(localID, _name, _description, _product.getId(), _product) ;
+		_product.getArtifacts().add(localArtifact) ;
+		_product.setChanged() ;
+		_product.notifyObservers(localArtifact) ;
+	}
+
+	/**
+	 * Adds new task into an "activity"
+	 * 
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _task
+	 * @param _name
+	 * @param _description
+	 * @throws DuplicateElementException
+	 */
+	public static void addTaskDefinitionIntoTaskDescriptor (TaskDescriptor _task, String _name, String _description) throws DuplicateElementException
+	{
+		Iterator <TaskDefinition> localIterator = _task.getTasks().iterator() ;
+		while (localIterator.hasNext())
+		{
+			if (localIterator.next().getName().equals(_name)) { throw new DuplicateElementException() ; }
+		}
+
+		// Generating new ID
+		Calendar localCalendar = Calendar.getInstance() ;
+		String localID = "_" + localCalendar.get(Calendar.MILLISECOND) + localCalendar.get(Calendar.DAY_OF_MONTH) + localCalendar.get(Calendar.MONTH)
+				+ localCalendar.get(Calendar.YEAR) + localCalendar.get(Calendar.HOUR) + localCalendar.get(Calendar.MINUTE) + localCalendar.get(Calendar.SECOND)
+				+ "_artf" ;
+		TaskDefinition localTask = new TaskDefinition(localID, _name, _description, _task.getId(), _task) ;
+		_task.getTasks().add(localTask) ;
+		_task.setChanged() ;
+		_task.notifyObservers(localTask) ;
 	}
 
 }

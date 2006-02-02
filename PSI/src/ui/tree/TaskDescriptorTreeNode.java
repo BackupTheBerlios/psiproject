@@ -1,12 +1,14 @@
 
 package ui.tree ;
 
+import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.tree.DefaultMutableTreeNode ;
+import javax.swing.tree.DefaultMutableTreeNode;
 
-import model.spem2.TaskDescriptor ;
+import model.spem2.TaskDefinition;
+import model.spem2.TaskDescriptor;
 
 /**
  * TaskDescriptorTreeNode : A tree representation of a task
@@ -36,13 +38,14 @@ public class TaskDescriptorTreeNode extends DefaultMutableTreeNode implements Ob
 		this.task = _task ;
 		this.task.addObserver(this) ;
 		this.setUserObject(task.getName()) ;
+		
+		Iterator<TaskDefinition> localIterator = task.getTasks().iterator() ;
+		while (localIterator.hasNext())
+		{
+			this.add(new TaskDefinitionTreeNode(localIterator.next())) ;
+		}
 	}
 	
-	public TaskDescriptor getTaskDescriptor()
-	{
-		return this.task;
-	}
-
 	/**
 	 * Getter
 	 * 
@@ -68,9 +71,16 @@ public class TaskDescriptorTreeNode extends DefaultMutableTreeNode implements Ob
 	/**
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
-	public void update (Observable _arg0, Object _arg1)
+	public void update (Observable _observable, Object _object)
 	{
-		
+		if (_object instanceof TaskDefinition)
+		{
+			// Adding to the node
+			if (task.getTasks().contains(_object))
+			{
+				add(new TaskDefinitionTreeNode((TaskDefinition)_object)) ;
+			}
+		}
 		
 	}
 

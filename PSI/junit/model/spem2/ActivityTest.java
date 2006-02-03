@@ -1,5 +1,8 @@
 package model.spem2;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import junit.framework.TestCase;
 
 /**
@@ -19,6 +22,7 @@ public class ActivityTest extends TestCase
 	{
 		super.setUp() ;
 		Activity activite = new Activity("0001","Activity1","This activity is the best!","parentId","$USER/interfaceDiagramPath/", "$USER/flowDiagramPath/","$USER/activityDiagramPath/");
+		Collection<BreakDownElement> bde = new Collections();
 	}
 
 	/*
@@ -34,7 +38,7 @@ public class ActivityTest extends TestCase
 	 */
 	public void testGetNestedElements ()
 	{
- 
+		assertEquals(activite.nestedElements, null);
 	}
 
 	/*

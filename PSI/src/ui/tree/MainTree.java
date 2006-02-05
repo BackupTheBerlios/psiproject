@@ -36,8 +36,10 @@ import model.Project ;
 import process.utility.BreakdownElementsControler ;
 import ui.dialog.ArtifactAdderDialog ;
 import ui.dialog.TaskDefinitionAdderDialog ;
+import ui.misc.ArtifactPanel;
 import ui.misc.MainTabbedPane ;
 import ui.misc.RoleDescriptorPanel ;
+import ui.misc.TaskDefinitionPanel;
 import ui.misc.TaskDescriptorPanel ;
 import ui.misc.WorkProductDescriptorPanel;
 import ui.resource.Bundle ;
@@ -479,6 +481,24 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				{
 					MainTabbedPane.getInstance().add(new WorkProductDescriptorPanel( ((WorkProductDescriptorTreeNode) localNode).getProduct()),
 							((WorkProductDescriptorTreeNode) localNode).getProduct().getName()) ;
+				}
+				
+				/*
+				 * Artifacts
+				 */
+				else if (localNode instanceof ArtifactTreeNode)
+				{
+					MainTabbedPane.getInstance().add(new ArtifactPanel( ((ArtifactTreeNode) localNode).getArtifact()),
+							((ArtifactTreeNode) localNode).getArtifact().getName()) ;
+				}
+				
+				/*
+				 * Task definitions
+				 */
+				else if (localNode instanceof TaskDefinitionTreeNode)
+				{
+					MainTabbedPane.getInstance().add(new TaskDefinitionPanel( ((TaskDefinitionTreeNode) localNode).getTask()),
+							((TaskDefinitionTreeNode) localNode).getTask().getName()) ;
 				}
 			}
 		}

@@ -59,7 +59,7 @@ public class TaskDefinitionTreeNode extends DefaultMutableTreeNode implements Ob
 	 */
 	public void update (Observable _observable, Object _object)
 	{
-		// The only thing that can change for this element is the name
+		this.setUserObject(task.getName()) ;
 		
 	}
 	

@@ -1,4 +1,5 @@
-package ui.tree;
+
+package ui.tree ;
 
 import java.util.Iterator;
 import java.util.Observable;
@@ -11,20 +12,20 @@ import model.spem2.WorkProductDescriptor;
 
 /**
  * WorkProductDescriptorTreeNode : a tree representation of a product
- *
+ * 
  * @author Conde Mickael K.
  * @version 1.0
- *
+ * 
  */
 public class WorkProductDescriptorTreeNode extends DefaultMutableTreeNode implements Observer
 {
 	private static final long serialVersionUID = 2218171819807912138L ;
-	
+
 	private WorkProductDescriptor product = null ;
 
 	/**
 	 * Constructor
-	 *
+	 * 
 	 * @param _product
 	 */
 	public WorkProductDescriptorTreeNode (WorkProductDescriptor _product)
@@ -34,19 +35,19 @@ public class WorkProductDescriptorTreeNode extends DefaultMutableTreeNode implem
 		this.product = _product ;
 		this.setUserObject(product.getName()) ;
 		this.product.addObserver(this) ;
-		
+
 		// Adding artifacts to this node
-		Iterator<Artifact> localIterator = product.getArtifacts().iterator() ;
+		Iterator <Artifact> localIterator = product.getArtifacts().iterator() ;
 		while (localIterator.hasNext())
 		{
 			this.add(new ArtifactTreeNode(localIterator.next())) ;
 		}
-		
+
 	}
 
 	/**
 	 * Getter
-	 *
+	 * 
 	 * @return Returns the product.
 	 */
 	public WorkProductDescriptor getProduct ()
@@ -56,8 +57,9 @@ public class WorkProductDescriptorTreeNode extends DefaultMutableTreeNode implem
 
 	/**
 	 * Setter
-	 *
-	 * @param _product The product to set.
+	 * 
+	 * @param _product
+	 *            The product to set.
 	 */
 	public void setProduct (WorkProductDescriptor _product)
 	{
@@ -71,10 +73,9 @@ public class WorkProductDescriptorTreeNode extends DefaultMutableTreeNode implem
 	{
 		if (_object instanceof Artifact)
 		{
-			// Adding to the node
 			if (product.getArtifacts().contains(_object))
 			{
-				add(new ArtifactTreeNode((Artifact)_object)) ;
+				add(new ArtifactTreeNode((Artifact) _object)) ;
 			}
 		}
 	}

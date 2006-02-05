@@ -30,6 +30,7 @@ public class ArtifactTreeNode extends DefaultMutableTreeNode implements Observer
 		super() ;
 
 		this.artifact = _artifact ;
+		this.artifact.addObserver(this) ;
 		this.setUserObject(artifact.getName()) ;
 	}
 
@@ -58,7 +59,7 @@ public class ArtifactTreeNode extends DefaultMutableTreeNode implements Observer
 	 */
 	public void update (Observable _observable, Object _observer)
 	{
-
+		this.setUserObject(artifact.getName()) ;
 	}
 
 }

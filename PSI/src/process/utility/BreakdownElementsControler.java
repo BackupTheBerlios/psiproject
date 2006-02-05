@@ -107,4 +107,23 @@ public class BreakdownElementsControler
 		_task.notifyObservers(localTask) ;
 	}
 
+	/**
+	 * Updates artifact with new values
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _artifact
+	 * @param _name
+	 * @param _description
+	 */
+	public static void updateArtifactInfo(Artifact _artifact, String _name, String _description)
+	{
+		_artifact.setName(_name) ;
+		_artifact.setDescription(_description) ;
+		_artifact.setChanged() ;
+		_artifact.notifyObservers() ;
+		
+	}
+	
 }

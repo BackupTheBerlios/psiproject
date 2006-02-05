@@ -502,7 +502,7 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		if (artifactsTable == null)
 		{
 			artifactsTable = new JTable(new ArtifactsTableModel(product)) ;
-			artifactsTable.setPreferredScrollableViewportSize(new Dimension(600, 80)) ;
+			artifactsTable.setPreferredScrollableViewportSize(new Dimension(500, 80)) ;
 			artifactsTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			artifactsTable.getTableHeader().setReorderingAllowed(false) ;
 		}
@@ -534,7 +534,7 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		if (inTasksTable == null)
 		{
 			inTasksTable = new JTable(new TaskDescriptorsTableModel(product, true)) ;
-			inTasksTable.setPreferredScrollableViewportSize(new Dimension(600, 80)) ;
+			inTasksTable.setPreferredScrollableViewportSize(new Dimension(500, 80)) ;
 			inTasksTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			inTasksTable.getTableHeader().setReorderingAllowed(false) ;
 		}
@@ -566,7 +566,7 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		if (outTasksTable == null)
 		{
 			outTasksTable = new JTable(new TaskDescriptorsTableModel(product, false)) ;
-			outTasksTable.setPreferredScrollableViewportSize(new Dimension(600, 80)) ;
+			outTasksTable.setPreferredScrollableViewportSize(new Dimension(500, 80)) ;
 			outTasksTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			outTasksTable.getTableHeader().setReorderingAllowed(false) ;
 		}
@@ -578,7 +578,7 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 	 */
 
 	/**
-	 * ArtifactsTableModel : Table model for artifacts TODO observers for rows ... :(
+	 * ArtifactsTableModel : Table model for artifacts
 	 * 
 	 * @author Conde Mickael K.
 	 * @version 1.0
@@ -678,6 +678,13 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		}
 	}
 
+	/**
+	 * TaskDescriptorsTableModel : Table model for tasks (descriptors)
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 *
+	 */
 	private class TaskDescriptorsTableModel extends AbstractTableModel
 	{
 		private static final long serialVersionUID = -8928082572980054226L ;
@@ -764,5 +771,6 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		}
 
 	}
-
+	
+	
 } // @jve:decl-index=0:visual-constraint="10,10"

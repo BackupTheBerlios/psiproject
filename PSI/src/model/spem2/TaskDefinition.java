@@ -1,5 +1,10 @@
 package model.spem2;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+
 
 /**
  * TaskDefinition : A more specific task type, defined within a project, not a process
@@ -8,9 +13,16 @@ package model.spem2;
  * @version 1.0
  *
  */
-public class TaskDefinition extends TaskDescriptor
+public class TaskDefinition extends TaskDescriptor implements Transferable
 {
 	private TaskDescriptor task ;
+	
+	/**
+	 * Drag and drop capability
+	 */
+	public static DataFlavor TASK_FLAVOR = new DataFlavor(RoleDescriptor.class, "Task") ;;
+	
+	private static DataFlavor[] flavors = {TASK_FLAVOR} ;
 	
 	/**
 	 * Constructor
@@ -60,6 +72,47 @@ public class TaskDefinition extends TaskDescriptor
 	public void setTask (TaskDescriptor _task)
 	{
 		this.task = _task ;
+	}
+	
+	/**
+	 * @see java.awt.datatransfer.Transferable#getTransferData(java.awt.datatransfer.DataFlavor)
+	 */
+	public Object getTransferData (DataFlavor _df) throws UnsupportedFlavorException, IOException
+	{
+		if (_df.equals(TASK_FLAVOR))
+		{
+			return this ;
+		}
+		else
+		{
+			throw new UnsupportedFlavorException(_df) ;
+		}
+	}	
+
+	/**
+	 * @see java.awt.datatransfer.Transferable#getTransferDataFlavors()
+	 */
+	public DataFlavor[] getTransferDataFlavors ()
+	{
+		return flavors ;
+	}
+	
+
+	/**
+	 * @see java.awt.datatransfer.Transferable#isDataFlavorSupported(java.awt.datatransfer.DataFlavor)
+	 */
+	public boolean isDataFlavorSupported (DataFlavor _df)
+	{
+		return _df.equals(TASK_FLAVOR) ;
+	}
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@ Override
+	public String toString ()
+	{
+		return getName() ;
 	}
 	
 }

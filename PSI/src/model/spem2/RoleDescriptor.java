@@ -1,6 +1,10 @@
 
 package model.spem2 ;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.ArrayList ;
 import java.util.Collection ;
 import java.util.Observable;
@@ -15,7 +19,7 @@ import model.Presentation;
  * @version 1.0
  * 
  */
-public class RoleDescriptor extends Observable implements Descriptor
+public class RoleDescriptor extends Observable implements Descriptor, Transferable
 {
 	/**
 	 * The unique identifier of the element
@@ -58,6 +62,13 @@ public class RoleDescriptor extends Observable implements Descriptor
 	 * The additional tasks of the role
 	 */
 	private Collection <WorkProductDescriptor> products ;
+	
+	/**
+	 * Drag and drop capability
+	 */
+	public static DataFlavor ROLE_FLAVOR = new DataFlavor(RoleDescriptor.class, "Role") ;;
+	
+	private static DataFlavor[] flavors = {ROLE_FLAVOR} ;
 
 	/**
 	 * Constructor
@@ -258,7 +269,48 @@ public class RoleDescriptor extends Observable implements Descriptor
 	}
 
 	
+	/**
+	 * @see java.awt.datatransfer.Transferable#getTransferData(java.awt.datatransfer.DataFlavor)
+	 */
+	public Object getTransferData (DataFlavor _df) throws UnsupportedFlavorException, IOException
+	{
+		if (_df.equals(ROLE_FLAVOR))
+		{
+			return this ;
+		}
+		else
+		{
+			throw new UnsupportedFlavorException(_df) ;
+		}
+	}	
 	
+
+	/**
+	 * @see java.awt.datatransfer.Transferable#getTransferDataFlavors()
+	 */
+	public DataFlavor[] getTransferDataFlavors ()
+	{
+		return flavors ;
+	}
+	
+
+	/**
+	 * @see java.awt.datatransfer.Transferable#isDataFlavorSupported(java.awt.datatransfer.DataFlavor)
+	 */
+	public boolean isDataFlavorSupported (DataFlavor _df)
+	{
+		return _df.equals(ROLE_FLAVOR) ;
+	}
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@ Override
+	public String toString ()
+	{
+		return name ;
+	}
+
 	
 	
 }

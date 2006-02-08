@@ -1,5 +1,10 @@
 package model.spem2;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+
 /**
  * Artifact : a definition of a product within a project
  *
@@ -7,12 +12,19 @@ package model.spem2;
  * @version 1.0
  *
  */
-public class Artifact extends WorkProductDescriptor
+public class Artifact extends WorkProductDescriptor implements Transferable
 {
 	/**
 	 * 
 	 */
 	private WorkProductDescriptor product ;
+	
+	/**
+	 * Drag and drop capability
+	 */
+	public static DataFlavor ARTIFACT_FLAVOR = new DataFlavor(RoleDescriptor.class, "Artifact") ;;
+	
+	private static DataFlavor[] flavors = {ARTIFACT_FLAVOR} ;
 	
 	/**
 	 * Constructor
@@ -63,4 +75,44 @@ public class Artifact extends WorkProductDescriptor
 		this.product = _product ;
 	}
 
+	/**
+	 * @see java.awt.datatransfer.Transferable#getTransferData(java.awt.datatransfer.DataFlavor)
+	 */
+	public Object getTransferData (DataFlavor _df) throws UnsupportedFlavorException, IOException
+	{
+		if (_df.equals(ARTIFACT_FLAVOR))
+		{
+			return this ;
+		}
+		else
+		{
+			throw new UnsupportedFlavorException(_df) ;
+		}
+	}	
+
+	/**
+	 * @see java.awt.datatransfer.Transferable#getTransferDataFlavors()
+	 */
+	public DataFlavor[] getTransferDataFlavors ()
+	{
+		return flavors ;
+	}
+	
+
+	/**
+	 * @see java.awt.datatransfer.Transferable#isDataFlavorSupported(java.awt.datatransfer.DataFlavor)
+	 */
+	public boolean isDataFlavorSupported (DataFlavor _df)
+	{
+		return _df.equals(ARTIFACT_FLAVOR) ;
+	}
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@ Override
+	public String toString ()
+	{
+		return getName() ;
+	}
 }

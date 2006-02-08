@@ -5,6 +5,7 @@ import java.util.Collection ;
 import java.util.Iterator ;
 
 import javax.swing.tree.DefaultMutableTreeNode ;
+import javax.swing.tree.DefaultTreeModel;
 
 import ui.resource.Bundle ;
 
@@ -27,16 +28,21 @@ public class ComponentTreeNode extends DefaultMutableTreeNode
 	private static final long serialVersionUID = 4453822314602802032L ;
 
 	private Component component ;
+	
+	private DefaultTreeModel treeModel = null ;
 
+	
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param _component
+	 * @param _model
 	 */
-	public ComponentTreeNode (Component _component)
+	public ComponentTreeNode (Component _component, DefaultTreeModel _model)
 	{
 		super() ;
 
+		this.treeModel = _model ;
 		this.component = _component ;
 		this.setUserObject(component.getDescriptor().getName()) ;
 
@@ -54,17 +60,17 @@ public class ComponentTreeNode extends DefaultMutableTreeNode
 
 			if (localElement instanceof RoleDescriptor)
 			{
-				localRoleNode.add(new RoleDescriptorTreeNode((RoleDescriptor) localElement)) ;
+				localRoleNode.add(new RoleDescriptorTreeNode((RoleDescriptor) localElement, treeModel)) ;
 			}
 			
 			else if (localElement instanceof Activity)
 			{
-				localWDNode.add(new ActivityTreeNode((Activity) localElement)) ;
+				localWDNode.add(new ActivityTreeNode((Activity) localElement, treeModel)) ;
 			}
 			
 			else if (localElement instanceof WorkProductDescriptor)
 			{
-				localProductsNode.add(new WorkProductDescriptorTreeNode((WorkProductDescriptor) localElement)) ;
+				localProductsNode.add(new WorkProductDescriptorTreeNode((WorkProductDescriptor) localElement, treeModel)) ;
 			}
 		}
 

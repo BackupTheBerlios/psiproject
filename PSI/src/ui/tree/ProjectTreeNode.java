@@ -4,6 +4,7 @@ package ui.tree ;
 import java.util.Iterator ;
 
 import javax.swing.tree.DefaultMutableTreeNode ;
+import javax.swing.tree.DefaultTreeModel;
 
 import ui.resource.Bundle ;
 
@@ -22,24 +23,28 @@ public class ProjectTreeNode extends DefaultMutableTreeNode
 	private static final long serialVersionUID = -3196033141454374573L ;
 
 	private Project project = null ;
+	
+	private DefaultTreeModel treeModel = null ; 
 
+	
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param _project
-	 *            the project to display
+	 * @param _model
 	 */
-	public ProjectTreeNode (Project _project)
+	public ProjectTreeNode (Project _project, DefaultTreeModel _model)
 	{
 		super() ;
 
+		this.treeModel = _model ;
 		this.project = _project ;
 		this.setUserObject(project.getName()) ;
 
 		// Process information
 		if (project.getProcess() != null)
 		{
-			DefaultMutableTreeNode localProcessRoot = new ProcessTreeNode(project.getProcess()) ;
+			DefaultMutableTreeNode localProcessRoot = new ProcessTreeNode(project.getProcess(), treeModel) ;
 			this.add(localProcessRoot) ;
 		}
 
@@ -50,7 +55,7 @@ public class ProjectTreeNode extends DefaultMutableTreeNode
 			Iterator <HumanResource> localIterator = project.getResources().iterator() ;
 			while (localIterator.hasNext())
 			{
-				localRessourcesRoot.add(new ResourceTreeNode(localIterator.next())) ;
+				localRessourcesRoot.add(new ResourceTreeNode(localIterator.next(), treeModel)) ;
 			}
 			this.add(localRessourcesRoot) ;
 		}

@@ -2,6 +2,7 @@
 package ui.tree ;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import model.spem2.RoleDescriptor;
 
@@ -20,18 +21,22 @@ public class RoleDescriptorTreeNode extends DefaultMutableTreeNode
 	 * The role of the node
 	 */
 	private RoleDescriptor role ;
+	
+	@SuppressWarnings("unused")
+	private DefaultTreeModel treeModel = null ;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param _role
 	 */
-	public RoleDescriptorTreeNode (RoleDescriptor _role)
+	public RoleDescriptorTreeNode (RoleDescriptor _role, DefaultTreeModel _model)
 	{
 		super() ;
 
+		this.treeModel = _model ;
 		this.role = _role ;
-		this.setUserObject(role.getName()) ;
+		this.setUserObject(role) ;
 	}
 
 	/**

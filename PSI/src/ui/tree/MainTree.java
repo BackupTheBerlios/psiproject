@@ -1,49 +1,50 @@
 
 package ui.tree ;
 
-import java.awt.datatransfer.Transferable ;
-import java.awt.datatransfer.UnsupportedFlavorException ;
-import java.awt.dnd.DnDConstants ;
-import java.awt.dnd.DragGestureEvent ;
-import java.awt.dnd.DragGestureListener ;
-import java.awt.dnd.DragSource ;
-import java.awt.dnd.DragSourceDragEvent ;
-import java.awt.dnd.DragSourceDropEvent ;
-import java.awt.dnd.DragSourceEvent ;
-import java.awt.dnd.DragSourceListener ;
-import java.awt.dnd.DropTarget ;
-import java.awt.dnd.DropTargetDragEvent ;
-import java.awt.dnd.DropTargetDropEvent ;
-import java.awt.dnd.DropTargetEvent ;
-import java.awt.dnd.DropTargetListener ;
-import java.awt.event.KeyAdapter ;
-import java.awt.event.KeyEvent ;
-import java.awt.event.MouseAdapter ;
-import java.awt.event.MouseEvent ;
-import java.io.IOException ;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
 
-import javax.swing.JMenuItem ;
-import javax.swing.JPopupMenu ;
-import javax.swing.JTree ;
-import javax.swing.event.TreeSelectionEvent ;
-import javax.swing.event.TreeSelectionListener ;
-import javax.swing.tree.DefaultMutableTreeNode ;
-import javax.swing.tree.DefaultTreeModel ;
-import javax.swing.tree.TreePath ;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
-import model.HumanResource ;
-import model.Project ;
-import process.utility.BreakdownElementsControler ;
-import ui.dialog.ArtifactAdderDialog ;
-import ui.dialog.TaskDefinitionAdderDialog ;
+import model.HumanResource;
+import model.Project;
+import model.spem2.RoleDescriptor;
+import process.utility.BreakdownElementsControler;
+import ui.dialog.ArtifactAdderDialog;
+import ui.dialog.TaskDefinitionAdderDialog;
 import ui.misc.ArtifactPanel;
-import ui.misc.MainTabbedPane ;
-import ui.misc.RoleDescriptorPanel ;
+import ui.misc.MainTabbedPane;
+import ui.misc.RoleDescriptorPanel;
 import ui.misc.TaskDefinitionPanel;
-import ui.misc.TaskDescriptorPanel ;
+import ui.misc.TaskDescriptorPanel;
 import ui.misc.WorkProductDescriptorPanel;
-import ui.resource.Bundle ;
-import ui.window.MainFrame ;
+import ui.resource.Bundle;
+import ui.window.MainFrame;
 
 /**
  * MainTree : surcharged JTree to handle drag and drop
@@ -71,6 +72,8 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 	private Project project = null ;
 
 	private MainFrame mainFrame = null ;
+	
+	private DefaultTreeModel treeModel = null ;
 
 	// private JPopupMenu resourcePopupMenu = null ;
 
@@ -81,8 +84,9 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 	 * @param _frame
 	 */
 	public MainTree (Project _project, MainFrame _frame)
-	{
+	{		
 		super(new DefaultTreeModel(new DefaultMutableTreeNode(Bundle.getText("MainTreeDefault")))) ;
+		this.treeModel = (DefaultTreeModel)this.getModel() ;
 
 		this.project = _project ;
 		this.mainFrame = _frame ;
@@ -205,7 +209,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 	public void loadProject (Project _project)
 	{
 		this.project = _project ;
-		((DefaultTreeModel) getModel()).setRoot(new ProjectTreeNode(project)) ;
+		((DefaultTreeModel) getModel()).setRoot(new ProjectTreeNode(project, treeModel)) ;
 
 	}
 
@@ -221,11 +225,11 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 		DefaultMutableTreeNode dragNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
 		if (dragNode != null)
 		{
-			if (dragNode instanceof ResourceTreeNode)
+			if (dragNode instanceof ResourceTreeNode || dragNode instanceof RoleDescriptorTreeNode || dragNode instanceof TaskDefinitionTreeNode || dragNode instanceof ArtifactTreeNode)
 			{
 				Transferable transferable = (Transferable) dragNode.getUserObject() ;
 				_evt.startDrag(DragSource.DefaultLinkDrop, transferable, this) ;
-			}
+			}			
 
 			/*
 			 * else { _evt.startDrag(DragSource.DefaultLinkNoDrop, new StringSelection("DND"), this) ; }
@@ -316,12 +320,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 			Transferable transferable = _evt.getTransferable() ;
 
 			// Checking that its a human resource
-			if (!transferable.isDataFlavorSupported(HumanResource.RESOURCE_FLAVOR))
-			{
-				_evt.rejectDrop() ;
-			}
-
-			else
+			if (transferable.isDataFlavorSupported(HumanResource.RESOURCE_FLAVOR))
 			{
 				HumanResource localResource = (HumanResource) transferable.getTransferData(HumanResource.RESOURCE_FLAVOR) ;
 
@@ -351,6 +350,27 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				 * 
 				 * break ; } } }
 				 */
+			}
+			
+			else if (transferable.isDataFlavorSupported(RoleDescriptor.ROLE_FLAVOR))
+			{
+				RoleDescriptor localRole = (RoleDescriptor) transferable.getTransferData(RoleDescriptor.ROLE_FLAVOR) ;
+				
+				TreePath localPath = getPathForLocation(_evt.getLocation().x, _evt.getLocation().y) ;
+				DefaultMutableTreeNode localTargetNode = (DefaultMutableTreeNode) localPath.getLastPathComponent() ;
+
+				// If the node is a role, then linking
+				if (localTargetNode instanceof ResourceTreeNode)
+				{
+					BreakdownElementsControler.linkRoleDescriptorAndHumanResource( localRole, ((ResourceTreeNode) localTargetNode).getResource()) ;
+					_evt.getDropTargetContext().dropComplete(true) ;
+				}
+				
+			}
+
+			else
+			{
+				_evt.rejectDrop() ;
 			}
 		}
 		catch (UnsupportedFlavorException exc)
@@ -384,8 +404,8 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 	public void valueChanged (TreeSelectionEvent _arg0)
 	{
 
-	}
-
+	}	
+	
 	/*
 	 * Other listeners
 	 */
@@ -415,7 +435,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 		@ Override
 		public void mouseReleased (MouseEvent _e)
 		{
-			if (_e.isPopupTrigger())
+			if (_e.isPopupTrigger() || _e.getButton() == MouseEvent.BUTTON3)
 			{
 				TreePath localPath = MainTree.this.getPathForRow(MainTree.this.getRowForLocation(_e.getX(), _e.getY())) ;
 
@@ -488,7 +508,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				 */
 				else if (localNode instanceof ArtifactTreeNode)
 				{
-					MainTabbedPane.getInstance().add(new ArtifactPanel( ((ArtifactTreeNode) localNode).getArtifact()),
+					MainTabbedPane.getInstance().add(new ArtifactPanel(mainFrame, ((ArtifactTreeNode) localNode).getArtifact()),
 							((ArtifactTreeNode) localNode).getArtifact().getName()) ;
 				}
 				
@@ -497,7 +517,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				 */
 				else if (localNode instanceof TaskDefinitionTreeNode)
 				{
-					MainTabbedPane.getInstance().add(new TaskDefinitionPanel( ((TaskDefinitionTreeNode) localNode).getTask()),
+					MainTabbedPane.getInstance().add(new TaskDefinitionPanel(mainFrame, ((TaskDefinitionTreeNode) localNode).getTask()),
 							((TaskDefinitionTreeNode) localNode).getTask().getName()) ;
 				}
 			}
@@ -533,6 +553,6 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 			// System.out.println(_e) ;
 		}
 
-	}
+	}	
 
 }

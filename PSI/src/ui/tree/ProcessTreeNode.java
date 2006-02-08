@@ -5,6 +5,7 @@ import java.util.Collection ;
 import java.util.Iterator ;
 
 import javax.swing.tree.DefaultMutableTreeNode ;
+import javax.swing.tree.DefaultTreeModel;
 
 import model.Component ;
 import model.spem2.BreakdownElement ;
@@ -22,16 +23,21 @@ public class ProcessTreeNode extends DefaultMutableTreeNode
 	private static final long serialVersionUID = -7393283936901894640L ;
 
 	private DeliveryProcess process = null ;
+	
+	private DefaultTreeModel treeModel = null ;
 
+	
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param _process
+	 * @param _model
 	 */
-	public ProcessTreeNode (DeliveryProcess _process)
+	public ProcessTreeNode (DeliveryProcess _process, DefaultTreeModel _model)
 	{
 		super() ;
 
+		this.treeModel = _model ;
 		this.process = _process ;
 		this.setUserObject(process.getDescriptor().getName()) ;
 
@@ -49,7 +55,7 @@ public class ProcessTreeNode extends DefaultMutableTreeNode
 
 			if (localElement instanceof Component)
 			{
-				this.add(new ComponentTreeNode((Component) localElement)) ;
+				this.add(new ComponentTreeNode((Component) localElement, treeModel)) ;
 			}
 		}
 	}

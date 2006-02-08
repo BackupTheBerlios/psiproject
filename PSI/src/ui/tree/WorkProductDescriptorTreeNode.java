@@ -6,6 +6,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import model.spem2.Artifact;
 import model.spem2.WorkProductDescriptor;
@@ -22,16 +23,21 @@ public class WorkProductDescriptorTreeNode extends DefaultMutableTreeNode implem
 	private static final long serialVersionUID = 2218171819807912138L ;
 
 	private WorkProductDescriptor product = null ;
+	
+	private DefaultTreeModel treeModel = null ;
 
+	
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param _product
+	 * @param _model
 	 */
-	public WorkProductDescriptorTreeNode (WorkProductDescriptor _product)
+	public WorkProductDescriptorTreeNode (WorkProductDescriptor _product, DefaultTreeModel _model)
 	{
 		super() ;
 
+		this.treeModel = _model ;
 		this.product = _product ;
 		this.setUserObject(product.getName()) ;
 		this.product.addObserver(this) ;
@@ -40,7 +46,7 @@ public class WorkProductDescriptorTreeNode extends DefaultMutableTreeNode implem
 		Iterator <Artifact> localIterator = product.getArtifacts().iterator() ;
 		while (localIterator.hasNext())
 		{
-			this.add(new ArtifactTreeNode(localIterator.next())) ;
+			this.add(new ArtifactTreeNode(localIterator.next(), treeModel)) ;
 		}
 
 	}
@@ -75,7 +81,7 @@ public class WorkProductDescriptorTreeNode extends DefaultMutableTreeNode implem
 		{
 			if (product.getArtifacts().contains(_object))
 			{
-				add(new ArtifactTreeNode((Artifact) _object)) ;
+				treeModel.insertNodeInto(new ArtifactTreeNode((Artifact) _object, treeModel), this, getChildCount()) ;
 			}
 		}
 	}

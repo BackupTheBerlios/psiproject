@@ -7,6 +7,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode ;
+import javax.swing.tree.DefaultTreeModel;
 
 import model.spem2.Activity ;
 import model.spem2.BreakdownElement;
@@ -24,16 +25,19 @@ public class ActivityTreeNode extends DefaultMutableTreeNode implements Observer
 	private static final long serialVersionUID = -6783865116938275134L ;
 
 	private Activity activity = null ;
+	
+	private DefaultTreeModel treeModel = null ;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param _activity
 	 */
-	public ActivityTreeNode (Activity _activity)
+	public ActivityTreeNode (Activity _activity, DefaultTreeModel _model)
 	{
 		super() ;
 
+		this.treeModel = _model ;
 		this.activity = _activity ;
 		this.setUserObject(activity.getDescriptor().getName()) ;
 		
@@ -48,7 +52,7 @@ public class ActivityTreeNode extends DefaultMutableTreeNode implements Observer
 
 			if (localElement instanceof TaskDescriptor)
 			{
-				this.add(new TaskDescriptorTreeNode((TaskDescriptor) localElement)) ;
+				this.add(new TaskDescriptorTreeNode((TaskDescriptor) localElement, treeModel)) ;
 			}
 		}
 	}

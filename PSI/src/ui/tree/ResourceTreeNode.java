@@ -5,6 +5,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 import model.HumanResource;
 import model.spem2.RoleDescriptor;
 
@@ -20,16 +22,19 @@ public class ResourceTreeNode extends DefaultMutableTreeNode implements Observer
 	private static final long serialVersionUID = -2206326976916871308L ;
 
 	private HumanResource resource = null ;
+	
+	private DefaultTreeModel treeModel = null ;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param _resource
 	 */
-	public ResourceTreeNode (HumanResource _resource)
+	public ResourceTreeNode (HumanResource _resource, DefaultTreeModel _model)
 	{
 		super() ;
 
+		this.treeModel = _model ;
 		this.resource = _resource ;
 		this.resource.addObserver(this) ;
 		this.setUserObject(resource) ;
@@ -70,7 +75,7 @@ public class ResourceTreeNode extends DefaultMutableTreeNode implements Observer
 			// If adding
 			if (resource.getPerformingRoles().contains(_object))
 			{
-				this.add(new RoleDescriptorTreeNode(tempRole)) ;
+				treeModel.insertNodeInto(new RoleDescriptorTreeNode(tempRole, treeModel), this, getChildCount()) ;
 			}
 			
 			// Else deleting
@@ -81,7 +86,7 @@ public class ResourceTreeNode extends DefaultMutableTreeNode implements Observer
 				{
 					if (((RoleDescriptorTreeNode)getChildAt(i)).getRole().getId().equals(tempRole.getId()))
 					{
-						remove(i) ;
+						treeModel.removeNodeFromParent((RoleDescriptorTreeNode)getChildAt(i)) ;
 					}
 				}
 			}

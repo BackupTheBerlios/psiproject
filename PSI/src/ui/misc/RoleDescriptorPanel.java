@@ -285,7 +285,7 @@ public class RoleDescriptorPanel extends JPanel implements Observer
 		if (resourcesTable == null)
 		{
 			resourcesTable = new JTable(new ResourcesTableModel(roleDescriptor)) ;
-			resourcesTable.setPreferredScrollableViewportSize(new Dimension(600, 80)) ;
+			resourcesTable.setPreferredScrollableViewportSize(new Dimension(500, resourcesTable.getRowHeight() * 4)) ;
 			resourcesTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			resourcesTable.getTableHeader().setReorderingAllowed(false) ;
 		}
@@ -345,7 +345,7 @@ public class RoleDescriptorPanel extends JPanel implements Observer
 		if (taskDescriptorsTable == null)
 		{
 			taskDescriptorsTable = new JTable(new TaskDescriptorsTableModel(roleDescriptor)) ;
-			taskDescriptorsTable.setPreferredScrollableViewportSize(new Dimension(600, 80)) ;
+			taskDescriptorsTable.setPreferredScrollableViewportSize(new Dimension(500, taskDescriptorsTable.getRowHeight() * 4)) ;
 			taskDescriptorsTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			taskDescriptorsTable.getTableHeader().setReorderingAllowed(false) ;
 		}

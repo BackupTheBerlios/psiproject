@@ -23,7 +23,9 @@ import model.spem2.Artifact;
 import model.spem2.TaskDefinition;
 import model.spem2.TaskDescriptor;
 import process.utility.BreakdownElementsControler;
+import ui.dialog.ArtifactManagerDialog;
 import ui.resource.Bundle;
+import ui.window.MainFrame;
 
 /**
  * ArtifactPanel : Panel view for an artifact
@@ -35,6 +37,8 @@ import ui.resource.Bundle;
 public class ArtifactPanel extends JPanel implements Observer
 {
 	private static final long serialVersionUID = -3397031967959716980L ;
+	
+	private MainFrame mainFrame = null ;
 
 	private Artifact artifact ;
 
@@ -95,9 +99,10 @@ public class ArtifactPanel extends JPanel implements Observer
 	/**
 	 * This is the default constructor
 	 */
-	public ArtifactPanel (Artifact _artifact)
+	public ArtifactPanel (MainFrame _frame, Artifact _artifact)
 	{
 		super() ;
+		this.mainFrame = _frame ;
 		this.artifact = _artifact ;
 		this.artifact.addObserver(this) ;
 
@@ -464,7 +469,7 @@ public class ArtifactPanel extends JPanel implements Observer
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
 				{
-					System.out.println("huhu") ;
+					new ArtifactManagerDialog(mainFrame, artifact, true) ;
 				}
 			}) ;
 		}
@@ -545,7 +550,7 @@ public class ArtifactPanel extends JPanel implements Observer
 		if (inTasksTable == null)
 		{
 			inTasksTable = new JTable(new TaskDefinitionsTableModel(artifact, true)) ;
-			inTasksTable.setPreferredScrollableViewportSize(new Dimension(500, 80)) ;
+			inTasksTable.setPreferredScrollableViewportSize(new Dimension(500, inTasksTable.getRowHeight() * 4)) ;
 			inTasksTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			inTasksTable.getTableHeader().setReorderingAllowed(false) ;
 		}
@@ -577,7 +582,7 @@ public class ArtifactPanel extends JPanel implements Observer
 		if (outTasksTable == null)
 		{
 			outTasksTable = new JTable(new TaskDefinitionsTableModel(artifact, false)) ;
-			outTasksTable.setPreferredScrollableViewportSize(new Dimension(500, 80)) ;
+			outTasksTable.setPreferredScrollableViewportSize(new Dimension(500, outTasksTable.getRowHeight() * 4)) ;
 			outTasksTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			outTasksTable.getTableHeader().setReorderingAllowed(false) ;
 		}

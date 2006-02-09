@@ -1,16 +1,20 @@
 
 package ui.misc ;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,11 +22,16 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.text.DateFormatter;
+import javax.swing.text.DefaultFormatterFactory;
 
 import model.spem2.Artifact;
 import model.spem2.TaskDefinition;
 import model.spem2.WorkProductDescriptor;
+import ui.dialog.TaskDefinitionManagerDialog;
 import ui.resource.Bundle;
+import ui.window.MainFrame;
 
 /**
  * TaskDefinitionPanel : Panel view for a task definition
@@ -34,6 +43,8 @@ import ui.resource.Bundle;
 public class TaskDefinitionPanel extends JPanel implements Observer
 {
 	private static final long serialVersionUID = 6053395905362266377L ;
+	
+	private MainFrame mainFrame = null ;
 
 	private TaskDefinition task = null ;
 
@@ -100,10 +111,13 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 	/**
 	 * This is the default constructor
 	 */
-	public TaskDefinitionPanel (TaskDefinition _task)
+	public TaskDefinitionPanel (MainFrame _frame, TaskDefinition _task)
 	{
 		super() ;
+		
+		this.mainFrame = _frame ;
 		this.task = _task ;
+		this.task.addObserver(this) ;
 
 		initialize() ;
 	}
@@ -433,6 +447,13 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		if (manageButton == null)
 		{
 			manageButton = new JButton(Bundle.getText("TaskDefinitionPanelButton")) ;
+			manageButton.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+					new TaskDefinitionManagerDialog(mainFrame, task, true) ;
+				}
+			}) ;
 		}
 		return manageButton ;
 	}
@@ -446,7 +467,10 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 	{
 		if (planificationTable == null)
 		{
-			planificationTable = new JTable() ;
+			planificationTable = new JTable(new PlanningTableModel(task)) ;
+			planificationTable.setPreferredScrollableViewportSize(new Dimension(500, planificationTable.getRowHeight() * 2)) ;
+			planificationTable.setDefaultEditor(Date.class, new DateFieldEditor()) ;
+			planificationTable.setDefaultRenderer(Date.class, new DateFieldRenderer()) ;
 		}
 		return planificationTable ;
 	}
@@ -476,6 +500,7 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		if (inArtifactsTable == null)
 		{
 			inArtifactsTable = new JTable(new ArtifactsTableModel(task, true)) ;
+			inArtifactsTable.setPreferredScrollableViewportSize(new Dimension(500, inArtifactsTable.getRowHeight() * 4)) ;
 		}
 		return inArtifactsTable ;
 	}
@@ -505,6 +530,7 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		if (outArtifactsTable == null)
 		{
 			outArtifactsTable = new JTable(new ArtifactsTableModel(task, false)) ;
+			outArtifactsTable.setPreferredScrollableViewportSize(new Dimension(500, outArtifactsTable.getRowHeight() * 4)) ;
 		}
 		return outArtifactsTable ;
 	}
@@ -577,6 +603,22 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		return descriptionScrollPane ;
 	}
 
+	/**
+	 * This method initializes planificationScrollPane	
+	 * 	
+	 * @return javax.swing.JScrollPane	
+	 */
+	private JScrollPane getPlanificationScrollPane ()
+	{
+		if (planificationScrollPane == null)
+		{
+			planificationScrollPane = new JScrollPane() ;
+			planificationScrollPane.setViewportView(getPlanificationTable());
+		}
+		return planificationScrollPane ;
+	}
+	
+	
 	/**
 	 * This method initializes descriptionTextArea	
 	 * 	
@@ -728,6 +770,19 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 			head.add(Bundle.getText("TaskDefinitionPanelPlanTableFinish")) ;
 			head.add(Bundle.getText("TaskDefinitionPanelPlanTableAmount")) ;
 		}
+		
+		
+
+		/**
+		 * @see javax.swing.table.AbstractTableModel#isCellEditable(int, int)
+		 */
+		@ Override
+		public boolean isCellEditable (int _row, int _col)
+		{
+			return _col > 0 ;
+		}
+
+
 
 		/**
 		 * @see javax.swing.table.TableModel#getColumnCount()
@@ -735,6 +790,24 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		public int getColumnCount ()
 		{
 			return COLUMN_NUMBER ;
+		}		
+		
+		/**
+		 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
+		 */
+		@ Override
+		public Class <?> getColumnClass (int _col)
+		{
+			return getValueAt(0, _col).getClass() ;
+		}
+
+		/**
+		 * @see javax.swing.table.AbstractTableModel#getColumnName(int)
+		 */
+		@ Override
+		public String getColumnName (int _col)
+		{
+			return head.get(_col) ;
 		}
 
 		/**
@@ -748,35 +821,142 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		/**
 		 * @see javax.swing.table.TableModel#getValueAt(int, int)
 		 */
-		public Object getValueAt (int _arg0, int _arg1)
+		public Object getValueAt (int _row, int _col)
 		{
-			return "gege" ;
+			switch (_row)
+			{
+				case 0 :
+					switch (_col)
+					{
+						case 0 :
+							return Bundle.getText("TaskDefinitionPanelPlanPrevision") ;
+						case 1 :
+							return task.getPlanningData().getStartDate() == null ? "lol" : task.getPlanningData().getStartDate() ;
+						case 2 :
+							return task.getPlanningData().getFinishDate()  == null ? "lol" : task.getPlanningData().getFinishDate();
+						default :
+							return task.getPlanningData().getDuration() ;
+					}
+				default :
+					switch (_col)
+					{
+						case 0 :
+							return Bundle.getText("TaskDefinitionPanelPlanReal") ;
+						case 1 :
+							return task.getRealData().getStartDate() == null ? "lol" : task.getRealData().getStartDate() ;
+						case 2 :
+							return task.getRealData().getFinishDate()  == null ? "lol" : task.getRealData().getFinishDate() ;
+						default :
+							return task.getRealData().getDuration() ;
+					}
+					
+			}
 		}
+		
+		
+
+		/**
+		 * @see javax.swing.table.AbstractTableModel#setValueAt(java.lang.Object, int, int)
+		 */
+		@ Override
+		public void setValueAt (Object _object, int _row, int _col)
+		{
+		}
+
+
 
 		/**
 		 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 		 */
 		public void update (Observable _arg0, Object _arg1)
 		{
-			// TODO Auto-generated method stub
-			
+			fireTableDataChanged() ;			
 		}
 		
 	}
-
+	
 	/**
-	 * This method initializes planificationScrollPane	
-	 * 	
-	 * @return javax.swing.JScrollPane	
+	 * DateFieldRenderer : Renders a date in the planning table
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 *
 	 */
-	private JScrollPane getPlanificationScrollPane ()
+	private class DateFieldRenderer implements TableCellRenderer
 	{
-		if (planificationScrollPane == null)
+		private JFormattedTextField field = null ;		
+		
+		/**
+		 * Constructor
+		 *
+		 */
+		public DateFieldRenderer ()
 		{
-			planificationScrollPane = new JScrollPane() ;
-			planificationScrollPane.setViewportView(getPlanificationTable());
+			super() ;			
+			field = new JFormattedTextField(Bundle.dateFormat) ;
 		}
-		return planificationScrollPane ;
+
+		/**
+		 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
+		public Component getTableCellRendererComponent (JTable _table, Object _value, boolean _isSelected, boolean _hasFocus, int _row, int _col)
+		{
+			field.setValue(_value) ;
+			return field ;
+		}
+		
 	}
+	
+	/**
+	 * DateFieldEditor : Allows correct edition in table cells for date type
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 *
+	 */
+	private class DateFieldEditor extends DefaultCellEditor
+	{
+		private static final long serialVersionUID = 7691417260602343994L ;
+
+		/**
+		 * Constructor
+		 *
+		 */
+		public DateFieldEditor ()
+		{
+			super(new JFormattedTextField(Bundle.dateFormat)) ;
+
+			DateFormatter localFormatter = new DateFormatter(Bundle.dateFormat) ;
+
+			// formattage du champ de texte
+			DefaultFormatterFactory localFormatterFactory = new DefaultFormatterFactory(localFormatter) ;
+			((JFormattedTextField) getComponent()).setFormatterFactory(localFormatterFactory) ;
+
+		}
+
+		/**
+		 * @see javax.swing.DefaultCellEditor#getCellEditorValue()
+		 */
+		@ Override
+		public Object getCellEditorValue ()
+		{
+			return ((JFormattedTextField) getComponent()).getValue() ;
+
+		}
+
+		/**
+		 * @see javax.swing.DefaultCellEditor#getTableCellEditorComponent(javax.swing.JTable, java.lang.Object, boolean, int, int)
+		 */
+		@ Override
+		public Component getTableCellEditorComponent (JTable _table, Object _value, boolean _arg2, int _row, int _col)
+		{
+			((JFormattedTextField) getComponent()).setValue(_value) ;
+			return getComponent() ;
+		}
+		
+		
+		
+	}
+
 	
 }  //  @jve:decl-index=0:visual-constraint="10,10"

@@ -502,7 +502,7 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		if (artifactsTable == null)
 		{
 			artifactsTable = new JTable(new ArtifactsTableModel(product)) ;
-			artifactsTable.setPreferredScrollableViewportSize(new Dimension(500, 80)) ;
+			artifactsTable.setPreferredScrollableViewportSize(new Dimension(500, artifactsTable.getRowHeight() * 4)) ;
 			artifactsTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			artifactsTable.getTableHeader().setReorderingAllowed(false) ;
 		}
@@ -534,7 +534,7 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		if (inTasksTable == null)
 		{
 			inTasksTable = new JTable(new TaskDescriptorsTableModel(product, true)) ;
-			inTasksTable.setPreferredScrollableViewportSize(new Dimension(500, 80)) ;
+			inTasksTable.setPreferredScrollableViewportSize(new Dimension(500, inTasksTable.getRowHeight() * 4)) ;
 			inTasksTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			inTasksTable.getTableHeader().setReorderingAllowed(false) ;
 		}
@@ -566,7 +566,7 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		if (outTasksTable == null)
 		{
 			outTasksTable = new JTable(new TaskDescriptorsTableModel(product, false)) ;
-			outTasksTable.setPreferredScrollableViewportSize(new Dimension(500, 80)) ;
+			outTasksTable.setPreferredScrollableViewportSize(new Dimension(500, outTasksTable.getRowHeight() * 4)) ;
 			outTasksTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			outTasksTable.getTableHeader().setReorderingAllowed(false) ;
 		}

@@ -10,6 +10,7 @@ import java.io.FileOutputStream ;
 import java.io.IOException ;
 import java.io.OutputStreamWriter ;
 import java.io.UnsupportedEncodingException ;
+import java.text.DateFormat;
 import java.text.ParseException ;
 import java.text.SimpleDateFormat ;
 import java.util.ArrayList ;
@@ -34,13 +35,14 @@ import model.Guide ;
 import model.GuideType ;
 import model.HumanResource ;
 import model.Interface ;
-import model.Presentation;
+import model.Presentation ;
 import model.Project ;
 import model.spem2.Activity ;
 import model.spem2.BreakdownElement ;
 import model.spem2.DeliveryProcess ;
-import model.spem2.ProductType;
+import model.spem2.ProductType ;
 import model.spem2.RoleDescriptor ;
+import model.spem2.TaskDefinition;
 import model.spem2.TaskDescriptor ;
 import model.spem2.WorkProductDescriptor ;
 
@@ -715,7 +717,7 @@ public class ProjectControler
 
 					activitiesInfo = activitiesInfo + "</definitionTravail>\n" ;
 				} // End activities
-				
+
 				// For task descriptors
 				else if (localElement instanceof TaskDescriptor)
 				{
@@ -734,7 +736,7 @@ public class ProjectControler
 						roleIterator = ((TaskDescriptor) localElement).getPrimaryPerformers().iterator() ;
 						taskDescsInfo = taskDescsInfo + "<participationRole>" + roleIterator.next().getId() + "</participationRole>\n" ;
 					}
-					
+
 					// Activity
 					if ( ((TaskDescriptor) localElement).getParentId().equals(""))
 					{
@@ -742,10 +744,10 @@ public class ProjectControler
 					}
 					else
 					{
-						taskDescsInfo = taskDescsInfo + "<agregatDefinitionTravail>" + ((TaskDescriptor) localElement).getParentId() + "</agregatDefinitionTravail>\n" ;
-					}					
-					
-					
+						taskDescsInfo = taskDescsInfo + "<agregatDefinitionTravail>" + ((TaskDescriptor) localElement).getParentId()
+								+ "</agregatDefinitionTravail>\n" ;
+					}
+
 					// Products
 					if ( ((TaskDescriptor) localElement).getInputProducts().size() == 0)
 					{
@@ -762,7 +764,7 @@ public class ProjectControler
 						}
 						taskDescsInfo = taskDescsInfo + "</liste_entreeProduit>\n" ;
 					}
-					
+
 					if ( ((TaskDescriptor) localElement).getOutputProducts().size() == 0)
 					{
 						taskDescsInfo = taskDescsInfo + "<liste_sortieProduit/>\n" ;
@@ -778,7 +780,7 @@ public class ProjectControler
 						}
 						taskDescsInfo = taskDescsInfo + "</liste_sortieProduit>\n" ;
 					}
-					
+
 					if ( ((TaskDescriptor) localElement).getPresentationElement() == null)
 					{
 						taskDescsInfo = taskDescsInfo + "<elementPresentationId/>" ;
@@ -791,7 +793,7 @@ public class ProjectControler
 
 					taskDescsInfo = taskDescsInfo + "</activite>\n" ;
 				} // End taskDescs
-				
+
 				// For interfaces
 				else if (localElement instanceof Interface)
 				{
@@ -804,18 +806,20 @@ public class ProjectControler
 					}
 					else
 					{
-						interfacesInfo = interfacesInfo + "<interfaceRequiseComposant>" + ((Interface) localElement).getRequiredForComponent().getDescriptor().getId() + "</interfaceRequiseComposant>\n" ;
-					}					
-					
+						interfacesInfo = interfacesInfo + "<interfaceRequiseComposant>"
+								+ ((Interface) localElement).getRequiredForComponent().getDescriptor().getId() + "</interfaceRequiseComposant>\n" ;
+					}
+
 					if ( ((Interface) localElement).getGivenForComponent() == null)
 					{
 						interfacesInfo = interfacesInfo + "<interfaceFournieComposant/>" ;
 					}
 					else
 					{
-						interfacesInfo = interfacesInfo + "<interfaceFournieComposant>" + ((Interface) localElement).getGivenForComponent().getDescriptor().getId() + "</interfaceFournieComposant>\n" ;
+						interfacesInfo = interfacesInfo + "<interfaceFournieComposant>"
+								+ ((Interface) localElement).getGivenForComponent().getDescriptor().getId() + "</interfaceFournieComposant>\n" ;
 					}
-					
+
 					// Products
 					if ( ((Interface) localElement).getProducts().size() == 0)
 					{
@@ -831,12 +835,12 @@ public class ProjectControler
 							interfacesInfo = interfacesInfo + "<interfaceProduit>" + productIterator.next().getId() + "</interfaceProduit>\n" ;
 						}
 						interfacesInfo = interfacesInfo + "</liste_interfaceProduit>\n" ;
-					} 
+					}
 
 					interfacesInfo = interfacesInfo + "</interface>\n" ;
 				} // End interfaces
-				
-				//	 For product types
+
+				// For product types
 				else if (localElement instanceof ProductType)
 				{
 					productTypesInfo = productTypesInfo + "<typeProduit>\n" ;
@@ -844,18 +848,18 @@ public class ProjectControler
 					productTypesInfo = productTypesInfo + "<nom>" + ((ProductType) localElement).getName() + "</nom>\n" ;
 					productTypesInfo = productTypesInfo + "</typeProduit>\n" ;
 				} // End product types
-				
+
 				// For states
-				
+
 				// For presentation packages
-				
+
 				// For presentation elements
 				else if (localElement instanceof Presentation)
 				{
 					presentationsInfo = presentationsInfo + "<elementPresentation>\n" ;
 					presentationsInfo = presentationsInfo + "<id>" + ((Presentation) localElement).getId() + "</id>\n" ;
 					presentationsInfo = presentationsInfo + "<nom>" + ((Presentation) localElement).getName() + "</nom>\n" ;
-					
+
 					// Icon
 					if ( ((Presentation) localElement).getIconPath().equals(""))
 					{
@@ -865,7 +869,7 @@ public class ProjectControler
 					{
 						presentationsInfo = presentationsInfo + "<cheminIcone>" + ((Presentation) localElement).getIconPath() + "</cheminIcone>\n" ;
 					}
-					
+
 					// Content
 					if ( ((Presentation) localElement).getContentPath().equals(""))
 					{
@@ -875,7 +879,7 @@ public class ProjectControler
 					{
 						presentationsInfo = presentationsInfo + "<cheminContenu>" + ((Presentation) localElement).getContentPath() + "</cheminContenu>\n" ;
 					}
-					
+
 					// Description
 					if ( ((Presentation) localElement).getDescription().equals(""))
 					{
@@ -885,7 +889,7 @@ public class ProjectControler
 					{
 						presentationsInfo = presentationsInfo + "<description>" + ((Presentation) localElement).getDescription() + "</description>\n" ;
 					}
-					
+
 					// Page
 					if ( ((Presentation) localElement).getPagePath().equals(""))
 					{
@@ -895,7 +899,7 @@ public class ProjectControler
 					{
 						presentationsInfo = presentationsInfo + "<cheminPage>" + ((Presentation) localElement).getPagePath() + "</cheminPage>\n" ;
 					}
-					
+
 					// Guides
 					if ( ((Presentation) localElement).getGuides().size() == 0)
 					{
@@ -940,7 +944,6 @@ public class ProjectControler
 						guidesInfo = guidesInfo + "<elementPresentationId>" + ((Guide) localElement).getPresentationElement().getId()
 								+ "</elementPresentationId>\n" ;
 					}
-					 
 
 					guidesInfo = guidesInfo + "</guide>\n" ;
 				} // End guides
@@ -994,7 +997,7 @@ public class ProjectControler
 			{
 				localOSW.write("<liste_activite>\n" + taskDescsInfo + "</liste_activite>\n") ;
 			}
-			
+
 			// Listing interfaces
 			if (interfacesInfo.equals(""))
 			{
@@ -1004,7 +1007,7 @@ public class ProjectControler
 			{
 				localOSW.write("<liste_interface>\n" + interfacesInfo + "</liste_interface>\n") ;
 			}
-			
+
 			// Listing product types
 			if (productTypesInfo.equals(""))
 			{
@@ -1020,7 +1023,7 @@ public class ProjectControler
 
 			// Listing package presentations
 			localOSW.write("<liste_paquetagePresentation/>\n") ;
-			
+
 			// Listing presentations
 			if (presentationsInfo.equals(""))
 			{
@@ -1030,7 +1033,7 @@ public class ProjectControler
 			{
 				localOSW.write("<liste_elementPresentation>\n" + presentationsInfo + "</liste_elementPresentation>\n") ;
 			}
-			
+
 			// Listing guides
 			if (guidesInfo.equals(""))
 			{
@@ -1201,4 +1204,185 @@ public class ProjectControler
 		}
 	}
 
+	public static void exportToOpenWorkbench (Project _project, File _destination) throws FileSaveException
+	{
+		try
+		{
+			FileOutputStream localFOS = new FileOutputStream(_destination) ;
+			BufferedOutputStream localBOS = new BufferedOutputStream(localFOS) ;
+
+			OutputStreamWriter localOSW = new OutputStreamWriter(localBOS, "ISO-8859-1") ;
+
+			
+			
+			//date format for open workbench 
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh':'mm':'ss");
+
+			/*
+			 * Initialisation
+			 */
+			BreakdownElement localElement = null ;
+			
+			Iterator <BreakdownElement> localIterator ;
+			
+			ArrayList <Component> localComponents = new ArrayList <Component>() ;
+			HumanResource localTempResource ;
+			TaskDefinition localTempTask;
+
+			// The following variables represents buffers for various elements (for optimisation in
+			// loops)
+			
+			Iterator <TaskDefinition> taskIterator ;
+			
+			Iterator <HumanResource> resourceIterator ;
+			
+			// Initializing components
+			localIterator = _project.getProcess().getNestedElements().iterator() ;
+			while (localIterator.hasNext())
+			{
+				localElement = localIterator.next() ;
+				if (localElement instanceof Component)
+				{
+					localComponents.add((Component) localElement) ;
+				}
+			}
+
+			/*
+			 * Writing the file
+			 */
+			localOSW.write("<?xml version=\"1.0\"?>\n") ;
+			localOSW.write("<WORKBENCH_PROJECT>\n");
+			localOSW.write("<BaseCalendars>\n");
+			localOSW.write("<Calendar name=\"Standard\"/>\n");
+			localOSW.write("</BaseCalendars>\n");
+			
+			//Members
+			if (_project.getResources().size() == 0)
+			{
+				localOSW.write("<PoolRessources/>\n") ;
+			}
+			else
+			{
+				resourceIterator = _project.getResources().iterator() ;
+				localOSW.write("<PoolResources>\n") ;
+				while (resourceIterator.hasNext())
+				{
+					localTempResource = resourceIterator.next() ;
+					localOSW.write("<PoolResource resourceType=\"0\" userFlag2=\"false\" userFlag1=\"false\" ") ;
+					localOSW.write("fullName=\"" + localTempResource.getFullName() + "\" ") ;
+					localOSW.write("isExternal=\"false\" ") ;
+					localOSW.write("isActive=\"true\" ") ;
+					localOSW.write("resourceId=\"" + localTempResource.getId() + "\" ") ;
+					localOSW.write("employmentType=\"\" ") ;
+					localOSW.write("openForTimeEntry=\"false\" ") ;
+					localOSW.write("isRole=\"false\" ") ;
+					localOSW.write("trackMode=\"2\">") ;
+					localOSW.write("</PoolResource>\n") ;
+				}
+				localOSW.write("</PoolResources>\n") ;
+			}
+			
+			localOSW.write("<Projects>\n") ;
+			localOSW.write("<Project UID=\"" + _project.getId() + " \" ") ;
+			localOSW.write("closed=\"false\" ") ;
+			localOSW.write("active=\"true\" ") ;
+			localOSW.write("approved=\"false\" ") ;
+			localOSW.write("start=\"" + dateFormat.format(_project.getStartDate()) + " \" ") ;
+			localOSW.write("openForTimeEntry=\"true\" ") ;
+			localOSW.write("format=\"0\" ") ;
+			localOSW.write("trackMode=\"0\" ") ;
+			localOSW.write("departement=\"\" ") ;
+			localOSW.write("description=\"" + _project.getDescription() + " \" ") ;
+			localOSW.write("finish=\"" + dateFormat.format(_project.getFinishDate()) + " \" ") ;
+			localOSW.write("priority=\"10\" ") ;
+			localOSW.write("finishImposed=\"true\" ") ;
+			localOSW.write("budget=\"\" ") ;
+			localOSW.write("cpmType=\"0\" ") ;
+			localOSW.write("name=\"" + _project.getName() + " \" ") ;
+			localOSW.write("projectID=\"" + _project.getId() + " \" ") ;
+			localOSW.write("startImposed=\"false\" ") ;
+			localOSW.write("programme=\"false\">\n") ;
+			
+			localOSW.write("<Resources>\n") ;
+			//Link between Menbers and the project
+			resourceIterator = _project.getResources().iterator() ;
+			while (resourceIterator.hasNext())
+			{
+				localTempResource = resourceIterator.next() ;
+				localOSW.write("<Resource requestStatus=\"1\" ") ;
+				localOSW.write("resourceID=\"" + localTempResource.getId() + "\" ") ;
+				localOSW.write("openForTimeEntry=\"true\" ") ;
+				localOSW.write("bookingStatus=\"5\">\n") ;
+				//Curve name for open workbench
+				localOSW.write("<Curve name=\"allocation\" type=\"1\" default=\"1.0\" />\n") ;
+				localOSW.write("<Curve name=\"rate\" type=\"1\" default=\"2.777777777777778E-4\" />\n") ;
+				localOSW.write("</Resource>\n") ;
+			}
+			
+			
+			localOSW.write("</Resources>\n") ;
+			
+			//Link between Tasks and the project
+			//Tasks : in and out
+			resourceIterator = _project.getResources().iterator() ;
+			while (resourceIterator.hasNext())
+			{
+				localTempResource = resourceIterator.next() ;
+				taskIterator = (localTempResource).getPerformingTasks().iterator();
+				while (taskIterator.hasNext())
+				{
+					localTempTask = taskIterator.next();
+					localOSW.write("<Task ") ;
+					localOSW.write("start=\"" + dateFormat.format(localTempTask.getPlanningData().getStartDate()) + "\" ") ;
+					localOSW.write("proxy=\"false\" ") ;
+					localOSW.write("critical=\"false\" ") ;
+					localOSW.write("status=\"0\" ") ;
+					localOSW.write("outlineLevel=\"1\" ") ;
+					localOSW.write("finish=\"" + dateFormat.format(localTempTask.getPlanningData().getFinishDate()) + "\" ") ;
+					localOSW.write("summary=\"false\" ") ;
+					localOSW.write("milestone=\"false\" ") ;
+					localOSW.write("name=\"" + localTempTask.getName() + "\" ") ;
+					localOSW.write("taskID=\"" + localTempTask.getId() + "\" ") ;
+					localOSW.write("fixed=\"false\" ") ;
+					localOSW.write("locked=\"false\" ") ;
+					localOSW.write("key=\"false\" ") ;
+					localOSW.write("percComp=\"0.0\" ") ;
+					localOSW.write("unplanned=\"false\">\n") ;
+					
+					localOSW.write("<Assignments>\n") ;
+					localOSW.write("<Assignment status=\"0\" ") ;
+					localOSW.write("resourceID=\"" + localTempResource.getId() + "\" ") ;
+					localOSW.write("unplanned=\"false\" ") ;
+					localOSW.write("estPattern=\"3\" ") ;
+					localOSW.write("estMax=\"1.0\"/>\n") ;
+					localOSW.write("</Assignments>\n") ;
+					
+					localOSW.write("</Task>") ;
+				}
+			}
+			
+			localOSW.write("</Project>\n") ;
+			localOSW.write("</Projects>\n") ;
+			localOSW.write("</WORKBENCH_PROJECT>\n");
+			
+			localOSW.flush() ;
+			localOSW.close() ;
+			
+		}
+		catch (FileNotFoundException exc)
+		{
+			throw new FileSaveException() ;
+		}
+
+		catch (UnsupportedEncodingException exc)
+		{
+			throw new FileSaveException() ;
+		}
+
+		catch (IOException exc)
+		{
+			throw new FileSaveException() ;
+		}
+
+	}
 }

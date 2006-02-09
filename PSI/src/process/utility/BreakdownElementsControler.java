@@ -44,6 +44,67 @@ public class BreakdownElementsControler
 			_resource.notifyObservers(_role) ;
 		}
 	}
+	
+	/**
+	 * Links roles and human resources : by editing the proper collections
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _role
+	 * @param _resource
+	 */
+	public static void unlinkRoleDescriptorAndHumanResource (RoleDescriptor _role, HumanResource _resource)
+	{
+		if (_role.getPerformers().contains(_resource))
+		{
+			_role.getPerformers().remove(_resource) ;
+			_role.setChanged() ;
+			_role.notifyObservers(_resource) ;
+			// Back linking
+			_resource.getPerformingRoles().remove(_role) ;
+			_resource.setChanged() ;
+			_resource.notifyObservers(_role) ;
+		}
+	}
+	
+	/**
+	 * Links a task to a resource
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _task
+	 * @param _resource
+	 */
+	public static void linkTaskDefinitionAndHumanResource (TaskDefinition _task, HumanResource _resource)
+	{
+		if (!_resource.getPerformingTasks().contains(_task))
+		{
+			_resource.getPerformingTasks().add(_task) ;
+			_resource.setChanged() ;
+			_resource.notifyObservers(_task) ;
+		}
+	}
+	
+	/**
+	 * Unlinks a task with a resource
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _task
+	 * @param _resource
+	 */
+	public static void unlinkTaskDefinitionAndHumanResource (TaskDefinition _task, HumanResource _resource)
+	{
+		if (_resource.getPerformingTasks().contains(_task))
+		{
+			_resource.getPerformingTasks().remove(_task) ;
+			_resource.setChanged() ;
+			_resource.notifyObservers(_task) ;
+		}
+	}
 
 	/**
 	 * Adds a new artifact into a product
@@ -126,4 +187,127 @@ public class BreakdownElementsControler
 		
 	}
 	
+	/**
+	 * Makes a link between an artifact and task definitions (input or output dependencies)
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _artifact
+	 * @param _tasks
+	 * @param _in
+	 */
+	public static void linkArtifactToTaskDefinitions(Artifact _artifact, Object[] _tasks, boolean _in)
+	{
+		for (int i = 0 ; i < _tasks.length ; i++)
+		{
+			if (_in)
+			{
+				((TaskDefinition)_tasks[i]).getInputProducts().add(_artifact) ;
+				_artifact.getUsingTasks().add((TaskDefinition)_tasks[i]) ;
+			}
+			else
+			{
+				((TaskDefinition)_tasks[i]).getOutputProducts().add(_artifact) ;
+				_artifact.getProducingTasks().add((TaskDefinition)_tasks[i]) ;
+			}
+			((TaskDefinition)_tasks[i]).setChanged() ;
+			((TaskDefinition)_tasks[i]).notifyObservers(_artifact) ;
+			_artifact.setChanged() ;
+			_artifact.notifyObservers(_tasks[i]) ;
+		}		
+	}
+	
+	/**
+	 * Unlinks previously linked artifact and tasks
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _artifact
+	 * @param _tasks
+	 * @param _in
+	 */
+	public static void unlinkArtifactAndTaskDefinitions(Artifact _artifact, Object[] _tasks, boolean _in)
+	{
+		for (int i = 0 ; i < _tasks.length ; i++)
+		{
+			if (_in)
+			{
+				((TaskDefinition)_tasks[i]).getInputProducts().remove(_artifact) ;
+				_artifact.getUsingTasks().remove((TaskDefinition)_tasks[i]) ;
+			}
+			else
+			{
+				((TaskDefinition)_tasks[i]).getOutputProducts().remove(_artifact) ;
+				_artifact.getProducingTasks().remove((TaskDefinition)_tasks[i]) ;
+			}
+			((TaskDefinition)_tasks[i]).setChanged() ;
+			((TaskDefinition)_tasks[i]).notifyObservers(_artifact) ;
+			_artifact.setChanged() ;
+			_artifact.notifyObservers(_tasks[i]) ;
+		}		
+	}
+	
+	/**
+	 * Makes a link between a task and artifacts (input or output dependencies)
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _task
+	 * @param _artifacts
+	 * @param _in
+	 */
+	public static void linkTaskDefinitionToArtifacts(TaskDefinition _task, Object[] _artifacts, boolean _in)
+	{
+		for (int i = 0 ; i < _artifacts.length ; i++)
+		{
+			if (_in)
+			{
+				((Artifact)_artifacts[i]).getUsingTasks().add(_task) ;
+				_task.getInputProducts().add((Artifact)_artifacts[i]) ;
+			}
+			else
+			{
+				((Artifact)_artifacts[i]).getProducingTasks().add(_task) ;
+				_task.getOutputProducts().add((Artifact)_artifacts[i]) ;
+			}
+			((Artifact)_artifacts[i]).setChanged() ;
+			((Artifact)_artifacts[i]).notifyObservers(_task) ;
+			_task.setChanged() ;
+			_task.notifyObservers(_artifacts[i]) ;
+		}		
+	}
+	
+	/**
+	 * Unlinks previously linked task and artifacts
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _task
+	 * @param _artifacts
+	 * @param _in
+	 */
+	public static void unlinkTaskDefinitionAndArtifacts(TaskDefinition _task, Object[] _artifacts, boolean _in)
+	{
+		for (int i = 0 ; i < _artifacts.length ; i++)
+		{
+			if (_in)
+			{
+				((Artifact)_artifacts[i]).getUsingTasks().remove(_task) ;
+				_task.getInputProducts().remove((Artifact)_artifacts[i]) ;
+			}
+			else
+			{
+				((Artifact)_artifacts[i]).getProducingTasks().remove(_task) ;
+				_task.getOutputProducts().remove((Artifact)_artifacts[i]) ;
+			}
+			((Artifact)_artifacts[i]).setChanged() ;
+			((Artifact)_artifacts[i]).notifyObservers(_task) ;
+			_task.setChanged() ;
+			_task.notifyObservers(_artifacts[i]) ;
+		}		
+	}
 }

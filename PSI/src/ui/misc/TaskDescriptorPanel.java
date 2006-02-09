@@ -543,7 +543,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 			this.head = new ArrayList <String>() ;
 			head.add(Bundle.getText("TaskDescriptorPanelTableTasksID")) ;
 			head.add(Bundle.getText("TaskDescriptorPanelTableTasksName")) ;
-			head.add(Bundle.getText("TaskProductDescriptorPanelTableTasksDescription")) ;
+			head.add(Bundle.getText("TaskDescriptorPanelTableTasksDescription")) ;
 		}
 
 		/**

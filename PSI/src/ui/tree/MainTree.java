@@ -57,19 +57,17 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 {
 	private static final long serialVersionUID = -3884898485242997244L ;
 
-	private JPopupMenu activityPopupMenu = null ;
-
 	private JPopupMenu roleDescriptorPopupMenu = null ;
+	
+	private JPopupMenu roleDescriptorPopupMenuBis = null ;
 
 	private JPopupMenu workProductDescriptorPopupMenu = null ;
 
 	private JPopupMenu taskDescriptorPopupMenu = null ;
 	
-	private JPopupMenu taskArtifactPopupMenu = null ;
+	private JPopupMenu artifactPopupMenu = null ;
 
-	// private JPopupMenu artifactPopupMenu = null ;
-
-	// private JPopupMenu taskDefinitionPopupMenu = null ;
+	private JPopupMenu taskDefinitionPopupMenu = null ;
 
 	private Project project = null ;
 
@@ -95,37 +93,63 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 
 		/*
 		 * Building popups
-		 */
-		JMenuItem expandMenuItem = new JMenuItem(Bundle.getText("MainTreePopupShow")) ;
-		expandMenuItem.addActionListener(new java.awt.event.ActionListener()
+		 */		
+		// For Roles and roles bis (with delete option)
+		roleDescriptorPopupMenu = new JPopupMenu() ;
+		JMenuItem roleExpandMenuItem = new JMenuItem(Bundle.getText("MainTreePopupShow")) ;
+		roleExpandMenuItem.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed (java.awt.event.ActionEvent e)
-			{
-				System.out.println("hey") ;
+			{				
+				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
+				
+				if (localNode instanceof RoleDescriptorTreeNode)
+				{
+					MainTabbedPane.getInstance().add(new RoleDescriptorPanel( ((RoleDescriptorTreeNode) localNode).getRole()),
+							((RoleDescriptorTreeNode) localNode).getRole().getName()) ;
+				}				
 				
 			}
 		}) ;
+		JMenuItem activityCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
+		roleDescriptorPopupMenu.add(roleExpandMenuItem) ;
+		roleDescriptorPopupMenu.addSeparator() ;
+		roleDescriptorPopupMenu.add(activityCloseMenuItem) ;
 		
-		// For ActivityTreeNode
-		activityPopupMenu = new JPopupMenu() ;
-		JMenuItem activityAddMenuItem = new JMenuItem(Bundle.getText("MainTreePopupAddActivity")) ;
-		activityAddMenuItem.addActionListener(new java.awt.event.ActionListener()
+		roleDescriptorPopupMenuBis = new JPopupMenu() ;
+		JMenuItem roleExpandMenuItemBis = new JMenuItem(Bundle.getText("MainTreePopupShow")) ;
+		roleExpandMenuItemBis.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed (java.awt.event.ActionEvent e)
-			{
-				System.out.println("hey") ;
-				/*
-				 * new TaskDescriptorAdderDialog(MainFrame.this, ((ActivityTreeNode)
-				 * MainFrame.this.projectTree.getPathForRow(localLocation)
-				 * .getLastPathComponent()).getActivity()) ;
-				 */
+			{				
+				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
+				
+				if (localNode instanceof RoleDescriptorTreeNode)
+				{
+					MainTabbedPane.getInstance().add(new RoleDescriptorPanel( ((RoleDescriptorTreeNode) localNode).getRole()),
+							((RoleDescriptorTreeNode) localNode).getRole().getName()) ;
+				}				
+				
 			}
 		}) ;
-		JMenuItem activityCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
-		activityPopupMenu.add(activityAddMenuItem) ;
-		activityPopupMenu.add(expandMenuItem) ;
-		activityPopupMenu.addSeparator() ;
-		activityPopupMenu.add(activityCloseMenuItem) ;
+		JMenuItem roleUnlinkMenuItem = new JMenuItem(Bundle.getText("MainTreePopupDeleteRole")) ;
+		roleUnlinkMenuItem.addActionListener(new java.awt.event.ActionListener()
+		{
+			public void actionPerformed (java.awt.event.ActionEvent e)
+			{				
+				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
+				
+				if (localNode instanceof RoleDescriptorTreeNode)
+				{
+					BreakdownElementsControler.unlinkRoleDescriptorAndHumanResource( ((RoleDescriptorTreeNode) localNode).getRole(), ((ResourceTreeNode)localNode.getParent()).getResource()) ;
+				}				
+			}
+		}) ;
+		JMenuItem activityCloseMenuItemBis = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
+		roleDescriptorPopupMenuBis.add(roleExpandMenuItemBis) ;
+		roleDescriptorPopupMenuBis.add(roleUnlinkMenuItem) ;
+		roleDescriptorPopupMenuBis.addSeparator() ;
+		roleDescriptorPopupMenuBis.add(activityCloseMenuItemBis) ;
 
 		// For work products
 		workProductDescriptorPopupMenu = new JPopupMenu() ;
@@ -144,9 +168,24 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 
 			}
 		}) ;
+		JMenuItem workProductExpandMenuItem = new JMenuItem(Bundle.getText("MainTreePopupShow")) ;
+		workProductExpandMenuItem.addActionListener(new java.awt.event.ActionListener()
+		{
+			public void actionPerformed (java.awt.event.ActionEvent e)
+			{
+				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
+				
+				if (localNode instanceof WorkProductDescriptorTreeNode)
+				{
+					MainTabbedPane.getInstance().add(new WorkProductDescriptorPanel( ((WorkProductDescriptorTreeNode) localNode).getProduct()),
+							((WorkProductDescriptorTreeNode) localNode).getProduct().getName()) ;
+				}	
+				
+			}
+		}) ;
 		JMenuItem workProductCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
 		workProductDescriptorPopupMenu.add(workProductAddMenuItem) ;
-		//workProductDescriptorPopupMenu.add(expandMenuItem) ;
+		workProductDescriptorPopupMenu.add(workProductExpandMenuItem) ;
 		workProductDescriptorPopupMenu.addSeparator() ;
 		workProductDescriptorPopupMenu.add(workProductCloseMenuItem) ;
 
@@ -167,29 +206,69 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 
 			}
 		}) ;
+		JMenuItem taskDescriptorExpandMenuItem = new JMenuItem(Bundle.getText("MainTreePopupShow")) ;
+		taskDescriptorExpandMenuItem.addActionListener(new java.awt.event.ActionListener()
+		{
+			public void actionPerformed (java.awt.event.ActionEvent e)
+			{
+				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
+				
+				if (localNode instanceof TaskDescriptorTreeNode)
+				{
+					MainTabbedPane.getInstance().add(new TaskDescriptorPanel( ((TaskDescriptorTreeNode) localNode).getTask()),
+							((TaskDescriptorTreeNode) localNode).getTask().getName()) ;
+				}	
+				
+			}
+		}) ;
 		JMenuItem taskDescriptorCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
 		taskDescriptorPopupMenu.add(taskDescriptorAddMenuItem) ;
-		//taskDescriptorPopupMenu.add(expandMenuItem) ;
+		taskDescriptorPopupMenu.add(taskDescriptorExpandMenuItem) ;
 		taskDescriptorPopupMenu.addSeparator() ;
 		taskDescriptorPopupMenu.add(taskDescriptorCloseMenuItem) ;
 
-		// For RoleDescriptorTreeNode
-		roleDescriptorPopupMenu = new JPopupMenu() ;
-		JMenuItem roleDeleteMenuItem = new JMenuItem(Bundle.getText("MainTreePopupDeleteRole")) ;
-		JMenuItem roleCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
-		roleDescriptorPopupMenu.add(roleDeleteMenuItem) ;
-		//roleDescriptorPopupMenu.add(expandMenuItem) ;
-		roleDescriptorPopupMenu.addSeparator() ;
-		roleDescriptorPopupMenu.add(roleCloseMenuItem) ;
+				
+		// For artifacts
+		artifactPopupMenu = new JPopupMenu() ;
+		JMenuItem artifactCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
+		JMenuItem artifactExpandMenuItem = new JMenuItem(Bundle.getText("MainTreePopupShow")) ;
+		artifactExpandMenuItem.addActionListener(new java.awt.event.ActionListener()
+		{
+			public void actionPerformed (java.awt.event.ActionEvent e)
+			{
+				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
+				
+				if (localNode instanceof TaskDefinitionTreeNode)
+				{
+					MainTabbedPane.getInstance().add(new TaskDefinitionPanel(mainFrame, ((TaskDefinitionTreeNode) localNode).getTask()),
+							((TaskDefinitionTreeNode) localNode).getTask().getName()) ;
+				}
+			}
+		}) ;
+		artifactPopupMenu.add(artifactExpandMenuItem) ;
+		artifactPopupMenu.addSeparator() ;
+		artifactPopupMenu.add(artifactCloseMenuItem) ;
 		
-		// For tasks and artifacts
-		taskArtifactPopupMenu = new JPopupMenu() ;
-		JMenuItem taskArtifactDeleteMenuItem = new JMenuItem(Bundle.getText("MainTreePopupDeleteTaskArtifact")) ;
-		JMenuItem taskArtifactCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
-		taskArtifactPopupMenu.add(taskArtifactDeleteMenuItem) ;
-		//taskArtifactPopupMenu.add(expandMenuItem) ;
-		taskArtifactPopupMenu.addSeparator() ;
-		taskArtifactPopupMenu.add(taskArtifactCloseMenuItem) ;
+		taskDefinitionPopupMenu = new JPopupMenu() ;
+		JMenuItem taskDefinitionCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
+		JMenuItem taskDefinitionExpandMenuItem = new JMenuItem(Bundle.getText("MainTreePopupShow")) ;
+		taskDefinitionExpandMenuItem.addActionListener(new java.awt.event.ActionListener()
+		{
+			public void actionPerformed (java.awt.event.ActionEvent e)
+			{
+				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
+				
+				if (localNode instanceof TaskDefinitionTreeNode)
+				{
+					MainTabbedPane.getInstance().add(new TaskDefinitionPanel(mainFrame, ((TaskDefinitionTreeNode) localNode).getTask()),
+							((TaskDefinitionTreeNode) localNode).getTask().getName()) ;
+				}
+				
+			}
+		}) ;
+		taskDefinitionPopupMenu.add(taskDefinitionExpandMenuItem) ;
+		taskDefinitionPopupMenu.addSeparator() ;
+		taskDefinitionPopupMenu.add(taskDefinitionCloseMenuItem) ;
 
 		/*
 		 * Setting misc listeners
@@ -371,6 +450,12 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 					BreakdownElementsControler.linkRoleDescriptorAndHumanResource( ((RoleDescriptorTreeNode) localTargetNode).getRole(), localResource) ;
 					_evt.getDropTargetContext().dropComplete(true) ;
 				}
+				
+				else if (localTargetNode instanceof TaskDefinitionTreeNode)
+				{
+					BreakdownElementsControler.linkTaskDefinitionAndHumanResource( ((TaskDefinitionTreeNode) localTargetNode).getTask(), localResource) ;
+					_evt.getDropTargetContext().dropComplete(true) ;
+				}
 
 				/*
 				 * else if (localTargetNode instanceof TaskDescriptorTreeNode) { Collection
@@ -476,18 +561,20 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 			{
 				TreePath localPath = MainTree.this.getPathForRow(MainTree.this.getRowForLocation(_e.getX(), _e.getY())) ;
 
-				if (localPath.getLastPathComponent() instanceof ActivityTreeNode)
+				if (localPath.getLastPathComponent() instanceof RoleDescriptorTreeNode)
 				{
-					MainTree.this.setSelectionPath(localPath) ;
-					activityPopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;
-				}
-
-				else if (localPath.getLastPathComponent() instanceof RoleDescriptorTreeNode
-						&& ((RoleDescriptorTreeNode) localPath.getLastPathComponent()).getParent() instanceof ResourceTreeNode)
-				{
-					MainTree.this.setSelectionPath(localPath) ;
-					roleDescriptorPopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;
-				}
+					if (((DefaultMutableTreeNode)localPath.getLastPathComponent()).getParent() instanceof ResourceTreeNode)
+					{
+						MainTree.this.setSelectionPath(localPath) ;
+						roleDescriptorPopupMenuBis.show(_e.getComponent(), _e.getX(), _e.getY()) ;
+					}
+					
+					else
+					{
+						MainTree.this.setSelectionPath(localPath) ;
+						roleDescriptorPopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;
+					}
+				}				
 
 				else if (localPath.getLastPathComponent() instanceof WorkProductDescriptorTreeNode)
 				{
@@ -499,6 +586,18 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				{
 					MainTree.this.setSelectionPath(localPath) ;
 					taskDescriptorPopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;
+				}
+				
+				else if (localPath.getLastPathComponent() instanceof ArtifactTreeNode)
+				{
+					MainTree.this.setSelectionPath(localPath) ;
+					artifactPopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;
+				}
+				
+				else if (localPath.getLastPathComponent() instanceof TaskDefinitionTreeNode)
+				{
+					MainTree.this.setSelectionPath(localPath) ;
+					taskDefinitionPopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;
 				}
 			}
 		}

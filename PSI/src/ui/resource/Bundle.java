@@ -1,6 +1,7 @@
 
 package ui.resource ;
 
+import java.text.SimpleDateFormat;
 import java.util.Locale ;
 import java.util.MissingResourceException ;
 import java.util.ResourceBundle ;
@@ -17,13 +18,21 @@ public class Bundle
 	/**
 	 * Basename to the resource file, contains the prefix
 	 */
-	private static String BASENAME = "ui/resource/label" ;
+	private static final String BASENAME = "ui/resource/label" ;
 
 	/**
 	 * Resource used to load the labels (i.e. text)
 	 */
 	private static ResourceBundle bundle = ResourceBundle.getBundle(BASENAME,
 			Locale.getDefault()) ;
+	
+	public static final String DATE_PATTERN = "dd'/'MM'/'yyyy" ;
+	
+	public static final String TIME_PATTERN = "HH:mm" ;
+	
+	public static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN) ;
+	
+	public static final SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_PATTERN) ;
 
 	/**
 	 * Gets the label linked to the key in the resource bundle.

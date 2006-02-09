@@ -5,7 +5,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import model.HumanResource;
 import model.spem2.RoleDescriptor;
@@ -23,18 +23,18 @@ public class ResourceTreeNode extends DefaultMutableTreeNode implements Observer
 
 	private HumanResource resource = null ;
 	
-	private DefaultTreeModel treeModel = null ;
+	private MainTree tree = null ;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param _resource
 	 */
-	public ResourceTreeNode (HumanResource _resource, DefaultTreeModel _model)
+	public ResourceTreeNode (HumanResource _resource, MainTree _tree)
 	{
 		super() ;
 
-		this.treeModel = _model ;
+		this.tree = _tree ;
 		this.resource = _resource ;
 		this.resource.addObserver(this) ;
 		this.setUserObject(resource) ;
@@ -75,7 +75,10 @@ public class ResourceTreeNode extends DefaultMutableTreeNode implements Observer
 			// If adding
 			if (resource.getPerformingRoles().contains(_object))
 			{
-				treeModel.insertNodeInto(new RoleDescriptorTreeNode(tempRole, treeModel), this, getChildCount()) ;
+				RoleDescriptorTreeNode localNode = new RoleDescriptorTreeNode(tempRole, tree) ;
+				tree.getModel().insertNodeInto(localNode, this, getChildCount()) ;
+				tree.scrollPathToVisible(new TreePath(localNode.getPath()));
+				
 			}
 			
 			// Else deleting
@@ -86,7 +89,8 @@ public class ResourceTreeNode extends DefaultMutableTreeNode implements Observer
 				{
 					if (((RoleDescriptorTreeNode)getChildAt(i)).getRole().getId().equals(tempRole.getId()))
 					{
-						treeModel.removeNodeFromParent((RoleDescriptorTreeNode)getChildAt(i)) ;
+						tree.getModel().removeNodeFromParent((RoleDescriptorTreeNode)getChildAt(i)) ;
+						break ;
 					}
 				}
 			}

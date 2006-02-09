@@ -4,7 +4,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import model.spem2.Artifact;
 
@@ -21,18 +20,18 @@ public class ArtifactTreeNode extends DefaultMutableTreeNode implements Observer
 	
 	private Artifact artifact ;
 	
-	private DefaultTreeModel treeModel = null ;
+	private MainTree tree = null ;
 
 	/**
 	 * Constructor
 	 *
 	 * @param _artifact
 	 */
-	public ArtifactTreeNode (Artifact _artifact, DefaultTreeModel treeModel)
+	public ArtifactTreeNode (Artifact _artifact, MainTree _tree)
 	{
 		super() ;
 
-		this.treeModel = treeModel ;
+		this.tree = _tree ;
 		this.artifact = _artifact ;
 		this.artifact.addObserver(this) ;
 		this.setUserObject(artifact) ;
@@ -63,7 +62,7 @@ public class ArtifactTreeNode extends DefaultMutableTreeNode implements Observer
 	 */
 	public void update (Observable _observable, Object _observer)
 	{
-		treeModel.reload(this) ;
+		tree.getModel().reload(this) ;
 	}
 
 }

@@ -4,7 +4,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import model.spem2.TaskDefinition;
 
@@ -21,18 +20,18 @@ public class TaskDefinitionTreeNode extends DefaultMutableTreeNode implements Ob
 	
 	private TaskDefinition task = null ;
 	
-	private DefaultTreeModel treeModel = null ;
+	private MainTree tree = null ;
 
 	/**
 	 * Constructor
 	 *
 	 * @param _task
 	 */
-	public TaskDefinitionTreeNode (TaskDefinition _task, DefaultTreeModel _model)
+	public TaskDefinitionTreeNode (TaskDefinition _task, MainTree _tree)
 	{
 		super() ;
 
-		this.treeModel = _model ;
+		this.tree = _tree ;
 		this.task = _task ;
 		this.task.addObserver(this) ;
 		this.setUserObject(task) ;
@@ -63,7 +62,7 @@ public class TaskDefinitionTreeNode extends DefaultMutableTreeNode implements Ob
 	 */
 	public void update (Observable _observable, Object _object)
 	{
-		treeModel.reload(this) ;
+		tree.getModel().reload(this) ;
 		
 	}
 	

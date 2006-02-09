@@ -64,6 +64,8 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 	private JPopupMenu workProductDescriptorPopupMenu = null ;
 
 	private JPopupMenu taskDescriptorPopupMenu = null ;
+	
+	private JPopupMenu taskArtifactPopupMenu = null ;
 
 	// private JPopupMenu artifactPopupMenu = null ;
 
@@ -84,16 +86,26 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 	 * @param _frame
 	 */
 	public MainTree (Project _project, MainFrame _frame)
-	{		
-		super(new DefaultTreeModel(new DefaultMutableTreeNode(Bundle.getText("MainTreeDefault")))) ;
-		this.treeModel = (DefaultTreeModel)this.getModel() ;
-
+	{
+		this.treeModel =  new DefaultTreeModel(new DefaultMutableTreeNode(Bundle.getText("MainTreeDefault"))) ;
+		this.setModel(treeModel) ;
+		
 		this.project = _project ;
 		this.mainFrame = _frame ;
 
 		/*
 		 * Building popups
 		 */
+		JMenuItem expandMenuItem = new JMenuItem(Bundle.getText("MainTreePopupShow")) ;
+		expandMenuItem.addActionListener(new java.awt.event.ActionListener()
+		{
+			public void actionPerformed (java.awt.event.ActionEvent e)
+			{
+				System.out.println("hey") ;
+				
+			}
+		}) ;
+		
 		// For ActivityTreeNode
 		activityPopupMenu = new JPopupMenu() ;
 		JMenuItem activityAddMenuItem = new JMenuItem(Bundle.getText("MainTreePopupAddActivity")) ;
@@ -111,6 +123,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 		}) ;
 		JMenuItem activityCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
 		activityPopupMenu.add(activityAddMenuItem) ;
+		activityPopupMenu.add(expandMenuItem) ;
 		activityPopupMenu.addSeparator() ;
 		activityPopupMenu.add(activityCloseMenuItem) ;
 
@@ -133,6 +146,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 		}) ;
 		JMenuItem workProductCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
 		workProductDescriptorPopupMenu.add(workProductAddMenuItem) ;
+		//workProductDescriptorPopupMenu.add(expandMenuItem) ;
 		workProductDescriptorPopupMenu.addSeparator() ;
 		workProductDescriptorPopupMenu.add(workProductCloseMenuItem) ;
 
@@ -155,6 +169,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 		}) ;
 		JMenuItem taskDescriptorCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
 		taskDescriptorPopupMenu.add(taskDescriptorAddMenuItem) ;
+		//taskDescriptorPopupMenu.add(expandMenuItem) ;
 		taskDescriptorPopupMenu.addSeparator() ;
 		taskDescriptorPopupMenu.add(taskDescriptorCloseMenuItem) ;
 
@@ -163,8 +178,18 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 		JMenuItem roleDeleteMenuItem = new JMenuItem(Bundle.getText("MainTreePopupDeleteRole")) ;
 		JMenuItem roleCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
 		roleDescriptorPopupMenu.add(roleDeleteMenuItem) ;
+		//roleDescriptorPopupMenu.add(expandMenuItem) ;
 		roleDescriptorPopupMenu.addSeparator() ;
 		roleDescriptorPopupMenu.add(roleCloseMenuItem) ;
+		
+		// For tasks and artifacts
+		taskArtifactPopupMenu = new JPopupMenu() ;
+		JMenuItem taskArtifactDeleteMenuItem = new JMenuItem(Bundle.getText("MainTreePopupDeleteTaskArtifact")) ;
+		JMenuItem taskArtifactCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
+		taskArtifactPopupMenu.add(taskArtifactDeleteMenuItem) ;
+		//taskArtifactPopupMenu.add(expandMenuItem) ;
+		taskArtifactPopupMenu.addSeparator() ;
+		taskArtifactPopupMenu.add(taskArtifactCloseMenuItem) ;
 
 		/*
 		 * Setting misc listeners
@@ -180,6 +205,18 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 
 		// Setting up the drop target
 		new DropTarget(this, DnDConstants.ACTION_LINK, this) ;
+	}
+
+	
+	
+	/**
+	 * Getter
+	 *
+	 * @return Returns the treeModel.
+	 */
+	public DefaultTreeModel getModel ()
+	{
+		return this.treeModel ;
 	}
 
 	/*
@@ -209,7 +246,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 	public void loadProject (Project _project)
 	{
 		this.project = _project ;
-		((DefaultTreeModel) getModel()).setRoot(new ProjectTreeNode(project, treeModel)) ;
+		treeModel.setRoot(new ProjectTreeNode(project, this)) ;
 
 	}
 

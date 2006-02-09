@@ -6,7 +6,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import model.spem2.TaskDefinition;
 import model.spem2.TaskDescriptor;
@@ -27,7 +27,7 @@ public class TaskDescriptorTreeNode extends DefaultMutableTreeNode implements Ob
 	 */
 	private TaskDescriptor task ;
 	
-	private DefaultTreeModel treeModel = null ;
+	private MainTree tree = null ;
 
 	
 	/**
@@ -36,11 +36,11 @@ public class TaskDescriptorTreeNode extends DefaultMutableTreeNode implements Ob
 	 * @param _task
 	 * @param _model
 	 */
-	public TaskDescriptorTreeNode (TaskDescriptor _task, DefaultTreeModel _model)
+	public TaskDescriptorTreeNode (TaskDescriptor _task, MainTree _tree)
 	{
 		super() ;
 
-		this.treeModel = _model ;
+		this.tree = _tree ;
 		this.task = _task ;
 		this.task.addObserver(this) ;
 		this.setUserObject(task.getName()) ;
@@ -48,7 +48,7 @@ public class TaskDescriptorTreeNode extends DefaultMutableTreeNode implements Ob
 		Iterator<TaskDefinition> localIterator = task.getTasks().iterator() ;
 		while (localIterator.hasNext())
 		{
-			this.add(new TaskDefinitionTreeNode(localIterator.next(), treeModel)) ;
+			this.add(new TaskDefinitionTreeNode(localIterator.next(), tree)) ;
 		}
 	}
 	
@@ -84,7 +84,9 @@ public class TaskDescriptorTreeNode extends DefaultMutableTreeNode implements Ob
 			// Adding to the node
 			if (task.getTasks().contains(_object))
 			{
-				treeModel.insertNodeInto(new TaskDefinitionTreeNode((TaskDefinition)_object, treeModel), this, getChildCount()) ;
+				TaskDefinitionTreeNode localNode = new TaskDefinitionTreeNode((TaskDefinition)_object, tree) ;
+				tree.getModel().insertNodeInto(localNode, this, getChildCount()) ;
+				tree.scrollPathToVisible(new TreePath(localNode.getPath()));
 			}
 		}
 		

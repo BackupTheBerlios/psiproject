@@ -1,15 +1,13 @@
 
 package ui.tree ;
 
-import java.util.Iterator ;
+import java.util.Iterator;
 
-import javax.swing.tree.DefaultMutableTreeNode ;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
-import ui.resource.Bundle ;
-
-import model.HumanResource ;
-import model.Project ;
+import model.HumanResource;
+import model.Project;
+import ui.resource.Bundle;
 
 /**
  * ProjectTreeNode : tree like representation of a Project
@@ -24,7 +22,7 @@ public class ProjectTreeNode extends DefaultMutableTreeNode
 
 	private Project project = null ;
 	
-	private DefaultTreeModel treeModel = null ; 
+	private MainTree tree = null ; 
 
 	
 	/**
@@ -33,18 +31,18 @@ public class ProjectTreeNode extends DefaultMutableTreeNode
 	 * @param _project
 	 * @param _model
 	 */
-	public ProjectTreeNode (Project _project, DefaultTreeModel _model)
+	public ProjectTreeNode (Project _project, MainTree _tree)
 	{
 		super() ;
 
-		this.treeModel = _model ;
+		this.tree = _tree ;
 		this.project = _project ;
 		this.setUserObject(project.getName()) ;
 
 		// Process information
 		if (project.getProcess() != null)
 		{
-			DefaultMutableTreeNode localProcessRoot = new ProcessTreeNode(project.getProcess(), treeModel) ;
+			DefaultMutableTreeNode localProcessRoot = new ProcessTreeNode(project.getProcess(), tree) ;
 			this.add(localProcessRoot) ;
 		}
 
@@ -55,7 +53,7 @@ public class ProjectTreeNode extends DefaultMutableTreeNode
 			Iterator <HumanResource> localIterator = project.getResources().iterator() ;
 			while (localIterator.hasNext())
 			{
-				localRessourcesRoot.add(new ResourceTreeNode(localIterator.next(), treeModel)) ;
+				localRessourcesRoot.add(new ResourceTreeNode(localIterator.next(), tree)) ;
 			}
 			this.add(localRessourcesRoot) ;
 		}

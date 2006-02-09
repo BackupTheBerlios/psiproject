@@ -6,7 +6,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import model.spem2.Artifact;
 import model.spem2.WorkProductDescriptor;
@@ -24,7 +24,7 @@ public class WorkProductDescriptorTreeNode extends DefaultMutableTreeNode implem
 
 	private WorkProductDescriptor product = null ;
 	
-	private DefaultTreeModel treeModel = null ;
+	private MainTree tree = null ;
 
 	
 	/**
@@ -33,11 +33,11 @@ public class WorkProductDescriptorTreeNode extends DefaultMutableTreeNode implem
 	 * @param _product
 	 * @param _model
 	 */
-	public WorkProductDescriptorTreeNode (WorkProductDescriptor _product, DefaultTreeModel _model)
+	public WorkProductDescriptorTreeNode (WorkProductDescriptor _product, MainTree _tree)
 	{
 		super() ;
 
-		this.treeModel = _model ;
+		this.tree = _tree ;
 		this.product = _product ;
 		this.setUserObject(product.getName()) ;
 		this.product.addObserver(this) ;
@@ -46,7 +46,7 @@ public class WorkProductDescriptorTreeNode extends DefaultMutableTreeNode implem
 		Iterator <Artifact> localIterator = product.getArtifacts().iterator() ;
 		while (localIterator.hasNext())
 		{
-			this.add(new ArtifactTreeNode(localIterator.next(), treeModel)) ;
+			this.add(new ArtifactTreeNode(localIterator.next(), tree)) ;
 		}
 
 	}
@@ -81,7 +81,9 @@ public class WorkProductDescriptorTreeNode extends DefaultMutableTreeNode implem
 		{
 			if (product.getArtifacts().contains(_object))
 			{
-				treeModel.insertNodeInto(new ArtifactTreeNode((Artifact) _object, treeModel), this, getChildCount()) ;
+				ArtifactTreeNode localNode = new ArtifactTreeNode((Artifact) _object, tree) ;
+				tree.getModel().insertNodeInto(localNode, this, getChildCount()) ;
+				tree.scrollPathToVisible(new TreePath(localNode.getPath()));
 			}
 		}
 	}

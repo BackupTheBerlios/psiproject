@@ -1,15 +1,14 @@
 
 package ui.tree ;
 
-import java.util.Collection ;
-import java.util.Iterator ;
+import java.util.Collection;
+import java.util.Iterator;
 
-import javax.swing.tree.DefaultMutableTreeNode ;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
-import model.Component ;
-import model.spem2.BreakdownElement ;
-import model.spem2.DeliveryProcess ;
+import model.Component;
+import model.spem2.BreakdownElement;
+import model.spem2.DeliveryProcess;
 
 /**
  * ProcessTreeNode : tree like representation of a Delivery Process
@@ -24,7 +23,7 @@ public class ProcessTreeNode extends DefaultMutableTreeNode
 
 	private DeliveryProcess process = null ;
 	
-	private DefaultTreeModel treeModel = null ;
+	private MainTree tree = null ;
 
 	
 	/**
@@ -33,11 +32,11 @@ public class ProcessTreeNode extends DefaultMutableTreeNode
 	 * @param _process
 	 * @param _model
 	 */
-	public ProcessTreeNode (DeliveryProcess _process, DefaultTreeModel _model)
+	public ProcessTreeNode (DeliveryProcess _process, MainTree _tree)
 	{
 		super() ;
 
-		this.treeModel = _model ;
+		this.tree = _tree ;
 		this.process = _process ;
 		this.setUserObject(process.getDescriptor().getName()) ;
 
@@ -55,7 +54,7 @@ public class ProcessTreeNode extends DefaultMutableTreeNode
 
 			if (localElement instanceof Component)
 			{
-				this.add(new ComponentTreeNode((Component) localElement, treeModel)) ;
+				this.add(new ComponentTreeNode((Component) localElement, tree)) ;
 			}
 		}
 	}

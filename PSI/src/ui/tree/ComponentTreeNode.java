@@ -1,19 +1,17 @@
 
 package ui.tree ;
 
-import java.util.Collection ;
-import java.util.Iterator ;
+import java.util.Collection;
+import java.util.Iterator;
 
-import javax.swing.tree.DefaultMutableTreeNode ;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
-import ui.resource.Bundle ;
-
-import model.Component ;
+import model.Component;
 import model.spem2.Activity;
-import model.spem2.BreakdownElement ;
-import model.spem2.RoleDescriptor ;
+import model.spem2.BreakdownElement;
+import model.spem2.RoleDescriptor;
 import model.spem2.WorkProductDescriptor;
+import ui.resource.Bundle;
 
 /**
  * ComponentTreeNode : A tree representation of a component
@@ -29,7 +27,7 @@ public class ComponentTreeNode extends DefaultMutableTreeNode
 
 	private Component component ;
 	
-	private DefaultTreeModel treeModel = null ;
+	private MainTree tree = null ;
 
 	
 	/**
@@ -38,11 +36,11 @@ public class ComponentTreeNode extends DefaultMutableTreeNode
 	 * @param _component
 	 * @param _model
 	 */
-	public ComponentTreeNode (Component _component, DefaultTreeModel _model)
+	public ComponentTreeNode (Component _component, MainTree _tree)
 	{
 		super() ;
 
-		this.treeModel = _model ;
+		this.tree = _tree ;
 		this.component = _component ;
 		this.setUserObject(component.getDescriptor().getName()) ;
 
@@ -60,17 +58,17 @@ public class ComponentTreeNode extends DefaultMutableTreeNode
 
 			if (localElement instanceof RoleDescriptor)
 			{
-				localRoleNode.add(new RoleDescriptorTreeNode((RoleDescriptor) localElement, treeModel)) ;
+				localRoleNode.add(new RoleDescriptorTreeNode((RoleDescriptor) localElement, tree)) ;
 			}
 			
 			else if (localElement instanceof Activity)
 			{
-				localWDNode.add(new ActivityTreeNode((Activity) localElement, treeModel)) ;
+				localWDNode.add(new ActivityTreeNode((Activity) localElement, tree)) ;
 			}
 			
 			else if (localElement instanceof WorkProductDescriptor)
 			{
-				localProductsNode.add(new WorkProductDescriptorTreeNode((WorkProductDescriptor) localElement, treeModel)) ;
+				localProductsNode.add(new WorkProductDescriptorTreeNode((WorkProductDescriptor) localElement, tree)) ;
 			}
 		}
 

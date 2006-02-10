@@ -12,7 +12,7 @@ import junit.framework.TestCase;
  * @version 1.0
  *
  */
-public class ActivityTest extends TestCase
+public class TestActivity extends TestCase
 {
 
 	/*
@@ -22,7 +22,7 @@ public class ActivityTest extends TestCase
 	{
 		super.setUp() ;
 		Activity activite = new Activity("0001","Activity1","This activity is the best!","parentId","$USER/interfaceDiagramPath/", "$USER/flowDiagramPath/","$USER/activityDiagramPath/");
-		Collection<BreakDownElement> bde = new Collections();
+		Collection<BreakDownElement> collection_bde = new Collections();
 	}
 
 	/*
@@ -38,7 +38,7 @@ public class ActivityTest extends TestCase
 	 */
 	public void testGetNestedElements ()
 	{
-		assertEquals(activite.nestedElements, null);
+		assertEquals(activite.getNestedElements(), null);
 	}
 
 	/*
@@ -46,7 +46,8 @@ public class ActivityTest extends TestCase
 	 */
 	public void testSetNestedElements ()
 	{
-
+		setNestedElements(collection_bde);
+		assertEquals(activite.getNestedElements(),collection_bde);
 	}
 
 	/*

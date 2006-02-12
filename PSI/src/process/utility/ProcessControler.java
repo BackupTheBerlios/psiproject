@@ -1258,7 +1258,7 @@ public class ProcessControler
 								// Adding tasks into Products
 								localTempProduct.getUsingTasks().add((TaskDescriptor) localNested.get(j)) ;
 								// And then adding Product link into task
-								((TaskDescriptor) localNested.get(j)).getOutputProducts().add(localTempProduct) ;
+								((TaskDescriptor) localNested.get(j)).getInputProducts().add(localTempProduct) ;
 
 							}
 						}
@@ -1271,7 +1271,7 @@ public class ProcessControler
 								// Adding tasks into Products
 								localTempProduct.getProducingTasks().add((TaskDescriptor) localNested.get(j)) ;
 								// And then adding Product link into task
-								((TaskDescriptor) localNested.get(j)).getInputProducts().add(localTempProduct) ;
+								((TaskDescriptor) localNested.get(j)).getOutputProducts().add(localTempProduct) ;
 
 							}
 						}

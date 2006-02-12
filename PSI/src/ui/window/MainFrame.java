@@ -1,11 +1,13 @@
 
 package ui.window ;
 
+import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
 import javax.swing.AbstractAction;
+import javax.swing.Box;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -31,6 +33,12 @@ import ui.misc.LogPanel;
 import ui.misc.MainTabbedPane;
 import ui.resource.Bundle;
 import ui.tree.MainTree;
+import javax.swing.ImageIcon ;
+import javax.swing.JPanel ;
+import java.awt.BorderLayout ;
+import javax.swing.JLabel ;
+import javax.swing.JToolBar ;
+import javax.swing.JButton ;
 
 /**
  * MainFrame : PSI main window
@@ -106,7 +114,7 @@ public class MainFrame extends JFrame
 	 * Here are defined actions which can be performed by the user. Abstract Actions are used to
 	 * group the same actions being performed from different components
 	 */
-	private AbstractAction actionOpen = new AbstractAction(Bundle.getText("MainFrameFileMenuOpen"))
+	private AbstractAction actionOpen = new AbstractAction()
 	{
 		private static final long serialVersionUID = -2015126209086384143L ;
 
@@ -116,7 +124,7 @@ public class MainFrame extends JFrame
 		}
 	} ;
 
-	private AbstractAction actionImport = new AbstractAction(Bundle.getText("MainFrameFileMenuImportProcess"))
+	private AbstractAction actionImport = new AbstractAction()
 	{
 		private static final long serialVersionUID = 7373920162223888058L ;
 
@@ -126,7 +134,7 @@ public class MainFrame extends JFrame
 		}
 	} ;
 
-	private AbstractAction actionCreate = new AbstractAction(Bundle.getText("MainFrameFileMenuCreate"))
+	private AbstractAction actionCreate = new AbstractAction()
 	{
 		private static final long serialVersionUID = 7373920162223888058L ;
 
@@ -136,7 +144,7 @@ public class MainFrame extends JFrame
 		}
 	} ;
 
-	private AbstractAction actionSave = new AbstractAction(Bundle.getText("MainFrameFileMenuSave"))
+	private AbstractAction actionSave = new AbstractAction()
 	{
 		private static final long serialVersionUID = 7631001239658565996L ;
 
@@ -146,7 +154,7 @@ public class MainFrame extends JFrame
 		}
 	} ;
 
-	private AbstractAction actionSaveAs = new AbstractAction(Bundle.getText("MainFrameFileMenuSaveAs"))
+	private AbstractAction actionSaveAs = new AbstractAction()
 	{
 		private static final long serialVersionUID = 4311979460217477316L ;
 
@@ -155,6 +163,22 @@ public class MainFrame extends JFrame
 			actionSaveAs(e) ;
 		}
 	} ;
+
+	private JPanel mainContentPane = null;
+
+	private JPanel statusPanel = null;
+
+	private JLabel statusLabel = null;
+
+	private JToolBar mainToolBar = null;
+
+	private JButton createButton = null;
+
+	private JButton openButton = null;
+
+	private JButton saveButton = null;
+
+	private JButton iterationButton = null;
 
 	/**
 	 * @throws HeadlessException
@@ -174,7 +198,6 @@ public class MainFrame extends JFrame
 	{
 		Preferences localPrefs = Preferences.getInstance() ;
 		this.setName("mainFrame") ;
-		this.setContentPane(getMainSplitPane()) ;
 		this.setJMenuBar(getMainMenuBar()) ;
 		this.setTitle("Project Supervising Indicators") ;
 		this.setBounds(localPrefs.getXPosition(), localPrefs.getYPosition(), localPrefs.getWidth(), localPrefs.getHeight()) ;
@@ -187,6 +210,7 @@ public class MainFrame extends JFrame
 		actionSave.setEnabled(false) ;
 		actionSaveAs.setEnabled(false) ;
 
+			this.setContentPane(getMainContentPane());
 		this.addWindowListener(new java.awt.event.WindowAdapter()
 		{
 			/**
@@ -668,6 +692,7 @@ public class MainFrame extends JFrame
 		{
 			openFileMenuItem = new JMenuItem() ;
 			openFileMenuItem.setAction(actionOpen) ;
+			openFileMenuItem.setText(Bundle.getText("MainFrameFileMenuOpen")) ;
 			openFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuOpenMn").charAt(0)) ;
 			openFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
@@ -683,8 +708,9 @@ public class MainFrame extends JFrame
 	{
 		if (createFileMenuItem == null)
 		{
-			createFileMenuItem = new JMenuItem() ;
+			createFileMenuItem = new JMenuItem() ;			
 			createFileMenuItem.setAction(actionCreate) ;
+			createFileMenuItem.setText(Bundle.getText("MainFrameFileMenuCreate")) ;
 			createFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuCreateMn").charAt(0)) ;
 			createFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
@@ -702,6 +728,7 @@ public class MainFrame extends JFrame
 		{
 			importProcessFileMenuItem = new JMenuItem() ;
 			importProcessFileMenuItem.setAction(actionImport) ;
+			importProcessFileMenuItem.setText(Bundle.getText("MainFrameFileMenuImportProcess")) ;
 			importProcessFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuImportProcessMn").charAt(0)) ;
 			importProcessFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
@@ -719,6 +746,7 @@ public class MainFrame extends JFrame
 		{
 			saveFileMenuItem = new JMenuItem() ;
 			saveFileMenuItem.setAction(actionSave) ;
+			saveFileMenuItem.setText(Bundle.getText("MainFrameFileMenuSave")) ;
 			saveFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuSaveMn").charAt(0)) ;
 			saveFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
@@ -736,6 +764,7 @@ public class MainFrame extends JFrame
 		{
 			saveAsFileMenuItem = new JMenuItem() ;
 			saveAsFileMenuItem.setAction(actionSaveAs) ;
+			saveAsFileMenuItem.setText(Bundle.getText("MainFrameFileMenuSaveAs")) ;
 			saveAsFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuSaveAsMn").charAt(0)) ;
 			saveAsFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK
 					| java.awt.event.InputEvent.SHIFT_MASK)) ;
@@ -752,7 +781,7 @@ public class MainFrame extends JFrame
 	{
 		if (closeFileMenuItem == null)
 		{
-			closeFileMenuItem = new JMenuItem() ;
+			closeFileMenuItem = new JMenuItem() ;			
 			closeFileMenuItem.setText(Bundle.getText("MainFrameFileMenuClose")) ;
 			closeFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuCloseMn").charAt(0)) ;
 			closeFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.CTRL_MASK)) ;
@@ -1066,6 +1095,126 @@ public class MainFrame extends JFrame
 	public Project getProject ()
 	{
 		return this.currentProject ;
+	}
+
+	/**
+	 * This method initializes mainContentPane	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getMainContentPane ()
+	{
+		if (mainContentPane == null)
+		{
+			mainContentPane = new JPanel() ;
+			mainContentPane.setLayout(new BorderLayout());
+			mainContentPane.add(getMainSplitPane(), java.awt.BorderLayout.CENTER);
+			mainContentPane.add(getStatusPanel(), java.awt.BorderLayout.SOUTH);
+			mainContentPane.add(getMainToolBar(), java.awt.BorderLayout.NORTH);
+		}
+		return mainContentPane ;
+	}
+
+	/**
+	 * This method initializes statusPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getStatusPanel ()
+	{
+		if (statusPanel == null)
+		{
+			statusLabel = new JLabel();
+			statusLabel.setText("JLabel");
+			statusPanel = new JPanel() ;
+			statusPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
+			statusPanel.add(statusLabel, null);
+		}
+		return statusPanel ;
+	}
+
+	/**
+	 * This method initializes mainToolBar	
+	 * 	
+	 * @return javax.swing.JToolBar	
+	 */
+	private JToolBar getMainToolBar ()
+	{
+		if (mainToolBar == null)
+		{
+			mainToolBar = new JToolBar() ;
+			mainToolBar.add(getCreateButton());
+			mainToolBar.add(Box.createRigidArea(new Dimension(5, 0))) ;
+			mainToolBar.add(getOpenButton());
+			mainToolBar.add(Box.createRigidArea(new Dimension(5, 0))) ;
+			mainToolBar.add(getSaveButton());
+			mainToolBar.addSeparator() ;			
+			mainToolBar.add(getIterationButton());			
+		}
+		return mainToolBar ;
+	}
+
+	/**
+	 * This method initializes createButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getCreateButton ()
+	{
+		if (createButton == null)
+		{
+			createButton = new JButton() ;
+			createButton.setAction(actionCreate) ;
+			createButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_create.gif")));
+			
+		}
+		return createButton ;
+	}
+
+	/**
+	 * This method initializes openButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getOpenButton ()
+	{
+		if (openButton == null)
+		{
+			openButton = new JButton() ;
+			openButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_open.gif")));
+		}
+		return openButton ;
+	}
+
+	/**
+	 * This method initializes saveButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getSaveButton ()
+	{
+		if (saveButton == null)
+		{
+			saveButton = new JButton() ;
+			saveButton.setAction(actionSave) ;
+			saveButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_save.gif")));
+			saveButton.setBorderPainted(false) ;
+		}
+		return saveButton ;
+	}
+
+	/**
+	 * This method initializes iterationButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getIterationButton ()
+	{
+		if (iterationButton == null)
+		{
+			iterationButton = new JButton() ;
+		}
+		return iterationButton ;
 	}
 
 } // @jve:decl-index=0:visual-constraint="158,10"

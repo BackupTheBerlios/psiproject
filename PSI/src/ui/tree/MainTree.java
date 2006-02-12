@@ -1,50 +1,53 @@
 
 package ui.tree ;
 
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.DragSourceEvent;
-import java.awt.dnd.DragSourceListener;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
+import java.awt.Component ;
+import java.awt.datatransfer.Transferable ;
+import java.awt.datatransfer.UnsupportedFlavorException ;
+import java.awt.dnd.DnDConstants ;
+import java.awt.dnd.DragGestureEvent ;
+import java.awt.dnd.DragGestureListener ;
+import java.awt.dnd.DragSource ;
+import java.awt.dnd.DragSourceDragEvent ;
+import java.awt.dnd.DragSourceDropEvent ;
+import java.awt.dnd.DragSourceEvent ;
+import java.awt.dnd.DragSourceListener ;
+import java.awt.dnd.DropTarget ;
+import java.awt.dnd.DropTargetDragEvent ;
+import java.awt.dnd.DropTargetDropEvent ;
+import java.awt.dnd.DropTargetEvent ;
+import java.awt.dnd.DropTargetListener ;
+import java.awt.event.KeyAdapter ;
+import java.awt.event.KeyEvent ;
+import java.awt.event.MouseAdapter ;
+import java.awt.event.MouseEvent ;
+import java.io.IOException ;
 
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JTree;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
+import javax.swing.ImageIcon ;
+import javax.swing.JMenuItem ;
+import javax.swing.JPopupMenu ;
+import javax.swing.JTree ;
+import javax.swing.event.TreeSelectionEvent ;
+import javax.swing.event.TreeSelectionListener ;
+import javax.swing.tree.DefaultMutableTreeNode ;
+import javax.swing.tree.DefaultTreeCellRenderer ;
+import javax.swing.tree.DefaultTreeModel ;
+import javax.swing.tree.TreePath ;
 
-import model.HumanResource;
-import model.Project;
-import model.spem2.RoleDescriptor;
-import process.utility.BreakdownElementsControler;
-import ui.dialog.ArtifactAdderDialog;
-import ui.dialog.TaskDefinitionAdderDialog;
-import ui.misc.ArtifactPanel;
-import ui.misc.MainTabbedPane;
-import ui.misc.RoleDescriptorPanel;
-import ui.misc.TaskDefinitionPanel;
-import ui.misc.TaskDescriptorPanel;
-import ui.misc.WorkProductDescriptorPanel;
-import ui.resource.Bundle;
-import ui.window.MainFrame;
+import model.HumanResource ;
+import model.Project ;
+import model.spem2.RoleDescriptor ;
+import process.utility.BreakdownElementsControler ;
+import ui.dialog.ArtifactAdderDialog ;
+import ui.dialog.TaskDefinitionAdderDialog ;
+import ui.misc.ArtifactPanel ;
+import ui.misc.MainTabbedPane ;
+import ui.misc.RoleDescriptorPanel ;
+import ui.misc.TaskDefinitionPanel ;
+import ui.misc.TaskDescriptorPanel ;
+import ui.misc.WorkProductDescriptorPanel ;
+import ui.resource.Bundle ;
+import ui.window.MainFrame ;
 
 /**
  * MainTree : surcharged JTree to handle drag and drop
@@ -58,13 +61,13 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 	private static final long serialVersionUID = -3884898485242997244L ;
 
 	private JPopupMenu roleDescriptorPopupMenu = null ;
-	
+
 	private JPopupMenu roleDescriptorPopupMenuBis = null ;
 
 	private JPopupMenu workProductDescriptorPopupMenu = null ;
 
 	private JPopupMenu taskDescriptorPopupMenu = null ;
-	
+
 	private JPopupMenu artifactPopupMenu = null ;
 
 	private JPopupMenu taskDefinitionPopupMenu = null ;
@@ -72,7 +75,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 	private Project project = null ;
 
 	private MainFrame mainFrame = null ;
-	
+
 	private DefaultTreeModel treeModel = null ;
 
 	// private JPopupMenu resourcePopupMenu = null ;
@@ -85,64 +88,66 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 	 */
 	public MainTree (Project _project, MainFrame _frame)
 	{
-		this.treeModel =  new DefaultTreeModel(new DefaultMutableTreeNode(Bundle.getText("MainTreeDefault"))) ;
+		this.treeModel = new DefaultTreeModel(new DefaultMutableTreeNode(Bundle.getText("MainTreeDefault"))) ;
 		this.setModel(treeModel) ;
-		
+		this.setCellRenderer(new MainTreeRenderer()) ;
+
 		this.project = _project ;
 		this.mainFrame = _frame ;
 
 		/*
 		 * Building popups
-		 */		
+		 */
 		// For Roles and roles bis (with delete option)
 		roleDescriptorPopupMenu = new JPopupMenu() ;
 		JMenuItem roleExpandMenuItem = new JMenuItem(Bundle.getText("MainTreePopupShow")) ;
 		roleExpandMenuItem.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed (java.awt.event.ActionEvent e)
-			{				
+			{
 				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
-				
+
 				if (localNode instanceof RoleDescriptorTreeNode)
 				{
-					MainTabbedPane.getInstance().add(new RoleDescriptorPanel( ((RoleDescriptorTreeNode) localNode).getRole()),
-							((RoleDescriptorTreeNode) localNode).getRole().getName()) ;
-				}				
-				
+					MainTabbedPane.getInstance().addTab( ((RoleDescriptorTreeNode) localNode).getRole().getName(),
+							new RoleDescriptorPanel( ((RoleDescriptorTreeNode) localNode).getRole())) ;
+				}
+
 			}
 		}) ;
 		JMenuItem activityCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
 		roleDescriptorPopupMenu.add(roleExpandMenuItem) ;
 		roleDescriptorPopupMenu.addSeparator() ;
 		roleDescriptorPopupMenu.add(activityCloseMenuItem) ;
-		
+
 		roleDescriptorPopupMenuBis = new JPopupMenu() ;
 		JMenuItem roleExpandMenuItemBis = new JMenuItem(Bundle.getText("MainTreePopupShow")) ;
 		roleExpandMenuItemBis.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed (java.awt.event.ActionEvent e)
-			{				
+			{
 				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
-				
+
 				if (localNode instanceof RoleDescriptorTreeNode)
 				{
-					MainTabbedPane.getInstance().add(new RoleDescriptorPanel( ((RoleDescriptorTreeNode) localNode).getRole()),
-							((RoleDescriptorTreeNode) localNode).getRole().getName()) ;
-				}				
-				
+					MainTabbedPane.getInstance().addTab( ((RoleDescriptorTreeNode) localNode).getRole().getName(),
+							new RoleDescriptorPanel( ((RoleDescriptorTreeNode) localNode).getRole())) ;
+				}
+
 			}
 		}) ;
 		JMenuItem roleUnlinkMenuItem = new JMenuItem(Bundle.getText("MainTreePopupDeleteRole")) ;
 		roleUnlinkMenuItem.addActionListener(new java.awt.event.ActionListener()
 		{
 			public void actionPerformed (java.awt.event.ActionEvent e)
-			{				
+			{
 				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
-				
+
 				if (localNode instanceof RoleDescriptorTreeNode)
 				{
-					BreakdownElementsControler.unlinkRoleDescriptorAndHumanResource( ((RoleDescriptorTreeNode) localNode).getRole(), ((ResourceTreeNode)localNode.getParent()).getResource()) ;
-				}				
+					BreakdownElementsControler.unlinkRoleDescriptorAndHumanResource( ((RoleDescriptorTreeNode) localNode).getRole(),
+							((ResourceTreeNode) localNode.getParent()).getResource()) ;
+				}
 			}
 		}) ;
 		JMenuItem activityCloseMenuItemBis = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
@@ -174,13 +179,13 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 			public void actionPerformed (java.awt.event.ActionEvent e)
 			{
 				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
-				
+
 				if (localNode instanceof WorkProductDescriptorTreeNode)
 				{
-					MainTabbedPane.getInstance().add(new WorkProductDescriptorPanel( ((WorkProductDescriptorTreeNode) localNode).getProduct()),
-							((WorkProductDescriptorTreeNode) localNode).getProduct().getName()) ;
-				}	
-				
+					MainTabbedPane.getInstance().addTab( ((WorkProductDescriptorTreeNode) localNode).getProduct().getName(),
+							new WorkProductDescriptorPanel( ((WorkProductDescriptorTreeNode) localNode).getProduct())) ;
+				}
+
 			}
 		}) ;
 		JMenuItem workProductCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
@@ -212,13 +217,13 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 			public void actionPerformed (java.awt.event.ActionEvent e)
 			{
 				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
-				
+
 				if (localNode instanceof TaskDescriptorTreeNode)
 				{
-					MainTabbedPane.getInstance().add(new TaskDescriptorPanel( ((TaskDescriptorTreeNode) localNode).getTask()),
-							((TaskDescriptorTreeNode) localNode).getTask().getName()) ;
-				}	
-				
+					MainTabbedPane.getInstance().addTab( ((TaskDescriptorTreeNode) localNode).getTask().getName(),
+							new TaskDescriptorPanel( ((TaskDescriptorTreeNode) localNode).getTask())) ;
+				}
+
 			}
 		}) ;
 		JMenuItem taskDescriptorCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
@@ -227,7 +232,6 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 		taskDescriptorPopupMenu.addSeparator() ;
 		taskDescriptorPopupMenu.add(taskDescriptorCloseMenuItem) ;
 
-				
 		// For artifacts
 		artifactPopupMenu = new JPopupMenu() ;
 		JMenuItem artifactCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
@@ -237,18 +241,18 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 			public void actionPerformed (java.awt.event.ActionEvent e)
 			{
 				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
-				
-				if (localNode instanceof TaskDefinitionTreeNode)
+
+				if (localNode instanceof ArtifactTreeNode)
 				{
-					MainTabbedPane.getInstance().add(new TaskDefinitionPanel(mainFrame, ((TaskDefinitionTreeNode) localNode).getTask()),
-							((TaskDefinitionTreeNode) localNode).getTask().getName()) ;
+					MainTabbedPane.getInstance().addTab( ((ArtifactTreeNode) localNode).getArtifact().getName(),
+							new ArtifactPanel(mainFrame, ((ArtifactTreeNode) localNode).getArtifact())) ;
 				}
 			}
 		}) ;
 		artifactPopupMenu.add(artifactExpandMenuItem) ;
 		artifactPopupMenu.addSeparator() ;
 		artifactPopupMenu.add(artifactCloseMenuItem) ;
-		
+
 		taskDefinitionPopupMenu = new JPopupMenu() ;
 		JMenuItem taskDefinitionCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
 		JMenuItem taskDefinitionExpandMenuItem = new JMenuItem(Bundle.getText("MainTreePopupShow")) ;
@@ -257,13 +261,13 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 			public void actionPerformed (java.awt.event.ActionEvent e)
 			{
 				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
-				
+
 				if (localNode instanceof TaskDefinitionTreeNode)
 				{
-					MainTabbedPane.getInstance().add(new TaskDefinitionPanel(mainFrame, ((TaskDefinitionTreeNode) localNode).getTask()),
-							((TaskDefinitionTreeNode) localNode).getTask().getName()) ;
+					MainTabbedPane.getInstance().addTab( ((TaskDefinitionTreeNode) localNode).getTask().getName(),
+							new TaskDefinitionPanel(mainFrame, ((TaskDefinitionTreeNode) localNode).getTask())) ;
 				}
-				
+
 			}
 		}) ;
 		taskDefinitionPopupMenu.add(taskDefinitionExpandMenuItem) ;
@@ -286,11 +290,9 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 		new DropTarget(this, DnDConstants.ACTION_LINK, this) ;
 	}
 
-	
-	
 	/**
 	 * Getter
-	 *
+	 * 
 	 * @return Returns the treeModel.
 	 */
 	public DefaultTreeModel getModel ()
@@ -341,11 +343,12 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 		DefaultMutableTreeNode dragNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
 		if (dragNode != null)
 		{
-			if (dragNode instanceof ResourceTreeNode || dragNode instanceof RoleDescriptorTreeNode || dragNode instanceof TaskDefinitionTreeNode || dragNode instanceof ArtifactTreeNode)
+			if (dragNode instanceof ResourceTreeNode || dragNode instanceof RoleDescriptorTreeNode || dragNode instanceof TaskDefinitionTreeNode
+					|| dragNode instanceof ArtifactTreeNode)
 			{
 				Transferable transferable = (Transferable) dragNode.getUserObject() ;
 				_evt.startDrag(DragSource.DefaultLinkDrop, transferable, this) ;
-			}			
+			}
 
 			/*
 			 * else { _evt.startDrag(DragSource.DefaultLinkNoDrop, new StringSelection("DND"), this) ; }
@@ -450,7 +453,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 					BreakdownElementsControler.linkRoleDescriptorAndHumanResource( ((RoleDescriptorTreeNode) localTargetNode).getRole(), localResource) ;
 					_evt.getDropTargetContext().dropComplete(true) ;
 				}
-				
+
 				else if (localTargetNode instanceof TaskDefinitionTreeNode)
 				{
 					BreakdownElementsControler.linkTaskDefinitionAndHumanResource( ((TaskDefinitionTreeNode) localTargetNode).getTask(), localResource) ;
@@ -473,21 +476,21 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				 * break ; } } }
 				 */
 			}
-			
+
 			else if (transferable.isDataFlavorSupported(RoleDescriptor.ROLE_FLAVOR))
 			{
 				RoleDescriptor localRole = (RoleDescriptor) transferable.getTransferData(RoleDescriptor.ROLE_FLAVOR) ;
-				
+
 				TreePath localPath = getPathForLocation(_evt.getLocation().x, _evt.getLocation().y) ;
 				DefaultMutableTreeNode localTargetNode = (DefaultMutableTreeNode) localPath.getLastPathComponent() ;
 
 				// If the node is a role, then linking
 				if (localTargetNode instanceof ResourceTreeNode)
 				{
-					BreakdownElementsControler.linkRoleDescriptorAndHumanResource( localRole, ((ResourceTreeNode) localTargetNode).getResource()) ;
+					BreakdownElementsControler.linkRoleDescriptorAndHumanResource(localRole, ((ResourceTreeNode) localTargetNode).getResource()) ;
 					_evt.getDropTargetContext().dropComplete(true) ;
 				}
-				
+
 			}
 
 			else
@@ -526,8 +529,8 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 	public void valueChanged (TreeSelectionEvent _arg0)
 	{
 
-	}	
-	
+	}
+
 	/*
 	 * Other listeners
 	 */
@@ -563,18 +566,18 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 
 				if (localPath.getLastPathComponent() instanceof RoleDescriptorTreeNode)
 				{
-					if (((DefaultMutableTreeNode)localPath.getLastPathComponent()).getParent() instanceof ResourceTreeNode)
+					if ( ((DefaultMutableTreeNode) localPath.getLastPathComponent()).getParent() instanceof ResourceTreeNode)
 					{
 						MainTree.this.setSelectionPath(localPath) ;
 						roleDescriptorPopupMenuBis.show(_e.getComponent(), _e.getX(), _e.getY()) ;
 					}
-					
+
 					else
 					{
 						MainTree.this.setSelectionPath(localPath) ;
 						roleDescriptorPopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;
 					}
-				}				
+				}
 
 				else if (localPath.getLastPathComponent() instanceof WorkProductDescriptorTreeNode)
 				{
@@ -587,13 +590,13 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 					MainTree.this.setSelectionPath(localPath) ;
 					taskDescriptorPopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;
 				}
-				
+
 				else if (localPath.getLastPathComponent() instanceof ArtifactTreeNode)
 				{
 					MainTree.this.setSelectionPath(localPath) ;
 					artifactPopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;
 				}
-				
+
 				else if (localPath.getLastPathComponent() instanceof TaskDefinitionTreeNode)
 				{
 					MainTree.this.setSelectionPath(localPath) ;
@@ -617,8 +620,8 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				 */
 				if (localNode instanceof TaskDescriptorTreeNode)
 				{
-					MainTabbedPane.getInstance().add(new TaskDescriptorPanel( ((TaskDescriptorTreeNode) localNode).getTask()),
-							((TaskDescriptorTreeNode) localNode).getTask().getName()) ;
+					MainTabbedPane.getInstance().addTab( ((TaskDescriptorTreeNode) localNode).getTask().getName(),
+							new TaskDescriptorPanel( ((TaskDescriptorTreeNode) localNode).getTask())) ;
 				}
 
 				/*
@@ -626,35 +629,35 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				 */
 				else if (localNode instanceof RoleDescriptorTreeNode)
 				{
-					MainTabbedPane.getInstance().add(new RoleDescriptorPanel( ((RoleDescriptorTreeNode) localNode).getRole()),
-							((RoleDescriptorTreeNode) localNode).getRole().getName()) ;
+					MainTabbedPane.getInstance().addTab( ((RoleDescriptorTreeNode) localNode).getRole().getName(),
+							new RoleDescriptorPanel( ((RoleDescriptorTreeNode) localNode).getRole())) ;
 				}
-				
+
 				/*
 				 * Product descriptors
 				 */
 				else if (localNode instanceof WorkProductDescriptorTreeNode)
 				{
-					MainTabbedPane.getInstance().add(new WorkProductDescriptorPanel( ((WorkProductDescriptorTreeNode) localNode).getProduct()),
-							((WorkProductDescriptorTreeNode) localNode).getProduct().getName()) ;
+					MainTabbedPane.getInstance().add( ((WorkProductDescriptorTreeNode) localNode).getProduct().getName(),
+							new WorkProductDescriptorPanel( ((WorkProductDescriptorTreeNode) localNode).getProduct())) ;
 				}
-				
+
 				/*
 				 * Artifacts
 				 */
 				else if (localNode instanceof ArtifactTreeNode)
 				{
-					MainTabbedPane.getInstance().add(new ArtifactPanel(mainFrame, ((ArtifactTreeNode) localNode).getArtifact()),
-							((ArtifactTreeNode) localNode).getArtifact().getName()) ;
+					MainTabbedPane.getInstance().add( ((ArtifactTreeNode) localNode).getArtifact().getName(),
+							new ArtifactPanel(mainFrame, ((ArtifactTreeNode) localNode).getArtifact())) ;
 				}
-				
+
 				/*
 				 * Task definitions
 				 */
 				else if (localNode instanceof TaskDefinitionTreeNode)
 				{
-					MainTabbedPane.getInstance().add(new TaskDefinitionPanel(mainFrame, ((TaskDefinitionTreeNode) localNode).getTask()),
-							((TaskDefinitionTreeNode) localNode).getTask().getName()) ;
+					MainTabbedPane.getInstance().add( ((TaskDefinitionTreeNode) localNode).getTask().getName(),
+							new TaskDefinitionPanel(mainFrame, ((TaskDefinitionTreeNode) localNode).getTask())) ;
 				}
 			}
 		}
@@ -689,6 +692,86 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 			// System.out.println(_e) ;
 		}
 
-	}	
+	}
+
+	/*
+	 * Renderer
+	 */
+	private class MainTreeRenderer extends DefaultTreeCellRenderer
+	{
+		private static final long serialVersionUID = 5340795009437591116L ;
+
+		/**
+		 * Constructor
+		 * 
+		 */
+		public MainTreeRenderer ()
+		{
+			super() ;
+		}
+
+		/**
+		 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree,
+		 *      java.lang.Object, boolean, boolean, boolean, int, boolean)
+		 */
+		@ Override
+		public Component getTreeCellRendererComponent (JTree _tree, Object _object, boolean _selected, boolean _expanded, boolean _leaf, int _row,
+				boolean _focus)
+		{
+			super.getTreeCellRendererComponent(_tree, _object, _selected, _expanded, _leaf, _row, _focus) ;
+
+			// Role
+			if (_object instanceof RoleDescriptorTreeNode)
+			{
+				setIcon(new ImageIcon(getClass().getResource("/ui/resource/icon_role.gif"))) ;
+			}
+
+			// Products and artifacts
+			else if (_object instanceof WorkProductDescriptorTreeNode)
+			{
+				setIcon(new ImageIcon(getClass().getResource("/ui/resource/icon_product.gif"))) ;
+			}
+
+			else if (_object instanceof ArtifactTreeNode)
+			{
+				setIcon(new ImageIcon(getClass().getResource("/ui/resource/icon_artifact.gif"))) ;
+			}
+
+			// Tasks
+			else if (_object instanceof ActivityTreeNode)
+			{
+				setIcon(new ImageIcon(getClass().getResource("/ui/resource/icon_work_definition.gif"))) ;
+			}
+
+			else if (_object instanceof TaskDescriptorTreeNode)
+			{
+				setIcon(new ImageIcon(getClass().getResource("/ui/resource/icon_activity.gif"))) ;
+			}
+
+			else if (_object instanceof TaskDefinitionTreeNode)
+			{
+				setIcon(new ImageIcon(getClass().getResource("/ui/resource/icon_task.gif"))) ;
+			}
+
+			// Others
+			else if (_object instanceof ProjectTreeNode)
+			{
+				setIcon(new ImageIcon(getClass().getResource("/ui/resource/icon_project.gif"))) ;
+			}
+
+			else if (_object instanceof ProcessTreeNode)
+			{
+				setIcon(new ImageIcon(getClass().getResource("/ui/resource/icon_process.gif"))) ;
+			}
+
+			else if (_object instanceof ComponentTreeNode)
+			{
+				setIcon(new ImageIcon(getClass().getResource("/ui/resource/icon_component.gif"))) ;
+			}
+
+			return this ;
+		}
+
+	}
 
 }

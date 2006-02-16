@@ -1,6 +1,7 @@
 
 package ui.window ;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -8,15 +9,20 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
@@ -28,17 +34,13 @@ import process.exception.FileParseException;
 import process.exception.FileSaveException;
 import process.utility.ProcessControler;
 import process.utility.ProjectControler;
+import ui.dialog.AboutDialog;
+import ui.window.HelpFrame;
 import ui.dialog.PreferenceDialog;
 import ui.misc.LogPanel;
 import ui.misc.MainTabbedPane;
 import ui.resource.Bundle;
 import ui.tree.MainTree;
-import javax.swing.ImageIcon ;
-import javax.swing.JPanel ;
-import java.awt.BorderLayout ;
-import javax.swing.JLabel ;
-import javax.swing.JToolBar ;
-import javax.swing.JButton ;
 
 /**
  * MainFrame : PSI main window
@@ -826,6 +828,13 @@ public class MainFrame extends JFrame
 			helpAboutMenuItem.setText(Bundle.getText("MainFrameAboutMenuHelp")) ;
 			helpAboutMenuItem.setMnemonic(Bundle.getText("MainFrameAboutMenuHelpMn").charAt(0)) ;
 			helpAboutMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK)) ;
+			helpAboutMenuItem.addActionListener(new java.awt.event.ActionListener()
+					{
+						public void actionPerformed (java.awt.event.ActionEvent e)
+						{
+							HelpFrame helpFrame = new HelpFrame();
+						}
+					}) ;
 		}
 		return helpAboutMenuItem ;
 	}
@@ -846,7 +855,7 @@ public class MainFrame extends JFrame
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
 				{
-
+					AboutDialog aboutDialog = new AboutDialog();
 				}
 			}) ;
 		}

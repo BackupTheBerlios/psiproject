@@ -20,7 +20,7 @@ public class TaskDefinition extends TaskDescriptor implements Transferable
 	/**
 	 * Drag and drop capability
 	 */
-	public static DataFlavor TASK_FLAVOR = new DataFlavor(RoleDescriptor.class, "Task") ;;
+	public static DataFlavor TASK_FLAVOR = new DataFlavor(TaskDefinition.class, "Task") ;;
 	
 	private static DataFlavor[] flavors = {TASK_FLAVOR} ;
 	

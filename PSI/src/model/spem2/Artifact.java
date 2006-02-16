@@ -22,7 +22,7 @@ public class Artifact extends WorkProductDescriptor implements Transferable
 	/**
 	 * Drag and drop capability
 	 */
-	public static DataFlavor ARTIFACT_FLAVOR = new DataFlavor(RoleDescriptor.class, "Artifact") ;;
+	public static DataFlavor ARTIFACT_FLAVOR = new DataFlavor(Artifact.class, "Artifact") ;;
 	
 	private static DataFlavor[] flavors = {ARTIFACT_FLAVOR} ;
 	

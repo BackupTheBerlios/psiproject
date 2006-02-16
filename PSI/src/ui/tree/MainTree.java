@@ -40,22 +40,22 @@ import model.spem2.RoleDescriptor ;
 import process.utility.BreakdownElementsControler ;
 import ui.dialog.ArtifactAdderDialog ;
 import ui.dialog.TaskDefinitionAdderDialog ;
-<<<<<<< MainTree.java
+
 import ui.misc.ActivityPanel;
 import ui.misc.ArtifactPanel;
-=======
+
 import ui.misc.ArtifactPanel ;
->>>>>>> 1.9
+
 import ui.misc.MainTabbedPane ;
 import ui.misc.RoleDescriptorPanel ;
 import ui.misc.TaskDefinitionPanel ;
 import ui.misc.TaskDescriptorPanel ;
-<<<<<<< MainTree.java
+
 import ui.misc.HumanResourcePanel; 
 import ui.misc.WorkProductDescriptorPanel;
-=======
+
 import ui.misc.WorkProductDescriptorPanel ;
->>>>>>> 1.9
+
 import ui.resource.Bundle ;
 import ui.window.MainFrame ;
 

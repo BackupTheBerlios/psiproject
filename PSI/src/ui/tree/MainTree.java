@@ -40,12 +40,22 @@ import model.spem2.RoleDescriptor ;
 import process.utility.BreakdownElementsControler ;
 import ui.dialog.ArtifactAdderDialog ;
 import ui.dialog.TaskDefinitionAdderDialog ;
+<<<<<<< MainTree.java
+import ui.misc.ActivityPanel;
+import ui.misc.ArtifactPanel;
+=======
 import ui.misc.ArtifactPanel ;
+>>>>>>> 1.9
 import ui.misc.MainTabbedPane ;
 import ui.misc.RoleDescriptorPanel ;
 import ui.misc.TaskDefinitionPanel ;
 import ui.misc.TaskDescriptorPanel ;
+<<<<<<< MainTree.java
+import ui.misc.HumanResourcePanel; 
+import ui.misc.WorkProductDescriptorPanel;
+=======
 import ui.misc.WorkProductDescriptorPanel ;
+>>>>>>> 1.9
 import ui.resource.Bundle ;
 import ui.window.MainFrame ;
 
@@ -582,7 +592,9 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				else if (localPath.getLastPathComponent() instanceof WorkProductDescriptorTreeNode)
 				{
 					MainTree.this.setSelectionPath(localPath) ;
+
 					workProductDescriptorPopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;
+
 				}
 
 				else if (localPath.getLastPathComponent() instanceof TaskDescriptorTreeNode)
@@ -623,7 +635,8 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 					MainTabbedPane.getInstance().addTab( ((TaskDescriptorTreeNode) localNode).getTask().getName(),
 							new TaskDescriptorPanel( ((TaskDescriptorTreeNode) localNode).getTask())) ;
 				}
-
+				
+								
 				/*
 				 * Role descriptors => displaying role infos
 				 */
@@ -658,6 +671,15 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				{
 					MainTabbedPane.getInstance().add( ((TaskDefinitionTreeNode) localNode).getTask().getName(),
 							new TaskDefinitionPanel(mainFrame, ((TaskDefinitionTreeNode) localNode).getTask())) ;
+				}
+				
+				/*
+				 * Resources definitions
+				 */
+				else if (localNode instanceof ResourceTreeNode)
+				{
+					MainTabbedPane.getInstance().add(new HumanResourcePanel( ((ResourceTreeNode) localNode).getResource()),
+							((ResourceTreeNode) localNode).getResource().getFullName()) ;
 				}
 			}
 		}

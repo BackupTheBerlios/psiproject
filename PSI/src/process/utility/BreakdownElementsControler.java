@@ -2,6 +2,7 @@
 package process.utility ;
 
 import java.util.Calendar ;
+import java.util.Date;
 import java.util.Iterator ;
 
 import model.HumanResource ;
@@ -309,5 +310,72 @@ public class BreakdownElementsControler
 			_task.setChanged() ;
 			_task.notifyObservers(_artifacts[i]) ;
 		}		
+	}
+	
+	/**
+	 * Sets a date for a task definition
+	 * 
+	 * @param _task
+	 * @param _date
+	 * @param _start
+	 * @param _prevision
+	 */
+	public static void setDateForTaskDefinition(TaskDefinition _task, Date _date, boolean _start, boolean _prevision)
+	{
+		if (_prevision)
+		{			
+			if (_start)
+			{
+				_task.getPlanningData().setStartDate(_date) ;
+			}
+			
+			else
+			{
+				_task.getPlanningData().setFinishDate(_date) ;
+			}
+		}
+		
+		else
+		{			
+			if (_start)
+			{
+				_task.getRealData().setStartDate(_date) ;
+			}
+			
+			else
+			{
+				_task.getRealData().setFinishDate(_date) ;
+			}
+		}
+		
+		_task.setChanged() ;
+		_task.notifyObservers() ;
+	}
+	
+	/**
+	 * Sets the duration of a task
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _task
+	 * @param _duration
+	 * @param _prevision
+	 */
+	public static void setDurationForTaskDefinition(TaskDefinition _task, float _duration, boolean _prevision)
+	{
+		if (_prevision)
+		{
+			_task.getPlanningData().setDuration(_duration) ;
+		}
+		
+		else
+		{
+			_task.getRealData().setDuration(_duration) ;
+		}
+		
+		_task.setChanged() ;
+		_task.notifyObservers() ;
+		
 	}
 }

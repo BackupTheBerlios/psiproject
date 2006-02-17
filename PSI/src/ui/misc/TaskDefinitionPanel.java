@@ -22,9 +22,11 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatterFactory;
+
+import process.utility.BreakdownElementsControler;
 
 import model.spem2.Artifact;
 import model.spem2.TaskDefinition;
@@ -735,6 +737,13 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		
 	}
 	
+	/**
+	 * PlanningTableModel : Table model for planification
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 *
+	 */
 	private class PlanningTableModel extends AbstractTableModel implements Observer
 	{
 		private static final long serialVersionUID = -5139748853363139948L ;
@@ -861,6 +870,18 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		@ Override
 		public void setValueAt (Object _object, int _row, int _col)
 		{
+			boolean localPrevision = _row == 0 ? true : false ;
+			boolean localStart = _col == 1 ? true : false ;
+			
+			if (_col == 3)
+			{
+				BreakdownElementsControler.setDurationForTaskDefinition(task, ((Float) _object).floatValue(), localPrevision) ;
+			}
+			else
+			{
+				BreakdownElementsControler.setDateForTaskDefinition(task, (Date) _object, localStart, localPrevision) ;
+			}					
+					
 		}
 
 
@@ -882,9 +903,9 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 	 * @version 1.0
 	 *
 	 */
-	private class DateFieldRenderer implements TableCellRenderer
+	private class DateFieldRenderer extends DefaultTableCellRenderer
 	{
-		private JFormattedTextField field = null ;		
+		private static final long serialVersionUID = 3306334890531211958L ;
 		
 		/**
 		 * Constructor
@@ -892,17 +913,16 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		 */
 		public DateFieldRenderer ()
 		{
-			super() ;			
-			field = new JFormattedTextField(Bundle.dateFormat) ;
+			super() ;
 		}
 
 		/**
-		 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 * @see javax.swing.table.DefaultTableCellRenderer#setValue(java.lang.Object)
 		 */
-		public Component getTableCellRendererComponent (JTable _table, Object _value, boolean _isSelected, boolean _hasFocus, int _row, int _col)
+		@ Override
+		protected void setValue (Object _object)
 		{
-			field.setValue(_value) ;
-			return field ;
+			super.setValue(Bundle.dateFormat.format(_object)) ;
 		}
 		
 	}
@@ -933,10 +953,12 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 			((JFormattedTextField) getComponent()).setFormatterFactory(localFormatterFactory) ;
 
 		}
+		
+		
 
 		/**
 		 * @see javax.swing.DefaultCellEditor#getCellEditorValue()
-		 */
+		 */	
 		@ Override
 		public Object getCellEditorValue ()
 		{
@@ -951,7 +973,7 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		public Component getTableCellEditorComponent (JTable _table, Object _value, boolean _arg2, int _row, int _col)
 		{
 			((JFormattedTextField) getComponent()).setValue(_value) ;
-			return getComponent() ;
+			return ((JFormattedTextField) getComponent()) ;
 		}
 		
 		

@@ -17,12 +17,12 @@ public class PlanningData implements ProcessElement
 	/**
 	 * Absolute starting date for one Breakdown Element
 	 */
-	private Date startDate ;
+	private Date startDate = null ;
 
 	/**
 	 * Absolute ending date for one Breakdown Element
 	 */
-	private Date finishDate ;
+	private Date finishDate = null ;
 
 	/**
 	 * Defines the ranking of a Breakdown Element relative to other Breakdown
@@ -59,8 +59,8 @@ public class PlanningData implements ProcessElement
 	public PlanningData()
 	{
 		super() ;
-		this.startDate = new Date();
-		this.finishDate = new Date();
+		startDate = new Date() ;
+		finishDate = new Date() ;
 		this.rank = 0;
 		this.duration = 0;		
 	}

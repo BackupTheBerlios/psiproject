@@ -1,14 +1,13 @@
 
 package ui.window ;
 
+
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
 import javax.swing.AbstractAction;
-import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -35,7 +34,6 @@ import process.exception.FileSaveException;
 import process.utility.ProcessControler;
 import process.utility.ProjectControler;
 import ui.dialog.AboutDialog;
-import ui.window.HelpFrame;
 import ui.dialog.PreferenceDialog;
 import ui.misc.LogPanel;
 import ui.misc.MainTabbedPane;
@@ -181,6 +179,8 @@ public class MainFrame extends JFrame
 	private JButton saveButton = null;
 
 	private JButton iterationButton = null;
+
+	private JButton saveAsButton = null;
 
 	/**
 	 * @throws HeadlessException
@@ -339,7 +339,7 @@ public class MainFrame extends JFrame
 			}
 
 			try
-			{
+			{				
 				currentProject = ProjectControler.create(localFile) ;
 				if (currentProject != null)
 				{					
@@ -1153,10 +1153,9 @@ public class MainFrame extends JFrame
 		{
 			mainToolBar = new JToolBar() ;
 			mainToolBar.add(getCreateButton());
-			mainToolBar.add(Box.createRigidArea(new Dimension(5, 0))) ;
 			mainToolBar.add(getOpenButton());
-			mainToolBar.add(Box.createRigidArea(new Dimension(5, 0))) ;
 			mainToolBar.add(getSaveButton());
+			mainToolBar.add(getSaveAsButton());
 			mainToolBar.addSeparator() ;			
 			mainToolBar.add(getIterationButton());			
 		}
@@ -1174,8 +1173,7 @@ public class MainFrame extends JFrame
 		{
 			createButton = new JButton() ;
 			createButton.setAction(actionCreate) ;
-			createButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_create.gif")));
-			
+			createButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_create.gif")));			
 		}
 		return createButton ;
 	}
@@ -1190,6 +1188,7 @@ public class MainFrame extends JFrame
 		if (openButton == null)
 		{
 			openButton = new JButton() ;
+			openButton.setAction(actionOpen) ;			
 			openButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_open.gif")));
 		}
 		return openButton ;
@@ -1207,7 +1206,6 @@ public class MainFrame extends JFrame
 			saveButton = new JButton() ;
 			saveButton.setAction(actionSave) ;
 			saveButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_save.gif")));
-			saveButton.setBorderPainted(false) ;
 		}
 		return saveButton ;
 	}
@@ -1222,8 +1220,25 @@ public class MainFrame extends JFrame
 		if (iterationButton == null)
 		{
 			iterationButton = new JButton() ;
+			iterationButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_iteration.gif")));
 		}
 		return iterationButton ;
+	}
+
+	/**
+	 * This method initializes saveAsButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getSaveAsButton ()
+	{
+		if (saveAsButton == null)
+		{
+			saveAsButton = new JButton() ;
+			saveAsButton.setAction(actionSaveAs) ;
+			saveAsButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_save_as.gif")));
+		}
+		return saveAsButton ;
 	}
 
 } // @jve:decl-index=0:visual-constraint="158,10"

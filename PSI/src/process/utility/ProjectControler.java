@@ -1,50 +1,52 @@
 
 package process.utility ;
 
-import java.io.BufferedInputStream ;
-import java.io.BufferedOutputStream ;
-import java.io.File ;
-import java.io.FileInputStream ;
-import java.io.FileNotFoundException ;
-import java.io.FileOutputStream ;
-import java.io.IOException ;
-import java.io.OutputStreamWriter ;
-import java.io.UnsupportedEncodingException ;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
-import java.text.ParseException ;
-import java.text.SimpleDateFormat ;
-import java.util.ArrayList ;
-import java.util.Collection ;
-import java.util.Iterator ;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
-import javax.xml.parsers.DocumentBuilder ;
-import javax.xml.parsers.DocumentBuilderFactory ;
-import javax.xml.parsers.ParserConfigurationException ;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document ;
-import org.w3c.dom.NamedNodeMap ;
-import org.w3c.dom.Node ;
-import org.w3c.dom.NodeList ;
-import org.xml.sax.SAXException ;
-import org.xml.sax.SAXParseException ;
-
-import process.exception.FileParseException ;
-import process.exception.FileSaveException ;
-import model.Component ;
-import model.Guide ;
-import model.GuideType ;
-import model.HumanResource ;
-import model.Interface ;
-import model.Presentation ;
-import model.Project ;
-import model.spem2.Activity ;
-import model.spem2.BreakdownElement ;
-import model.spem2.DeliveryProcess ;
-import model.spem2.ProductType ;
-import model.spem2.RoleDescriptor ;
+import model.Component;
+import model.Guide;
+import model.GuideType;
+import model.HumanResource;
+import model.Interface;
+import model.Presentation;
+import model.Project;
+import model.spem2.Activity;
+import model.spem2.Artifact;
+import model.spem2.BreakdownElement;
+import model.spem2.DeliveryProcess;
+import model.spem2.ProductType;
+import model.spem2.RoleDescriptor;
 import model.spem2.TaskDefinition;
-import model.spem2.TaskDescriptor ;
-import model.spem2.WorkProductDescriptor ;
+import model.spem2.TaskDescriptor;
+import model.spem2.WorkProductDescriptor;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
+import process.exception.FileParseException;
+import process.exception.FileSaveException;
 
 /**
  * ProjectControler : Loads, saves project information
@@ -308,19 +310,26 @@ public class ProjectControler
 			 * Initialisation
 			 */
 			BreakdownElement localElement ;
+			Artifact localArtifact ;
+			TaskDefinition localTaskDefinition ;
 			Collection <BreakdownElement> localNested ;
 			Iterator <BreakdownElement> localIterator ;
 			BreakdownElement localTempElement ;
 			ArrayList <Component> localComponents = new ArrayList <Component>() ;
 			HumanResource localTempResource ;
+			
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy") ;
 
 			// The following variables represents buffers for various elements (for optimisation in
 			// loops)
 			Iterator <BreakdownElement> internIterator ;
 			Iterator <WorkProductDescriptor> productIterator ;
+			Iterator <WorkProductDescriptor> fakeArtifactIterator ;
 			Iterator <TaskDescriptor> taskIterator ;
+			Iterator <TaskDefinition> taskDIterator ;
 			Iterator <RoleDescriptor> roleIterator ;
 			Iterator <Interface> interfaceIterator ;
+			Iterator <Artifact> artifactIterator ;
 			Iterator <Guide> guideIterator ;
 			Iterator <HumanResource> resourceIterator ;
 			String productsInfo = "" ;
@@ -338,6 +347,14 @@ public class ProjectControler
 			String presentationsInfo = "" ;
 			String guidesInfo = "" ;
 			String guideTypesInfo = "" ;
+			
+			String artifactsInfo = "" ;
+			String artifactsIds = "" ;
+			String artifactsForTaskIn = "" ;
+			String artifactsForTaskOut = "" ;
+			
+			String taskDefsInfo = "" ;
+			String taskDefsIds = "" ;
 
 			// Initializing components
 			localIterator = _project.getProcess().getNestedElements().iterator() ;
@@ -657,6 +674,33 @@ public class ProjectControler
 					}
 
 					productsInfo = productsInfo + "</produit>\n" ;
+					
+					// Artifacts list for product
+					// Info + ID
+					if (((WorkProductDescriptor)localElement).getArtifacts().size() > 0)
+					{
+						artifactsIds += "<ProduitArtefact>\n" ;
+						artifactsIds += "<idProduit>"+ ((WorkProductDescriptor)localElement).getId() + "</idProduit>\n" ;
+						artifactsIds += "<listeIdArtefact>\n" ;
+						
+						artifactIterator = ((WorkProductDescriptor)localElement).getArtifacts().iterator() ;
+						while (artifactIterator.hasNext())
+						{
+							localArtifact = artifactIterator.next() ;
+							artifactsInfo += "<eltArtefact>\n" ;
+							artifactsInfo += "<id>" + localArtifact.getId() + "</id>" ;
+							artifactsInfo += "<nom>" + localArtifact.getName() + "</nom>" ;
+							artifactsInfo += "</eltArtefact>\n" ;
+							
+							artifactsIds += "<id>" + localArtifact.getId() + "</id>" ;
+						} 
+						
+						artifactsIds += "</listeIdArtefact>\n" ;
+						artifactsIds += "</ProduitArtefact>\n" ;
+					}
+					// Association
+					
+					
 				} // End of product
 
 				// For activities
@@ -683,6 +727,8 @@ public class ProjectControler
 						activitiesInfo = activitiesInfo + "<cheminDiagrammeFlots>" + ((Activity) localElement).getFlowDiagramPath()
 								+ "</cheminDiagrammeFlots>\n" ;
 					}
+					
+					//activitiesInfo = activitiesInfo + "<agregatComposant>" + ((Activity) localElement) + "</agregatComposant>\n" ;
 
 					// Tasks
 					if ( ((Activity) localElement).getNestedElements().size() == 0)
@@ -792,6 +838,64 @@ public class ProjectControler
 					}
 
 					taskDescsInfo = taskDescsInfo + "</activite>\n" ;
+					
+					// Task Definitions for this descriptor
+					if (((TaskDescriptor)localElement).getTasks().size() > 0)
+					{
+						taskDefsIds += "<ActiviteTache>\n" ;
+						taskDefsIds += "<idActivite>"+ ((TaskDescriptor)localElement).getId() + "</idActivite\n" ;
+						taskDefsIds += "<listeIdTache>\n" ;
+						
+						taskDIterator = ((TaskDescriptor)localElement).getTasks().iterator() ;
+						while (taskDIterator.hasNext())
+						{							
+							localTaskDefinition = taskDIterator.next() ;
+							taskDefsInfo += "<eltTache>\n" ;
+							taskDefsInfo += "<id>" + localTaskDefinition.getId() + "</id>" ;
+							taskDefsInfo += "<nom>" + localTaskDefinition.getName() + "</nom>" ;
+							taskDefsInfo += "<tempsPasse>" + (int)localTaskDefinition.getRealData().getDuration() + "</tempsPasse>" ;
+							taskDefsInfo += "<dateFinReelle>" + dateFormat.format(localTaskDefinition.getRealData().getFinishDate()) + "</dateFinReelle>" ;
+							taskDefsInfo += "</eltTache>\n" ;					
+							
+							
+							
+							taskDefsIds += "<id>" + localTaskDefinition.getId() + "</id>" ;
+							
+							// Artifacts for tasks
+							if ( localTaskDefinition.getInputProducts().size() > 0)
+							{
+								
+								artifactsForTaskIn += "<tacheArtefact_Entree>\n" ;
+								artifactsForTaskIn += "<idTache>" + localTaskDefinition.getId() + "</idTache>\n" ;
+								fakeArtifactIterator = localTaskDefinition.getInputProducts().iterator() ;
+								artifactsForTaskIn += "<listeArtefact>\n" ;
+								while (fakeArtifactIterator.hasNext())
+								{
+									artifactsForTaskIn += "<id>" + fakeArtifactIterator.next().getId() + "</id>\n" ;
+								}
+								artifactsForTaskIn += "</listeArtefact>\n" ;
+								artifactsForTaskIn += "</tacheArtefact_Entree>\n" ;
+							}
+							if ( localTaskDefinition.getOutputProducts().size() > 0)
+							{
+								
+								artifactsForTaskOut += "<tacheArtefact_Sortie>\n" ;
+								artifactsForTaskOut += "<idTache>" + localTaskDefinition.getId() + "</idTache>\n" ;
+								fakeArtifactIterator = localTaskDefinition.getOutputProducts().iterator() ;
+								artifactsForTaskOut += "<listeArtefact>\n" ;
+								while (fakeArtifactIterator.hasNext())
+								{
+									artifactsForTaskOut += "<id>" + fakeArtifactIterator.next().getId() + "</id>\n" ;
+								}
+								artifactsForTaskOut += "</listeArtefact>\n" ;
+								artifactsForTaskOut += "</tacheArtefact_Sortie>\n" ;
+							}
+						}
+						
+						taskDefsIds += "</listeIdTache>\n" ;
+						taskDefsIds += "</ActiviteTache>\n" ;
+					}
+					
 				} // End taskDescs
 
 				// For interfaces
@@ -955,6 +1059,7 @@ public class ProjectControler
 					guideTypesInfo = guideTypesInfo + "<id>" + ((GuideType) localElement).getId() + "</id>\n" ;
 					guideTypesInfo = guideTypesInfo + "<nom>" + ((GuideType) localElement).getName() + "</nom>\n" ;
 					guideTypesInfo = guideTypesInfo + "</typeGuide>\n" ;
+					
 				} // End guideTypes
 			}
 
@@ -1101,11 +1206,25 @@ public class ProjectControler
 			// Iterations : TODO how it works
 			localOSW.write("<listeIterations/>\n") ;
 
-			// Tasks : TODO but could be task descriptors
-			localOSW.write("<listeTaches/>\n") ;
+			// Tasks
+			if (taskDefsInfo.equals(""))
+			{
+				localOSW.write("<listeTaches/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<listeTaches>\n" + taskDefsInfo + "</listeTaches>\n") ;
+			}
 
-			// Artefacts : TODO implementation
-			localOSW.write("<listeArtefacts/>\n") ;
+			// Artefacts :
+			if (artifactsInfo.equals(""))
+			{
+				localOSW.write("<listeArtefacts/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<listeArtefacts>\n" + artifactsInfo + "</listeArtefacts>\n") ;
+			}
 
 			localOSW.write("</elementProjet>\n") ;
 
@@ -1123,10 +1242,25 @@ public class ProjectControler
 			localOSW.write("<listeMembreTache/>\n") ;
 
 			// Between tasks and artifacts in
-			localOSW.write("<listeTacheArtefact_Entree/>\n") ;
+			if (artifactsForTaskIn.equals(""))
+			{
+				localOSW.write("<listeTacheArtefact_Entree/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<listeTacheArtefact_Entree>\n" + artifactsForTaskIn + "</listeTacheArtefact_Entree>\n") ;
+			}
 
-			// Between tasks and artifacts in
-			localOSW.write("<listeTacheArtefact_Sortie/>\n") ;
+			// Between tasks and artifacts out
+			if (artifactsForTaskOut.equals(""))
+			{
+				localOSW.write("<listeTacheArtefact_Sortie/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<listeTacheArtefact_Sortie>\n" + artifactsForTaskOut + "</listeTacheArtefact_Sortie>\n") ;
+			}
+
 			localOSW.write("</lienProjet>\n") ;
 
 			/*
@@ -1134,10 +1268,24 @@ public class ProjectControler
 			 */
 			localOSW.write("<lienProjetProcessus>\n") ;
 			// Between artifacts and products
-			localOSW.write("<listeProduitArtefact/>\n") ;
+			if (artifactsIds.equals(""))
+			{
+				localOSW.write("<listeProduitArtefact/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<listeProduitArtefact>\n" + artifactsIds + "</listeProduitArtefact>\n") ;
+			}
 
 			// Between tasks and "tasks" ?
-			localOSW.write("<listeActiviteTache/>\n") ;
+			if (taskDefsIds.equals(""))
+			{
+				localOSW.write("<listeActiviteTache/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<listeActiviteTache>\n" + taskDefsIds + "</listeActiviteTache>\n") ;
+			}
 
 			// Between members and roles
 			if (_project.getResources().size() == 0)

@@ -162,7 +162,7 @@ public class BreakdownElementsControler
 		Calendar localCalendar = Calendar.getInstance() ;
 		String localID = "_" + localCalendar.get(Calendar.MILLISECOND) + localCalendar.get(Calendar.DAY_OF_MONTH) + localCalendar.get(Calendar.MONTH)
 				+ localCalendar.get(Calendar.YEAR) + localCalendar.get(Calendar.HOUR) + localCalendar.get(Calendar.MINUTE) + localCalendar.get(Calendar.SECOND)
-				+ "_artf" ;
+				+ "_tskd" ;
 		TaskDefinition localTask = new TaskDefinition(localID, _name, _description, _task.getId(), _task) ;
 		_task.getTasks().add(localTask) ;
 		_task.setChanged() ;

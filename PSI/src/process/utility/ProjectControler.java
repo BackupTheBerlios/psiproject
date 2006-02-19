@@ -843,7 +843,7 @@ public class ProjectControler
 					if (((TaskDescriptor)localElement).getTasks().size() > 0)
 					{
 						taskDefsIds += "<ActiviteTache>\n" ;
-						taskDefsIds += "<idActivite>"+ ((TaskDescriptor)localElement).getId() + "</idActivite\n" ;
+						taskDefsIds += "<idActivite>"+ ((TaskDescriptor)localElement).getId() + "</idActivite>\n" ;
 						taskDefsIds += "<listeIdTache>\n" ;
 						
 						taskDIterator = ((TaskDescriptor)localElement).getTasks().iterator() ;
@@ -859,7 +859,7 @@ public class ProjectControler
 							
 							
 							
-							taskDefsIds += "<id>" + localTaskDefinition.getId() + "</id>" ;
+							taskDefsIds += "<id>" + localTaskDefinition.getId() + "</id>\n" ;
 							
 							// Artifacts for tasks
 							if ( localTaskDefinition.getInputProducts().size() > 0)
@@ -1178,8 +1178,8 @@ public class ProjectControler
 			{
 				localOSW.write("<description>" + _project.getDescription() + "</description>\n") ;
 			}
-			localOSW.write("<dateDebut>" + _project.getStartDate() + "</dateDebut>\n") ;
-			localOSW.write("<dateFin>" + _project.getFinishDate() + "</dateFin>\n") ;
+			localOSW.write("<dateDebut>" + dateFormat.format(_project.getStartDate()) + "</dateDebut>\n") ;
+			localOSW.write("<dateFin>" + dateFormat.format(_project.getFinishDate()) + "</dateFin>\n") ;
 			localOSW.write("</projet>\n") ;
 
 			// Members

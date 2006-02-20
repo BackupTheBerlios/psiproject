@@ -15,6 +15,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -1533,4 +1534,182 @@ public class ProjectControler
 		}
 
 	}
+	
+	public static void importFromOpenWorkbench(File _source, Project _currentProject) throws FileParseException
+	{
+		BreakdownElement localElement ;
+		TaskDefinition localTaskDefinition ;
+		Iterator <BreakdownElement> internIterator ;
+		Iterator <TaskDefinition> taskDefIterator ;
+		
+		try
+		{
+			FileInputStream localFIS = new FileInputStream(_source) ;
+			BufferedInputStream localBIS = new BufferedInputStream(localFIS) ;
+			DocumentBuilderFactory localDBF = DocumentBuilderFactory.newInstance() ;
+
+			try
+			{
+				DocumentBuilder localDB = localDBF.newDocumentBuilder() ;
+				localDB.setErrorHandler(new org.xml.sax.ErrorHandler()
+				{
+					/*
+					 * Even if nothing is done, an exception will be thrown
+					 * 
+					 * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
+					 */
+					public void fatalError (SAXParseException e) throws SAXException
+					{
+					}
+
+					/*
+					 * Making sure that SAX exception is thrown
+					 * 
+					 * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
+					 */
+					public void error (SAXParseException e) throws SAXParseException
+					{
+						throw e ;
+					}
+
+					/*
+					 * Warnings are not importants
+					 * 
+					 * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
+					 */
+					public void warning (SAXParseException e) throws SAXParseException
+					{
+
+					}
+				}) ;
+				
+				/*
+				 * Parsing the data and checking the file format
+				 */
+				Document localDocument = localDB.parse(localBIS) ;
+				if (!localDocument.getDocumentElement().getTagName().equalsIgnoreCase("WORKBENCH_PROJECT")) { throw new FileParseException() ; }
+				Node localTasksRootNode = localDocument.getDocumentElement().getElementsByTagName("Tasks").item(0) ;
+				if (localTasksRootNode == null) { throw new FileParseException() ; }
+
+				Node localTaskNode = null ;
+				NodeList localTasksNodeList = localTasksRootNode.getChildNodes() ;
+				int localChildCount = 0 ;
+				int localChildMax = localTasksNodeList.getLength() ;
+				
+				SimpleDateFormat localSDF = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss") ;
+				int localAttrTarget; // For optimising the loop
+
+				Node localAttrNode ;
+				int localAttrCount;
+				NamedNodeMap localAttributes;
+				
+				String localID = null;
+				String localName = null;
+				Date localDateStart = null;
+				Date localDateFinish = null;
+								
+				/*
+				 * Parsing
+				 */
+				while (localChildCount < localChildMax)
+				{
+					if (localTasksNodeList.item(localChildCount).getNodeType() == Node.ELEMENT_NODE
+							&& localTasksNodeList.item(localChildCount).getNodeName().equals("Task"))
+					{
+						localTaskNode = localTasksNodeList.item(localChildCount) ;
+						if (localTaskNode == null) { throw new FileParseException() ; }
+						localAttrTarget = 4 ;
+						localAttributes = localTaskNode.getAttributes(); 
+						localAttrCount = localAttributes.getLength() ;
+						for (int i = 0; i < localAttrCount; i++ )
+						{
+							localAttrNode = localAttributes.item(i) ;
+							if (localAttrNode.getNodeName().equalsIgnoreCase("taskID"))
+							{
+								localAttrTarget-- ;
+								localID = localAttrNode.getNodeValue();
+							}
+							else if (localAttrNode.getNodeName().equalsIgnoreCase("start"))
+							{
+								localAttrTarget-- ;
+								try
+								{
+									localDateStart = localSDF.parse(localAttrNode.getNodeValue());
+									
+								}
+								catch (ParseException pe)
+								{
+								}
+							}
+							else if (localAttrNode.getNodeName().equalsIgnoreCase("name"))
+							{
+								localAttrTarget-- ;
+								localName = localAttrNode.getNodeValue();
+								
+							}
+							else if (localAttrNode.getNodeName().equalsIgnoreCase("finish"))
+							{
+								localAttrTarget-- ;
+								try
+								{
+									localDateFinish = localSDF.parse(localAttrNode.getNodeValue());
+								}
+								catch (ParseException pe)
+								{
+								}
+																
+							}
+
+							if (localAttrTarget == 0)
+							{
+								break ;
+							}
+						}
+					}
+					
+					/*
+					 * Initialising of the local project.
+					 */
+					internIterator = _currentProject.getProcess().getNestedElements().iterator();
+					while(internIterator.hasNext()){
+						localElement = internIterator.next();
+						if (localElement instanceof TaskDescriptor){
+							if (((TaskDescriptor)localElement).getTasks().size() > 0){
+								taskDefIterator = ((TaskDescriptor)localElement).getTasks().iterator() ;
+								while (taskDefIterator.hasNext()){
+									localTaskDefinition = taskDefIterator.next();
+									if(localTaskDefinition.getId().equals(localID)){
+										localTaskDefinition.setName(localName);
+										localTaskDefinition.getRealData().setStartDate(localDateStart);
+										localTaskDefinition.getRealData().setFinishDate(localDateFinish);
+									}
+								}
+							}
+						}
+					}
+					
+					localChildCount++ ;
+				}
+								
+			}
+			catch (ParserConfigurationException eDBF)
+			{
+				throw new FileParseException() ;
+			}
+			catch (SAXException eDB)
+			{
+				throw new FileParseException() ;
+			}
+			catch (IOException eDB)
+			{
+				throw new FileParseException() ;
+			}
+		}
+		catch (FileNotFoundException eIS)
+		{
+			throw new FileParseException() ;
+		}
+		
+	}
+		
 }

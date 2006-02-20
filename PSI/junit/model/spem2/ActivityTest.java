@@ -8,13 +8,13 @@ import model.Presentation;
 import junit.framework.TestCase;
 
 /**
- * ActivityTest : TODO type description
+ * ActivityTest : Tests case for model.spem2.Activity.java
  *
- * @author m1isi28
+ * @author Avetisyan Gohar
  * @version 1.0
  *
  */
-public class TestActivity extends TestCase
+public class ActivityTest extends TestCase
 {
 	Activity activite;
 	Collection<BreakdownElement> collection_bde;

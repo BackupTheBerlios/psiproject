@@ -1,15 +1,4 @@
-package junit;
-
-import java.io.File;
-
-import process.exception.FileParseException;
-import junit.model.spem2.TestActivity;
-//import test.TestPointPolaire;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.process.utility.ProjectControlerTest;
+import junit.framework.*;
 
 /**
  * AllTests : TODO type description
@@ -18,15 +7,16 @@ import junit.process.utility.ProjectControlerTest;
  * @version 1.0
  *
  */
-public class AllTests extends TestCase
+public class AllTests
 {
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for test");
+
+	public static Test suite ()
+	{
+		TestSuite suite = new TestSuite("Test for default package") ;
 		//$JUnit-BEGIN$
-		suite.addTestSuite(TestActivity.class);
-		//suite.addTestSuite(TestPointCartesien.class);
+		suite.addTest(model.spem2.AllTests.suite());
 		//$JUnit-END$
-		return suite;
+		return suite ;
 	}
-	
+
 }

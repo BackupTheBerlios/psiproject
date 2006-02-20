@@ -16,10 +16,10 @@ import junit.framework.TestCase;
  */
 public class ActivityTest extends TestCase
 {
-	Activity activite;
-	Collection<BreakdownElement> collection_bde;
-	ActivityDescriptor act_desc;
-	Presentation presentation;
+	private Activity activite;
+	private Collection<BreakdownElement> collection_bde;
+	private ActivityDescriptor act_desc;
+	private Presentation presentation;
 	/*
 	 * @see TestCase#setUp()
 	 */

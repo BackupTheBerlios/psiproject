@@ -22,6 +22,8 @@ public class AllTests
 		TestSuite suite = new TestSuite("Test for model.spem2") ;
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ActivityTest.class) ;
+		suite.addTestSuite(ActivityDescriptorTest.class);
+		suite.addTestSuite(ArtifactTest.class);
 		
 		//$JUnit-END$
 		return suite ;

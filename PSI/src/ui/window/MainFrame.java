@@ -388,7 +388,7 @@ public class MainFrame extends JFrame
 			{
 				String localFileName = _file.getName() ;
 				String localFileExtension = localFileName.substring(localFileName.lastIndexOf(".") + 1) ;
-				return (_file.isDirectory() || (_file.isFile() && _file.canRead() && localFileExtension.equalsIgnoreCase("dpe"))) ;
+				return (_file.isDirectory() || (_file.isFile() && _file.canRead() && ((localFileExtension.equalsIgnoreCase("dpe")) || (localFileExtension.equalsIgnoreCase("xml"))))) ;
 			}
 
 			/*
@@ -409,18 +409,23 @@ public class MainFrame extends JFrame
 		{
 			try
 			{
-				currentProject.setProcess(ProcessControler.load(localFile)) ;
-				if (currentProject != null && currentProject.getProcess() != null)
-				{
-					// Updating actions
-					actionImport.setEnabled(false) ;
-					actionSave.setEnabled(true) ;
-					actionSaveAs.setEnabled(true) ;
+				if ((currentProject == null)||(currentProject.getProcess() == null)){
+					currentProject.setProcess(ProcessControler.load(localFile)) ;
+					if (currentProject != null && currentProject.getProcess() != null)
+					{
+						// Updating actions
+						actionImport.setEnabled(true) ;
+						actionSave.setEnabled(true) ;
+						actionSaveAs.setEnabled(true) ;
 
-					// Updating UI
-					getProjectTree().loadProject(currentProject) ;
-					LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProcessImported") + " : "
-							+ currentProject.getProcess().getDescriptor().getName())) ;
+						// Updating UI
+						getProjectTree().loadProject(currentProject) ;
+						LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProcessImported") + " : "
+								+ currentProject.getProcess().getDescriptor().getName())) ;
+					}
+				}
+				else{
+					ProjectControler.importFromOpenWorkbench(localFile, currentProject);
 				}
 			}
 			catch (FileParseException exc)

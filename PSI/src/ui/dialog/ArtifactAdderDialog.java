@@ -295,6 +295,7 @@ public class ArtifactAdderDialog extends JDialog
 		if (productTextField == null)
 		{
 			productTextField = new JTextField(20) ;
+			productTextField.setFocusable(false) ;
 			productTextField.setEditable(false) ;
 			productTextField.setText(product.getName()) ;
 		}
@@ -311,6 +312,13 @@ public class ArtifactAdderDialog extends JDialog
 		if (nameTextField == null)
 		{
 			nameTextField = new JTextField(20) ;
+			nameTextField.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+					ArtifactAdderDialog.this.addButton.doClick() ;
+				}
+			}) ;
 		}
 		return nameTextField ;
 	}

@@ -291,6 +291,7 @@ public class TaskDefinitionAdderDialog extends JDialog
 		if (taskDescriptorTextField == null)
 		{
 			taskDescriptorTextField = new JTextField(20) ;
+			taskDescriptorTextField.setFocusable(false) ;
 			taskDescriptorTextField.setText(task.getName()) ;
 			taskDescriptorTextField.setEditable(false);
 		}
@@ -306,7 +307,14 @@ public class TaskDefinitionAdderDialog extends JDialog
 	{
 		if (nameTextField == null)
 		{
-			nameTextField = new JTextField(20) ;
+			nameTextField = new JTextField(20) ;		
+			nameTextField.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+					TaskDefinitionAdderDialog.this.addButton.doClick() ;
+				}
+			}) ;
 		}
 		return nameTextField ;
 	}

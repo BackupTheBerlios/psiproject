@@ -30,9 +30,13 @@ public class Bundle
 	
 	public static final String TIME_PATTERN = "HH:mm" ;
 	
+	public static final String LOG_PATTERN = "HH:mm:ss" ;
+	
 	public static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN) ;
 	
 	public static final SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_PATTERN) ;
+	
+	public static final SimpleDateFormat logFormat = new SimpleDateFormat(LOG_PATTERN) ;
 
 	/**
 	 * Gets the label linked to the key in the resource bundle.

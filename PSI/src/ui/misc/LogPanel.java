@@ -2,12 +2,15 @@
 package ui.misc ;
 
 import java.awt.BorderLayout ;
+import java.awt.Dimension;
 import java.util.ArrayList ;
+import java.util.Date;
 
 import javax.swing.JPanel ;
 import javax.swing.JScrollPane ;
 import javax.swing.JTable ;
 import javax.swing.table.AbstractTableModel ;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import model.LogInformation ;
 import ui.resource.Bundle ;
@@ -65,6 +68,8 @@ public class LogPanel extends JPanel
 		logTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 		logTable.getColumnModel().getColumn(0).setPreferredWidth(150) ;
 		logTable.getTableHeader().setReorderingAllowed(false) ;
+		logTable.setDefaultRenderer(Date.class, new DateFieldRenderer()) ;
+		logTable.setPreferredScrollableViewportSize(new Dimension(logTable.getWidth(), logTable.getRowHeight() * MAXROWS)) ;
 		JScrollPane localScrollPane = new JScrollPane(logTable) ;
 
 		initialize() ;
@@ -135,6 +140,22 @@ public class LogPanel extends JPanel
 			this() ;
 
 			this.data = _data ;
+		}
+		
+		/**
+		 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
+		 */
+		@ Override
+		public Class <?> getColumnClass (int _col)
+		{
+			if (_col == 0)
+			{
+				return data.get(0).getDate().getClass() ;
+			}
+			else
+			{
+				return data.get(0).getName().getClass() ;
+			}
 		}
 
 		/**
@@ -219,6 +240,38 @@ public class LogPanel extends JPanel
 	}
 
 	
+	/**
+	 * DateFieldRenderer : Renders a date in the planning table
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 *
+	 */
+	private class DateFieldRenderer extends DefaultTableCellRenderer
+	{
+		private static final long serialVersionUID = 2139326802106744956L ;
+
+		/**
+		 * Constructor
+		 *
+		 */
+		public DateFieldRenderer ()
+		{
+			super() ;
+		}
+	
+		/**
+		 * @see javax.swing.table.DefaultTableCellRenderer#setValue(java.lang.Object)
+		 */
+		@ Override
+		protected void setValue (Object _object)
+		{
+			super.setValue(Bundle.logFormat.format(_object)) ;
+		}
+		
+	}
+
+
 	/**
 	 * Getter
 	 *

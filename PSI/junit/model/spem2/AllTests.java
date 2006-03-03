@@ -27,6 +27,9 @@ public class AllTests
 		suite.addTestSuite(ProcessTest.class);
 		suite.addTestSuite(PlanningDataTest.class);
 		suite.addTestSuite(ProductTypeTest.class);
+		//suite.addTestSuite(DeliveryProcessTest.class);
+		//suite.addTestSuite(IterationTest.class);
+		//suite.addTestSuite(PhaseTest.class);
 		
 		//$JUnit-END$
 		return suite ;

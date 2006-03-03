@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 /**
  * ComponentTest : TODO type description
  *
- * @author l3isi21
+ * @author KOUCH Hassan
  * @version 1.0
  *
  */
@@ -38,6 +38,7 @@ public class ComponentTest extends TestCase
 		super.setUp() ;
 		presentation = new Presentation("presentation_Id","presentation_Name","presentation_Desc","presentation_IconPath","presentation_ContentPath","presentation_PagePath");
 		collection = null;
+		collection_string = null;
 		iface = new Interface("iface_Id","iface_Name");
 		activityDescriptor = new ActivityDescriptor("activity_Id","activity_Name","activity_Desc","activity_ParentId");
 		component = new Component("component_Id","component_Name","component_Desc");
@@ -95,7 +96,7 @@ public class ComponentTest extends TestCase
 	 */
 	public void testGetResponsabilityDiagramPaths ()
 	{
-		assertEquals(component.getResponsabilityDiagramPaths(), "component_ResponsabilityDiagramPaths");
+		assertEquals(component.getResponsabilityDiagramPaths(), collection_string);
 	}
 
 	/*

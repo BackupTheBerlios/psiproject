@@ -7,7 +7,7 @@ import junit.awtui.*;
 /**
  * AllTests : Test suite for all tests of the package junit.model.spem2
  *
- * @author Avetisyan Gohar
+ * @author KOUCH Hassan
  * @version 1.0
  *
  */
@@ -21,7 +21,7 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Test for model") ;
 		//$JUnit-BEGIN$
-		suite.addTestSuite(Component.class) ;
+		suite.addTestSuite(ComponentTest.class) ;
 		
 		//suite.addTestSuite(ActivityDescriptorTest.class);
 		//suite.addTestSuite(ArtifactTest.class);

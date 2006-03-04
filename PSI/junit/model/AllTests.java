@@ -22,9 +22,10 @@ public class AllTests
 		TestSuite suite = new TestSuite("Test for model") ;
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ComponentTest.class) ;
-		
-		//suite.addTestSuite(ActivityDescriptorTest.class);
-		//suite.addTestSuite(ArtifactTest.class);
+		suite.addTestSuite(GuideTest.class);
+		suite.addTestSuite(GuideTypeTest.class);
+		suite.addTestSuite(HumanResourceTest.class);
+		suite.addTestSuite(InterfaceTest.class);
 		
 		//$JUnit-END$
 		return suite ;

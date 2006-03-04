@@ -26,6 +26,7 @@ public class AllTests
 		suite.addTestSuite(GuideTypeTest.class);
 		suite.addTestSuite(HumanResourceTest.class);
 		suite.addTestSuite(InterfaceTest.class);
+		suite.addTestSuite(LogInformationTest.class);
 		
 		//$JUnit-END$
 		return suite ;

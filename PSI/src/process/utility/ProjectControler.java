@@ -30,6 +30,7 @@ import model.Interface;
 import model.Presentation;
 import model.Project;
 import model.spem2.Activity;
+
 import model.spem2.Artifact;
 import model.spem2.BreakdownElement;
 import model.spem2.DeliveryProcess;
@@ -1399,7 +1400,7 @@ public class ProjectControler
 			/*
 			 * Writing the file
 			 */
-			localOSW.write("<?xml version=\"1.0\"?>\n") ;
+			localOSW.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n") ;
 			localOSW.write("<WORKBENCH_PROJECT>\n");
 			localOSW.write("<BaseCalendars>\n");
 			localOSW.write("<Calendar name=\"Standard\"/>\n");
@@ -1710,6 +1711,207 @@ public class ProjectControler
 			throw new FileParseException() ;
 		}
 		
+	}
+	
+	
+	public static void exportTo2DB (Project _project, File _destination) throws FileSaveException
+	{
+		try
+		{
+			FileOutputStream localFOS = new FileOutputStream(_destination) ;
+			BufferedOutputStream localBOS = new BufferedOutputStream(localFOS) ;
+
+			OutputStreamWriter localOSW = new OutputStreamWriter(localBOS, "ISO-8859-1") ;
+
+			
+			
+			//date format for open workbench 
+			DateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy");
+			
+			
+
+			/*
+			 * Initialisation
+			 */
+			BreakdownElement localElement = null ;
+			
+			Iterator <BreakdownElement> localIterator ;
+			Iterator <TaskDefinition> taskIterator ;
+			Iterator <TaskDefinition> taskDIterator ;
+			Iterator <HumanResource> resourceIterator ;
+			
+			ArrayList <Component> localComponents = new ArrayList <Component>() ;
+			HumanResource localTempResource ;
+			TaskDefinition localTempTask;
+			TaskDefinition localTaskDefinition ;
+			int prevbudget = 0;
+			int realbudget = 0;
+			
+			// Initializing components
+			localIterator = _project.getProcess().getNestedElements().iterator() ;
+			while (localIterator.hasNext())
+			{
+				localElement = localIterator.next() ;
+				if (localElement instanceof Component)
+				{
+					localComponents.add((Component) localElement) ;
+				}
+			}
+
+			/*
+			 * Writing the file
+			 */
+			localOSW.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n") ;
+			localOSW.write("<PSI-2DB>\n");
+			
+			//information about the project
+			localOSW.write("<project id=\""+ _project.getId() + "\">\n");
+			localOSW.write("<name>" + _project.getName() + "</name>\n") ;
+			
+			//total time pass on the project
+			localIterator = _project.getProcess().getNestedElements().iterator() ;
+			while (localIterator.hasNext())
+			{
+				localElement = localIterator.next() ;
+				//For task descriptors
+				if (localElement instanceof TaskDescriptor)
+				{
+					// Task Definitions for this descriptor
+					if (((TaskDescriptor)localElement).getTasks().size() > 0)
+					{
+						
+						taskDIterator = ((TaskDescriptor)localElement).getTasks().iterator() ;
+						while (taskDIterator.hasNext())
+						{							
+							localTaskDefinition = taskDIterator.next() ;
+							prevbudget = prevbudget + (int)localTaskDefinition.getPlanningData().getDuration() ;
+							realbudget = realbudget + (int)localTaskDefinition.getRealData().getDuration() ;
+						}
+					}
+				}
+			}
+							
+			localOSW.write("<prevbudget>" + prevbudget + "</prevbudget>\n") ;
+			localOSW.write("<realbudget>" + realbudget + "</realbudget>\n") ;
+			
+			
+			//Members
+			if (_project.getResources().size() == 0)
+			{
+				localOSW.write("<resource/>\n") ;
+			}
+			else
+			{
+				resourceIterator = _project.getResources().iterator() ;
+				
+				while (resourceIterator.hasNext())
+				{
+					localTempResource = resourceIterator.next() ;
+					localOSW.write("<resource id=\"" + localTempResource.getId() + "\">\n") ;
+					localOSW.write("<name>" + localTempResource.getFullName() + "</name>\n") ;				
+					localOSW.write("</resource>\n") ;
+				}
+			}
+			
+			localIterator = _project.getProcess().getNestedElements().iterator() ;
+			while (localIterator.hasNext())
+			{
+				localElement = localIterator.next() ;
+				//For Activity
+				if ((localElement instanceof Activity) && (! (localElement instanceof Component)))
+
+				{
+						
+						localOSW.write("<wbeset id=\"" + ((Activity) localElement).getDescriptor().getId()+ "\">\n") ;
+						localOSW.write("<name>" + ((Activity) localElement).getDescriptor().getName() + "</name>\n");
+						localOSW.write("</wbeset>\n");
+					
+				}
+			}
+			
+			
+			//Generating general data
+			localIterator = _project.getProcess().getNestedElements().iterator() ;
+			while (localIterator.hasNext())
+			{
+				localElement = localIterator.next() ;
+				//For task descriptors
+				if (localElement instanceof TaskDescriptor)
+				{
+					localOSW.write("<activity id=\"" + ((TaskDescriptor) localElement).getId() + "\">\n") ;
+					localOSW.write("<name>" + ((TaskDescriptor) localElement).getName() + "</name>\n") ;
+					
+					// Task Definitions for this descriptor
+					if (((TaskDescriptor)localElement).getTasks().size() > 0)
+					{
+						
+						taskDIterator = ((TaskDescriptor)localElement).getTasks().iterator() ;
+						while (taskDIterator.hasNext())
+						{							
+							localTaskDefinition = taskDIterator.next() ;
+							localOSW.write("<workbreakdownelement id =\"" + localTaskDefinition.getId() + "\">\n") ;
+							localOSW.write("<name>" + localTaskDefinition.getName() + "</name>\n") ;
+							localOSW.write("<prevstartdate>" + dateFormat.format(localTaskDefinition.getPlanningData().getStartDate()) + "</prevstartdate>\n") ;
+							localOSW.write("<prevenddate>" + dateFormat.format(localTaskDefinition.getPlanningData().getFinishDate()) + "</prevenddate>\n") ;
+							localOSW.write("<realstartdate>" + dateFormat.format(localTaskDefinition.getRealData().getStartDate()) + "</realstartdate>\n") ;
+							localOSW.write("<realenddate>" + dateFormat.format(localTaskDefinition.getRealData().getFinishDate()) + "</realenddate>\n") ;
+							localOSW.write("<prevamount>" + (int)localTaskDefinition.getPlanningData().getDuration() + "</prevamount>\n") ;
+							
+							
+							//Members
+							resourceIterator = _project.getResources().iterator() ;
+							while (resourceIterator.hasNext())
+							{
+								localTempResource = resourceIterator.next() ;
+								taskIterator = (localTempResource).getPerformingTasks().iterator();
+								while (taskIterator.hasNext())
+								{
+									localTempTask = taskIterator.next();
+									
+									//we verify if this person is working on this task
+									if (localTempTask.getId().equals(localTaskDefinition.getId()))
+									{
+										localOSW.write("<working id =\"" + localTaskDefinition.getId() + "\">\n") ;
+										localOSW.write("<amount>" + (int)localTaskDefinition.getRealData().getDuration() + "</amount>\n") ;
+										localOSW.write("<resource id=\"" + localTempResource.getId() + "\"/>\n ") ;
+										localOSW.write("</working>\n");
+									}
+								}
+							}
+							localOSW.write("<wbeset id=\"" + ((TaskDescriptor)localElement).getParentId() + "\"/>\n") ;
+							localOSW.write("</workbreakdownelement>\n");		
+						}
+						
+					}
+					
+					localOSW.write("</activity>\n");
+					
+				} // End taskDescs
+	
+			}
+			
+			localOSW.write("</project>\n");
+			localOSW.write("</PSI-2DB>\n");
+			
+			localOSW.flush() ;
+			localOSW.close() ;
+			
+		}
+		catch (FileNotFoundException exc)
+		{
+			throw new FileSaveException() ;
+		}
+
+		catch (UnsupportedEncodingException exc)
+		{
+			throw new FileSaveException() ;
+		}
+
+		catch (IOException exc)
+		{
+			throw new FileSaveException() ;
+		}
+
 	}
 		
 }

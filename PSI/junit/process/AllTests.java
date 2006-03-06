@@ -1,4 +1,4 @@
-package model;
+package process;
 
 import junit.framework.*;
 import junit.framework.TestSuite;

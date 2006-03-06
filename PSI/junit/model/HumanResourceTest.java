@@ -45,7 +45,7 @@ public class HumanResourceTest extends TestCase
 	 */
 	public void testGetFullName ()
 	{
-		assetEquals(humanResource.getFullName(), "humanResource_FullName");
+		assertEquals(humanResource.getFullName(), "humanResource_FullName");
 	}
 
 	/*

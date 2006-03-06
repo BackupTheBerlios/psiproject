@@ -24,7 +24,7 @@ public class ProjectTest extends TestCase
 	private Project projet;
 	private Date StartDate;
 	private Date FinishDate;
-	private Date date_DP; 
+	//private Date date_DP; 
 	private DeliveryProcess DP;
 	private Collection <HumanResource> ressources;
 	
@@ -37,8 +37,8 @@ public class ProjectTest extends TestCase
 		
 		ressources = null;          
 	
-		DP = new DP("DP_Id","DP_Name","DP_Desc","DP_AuthorFullName","DP_AuthorMail");
-		DP.setDate(date_DP);
+		DP = new DeliveryProcess("DP_Id","DP_Name","DP_Desc","DP_AuthorFullName","DP_AuthorMail");
+		DP.setDate("date_DP");
 		DP.setGenerationPath("DP_GenerationPath");
 		
 		FinishDate = new Date();

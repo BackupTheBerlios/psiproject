@@ -43,7 +43,7 @@ public class LogInformationTest extends TestCase
 	 */
 	public void testGetDate ()
 	{
-		assertEqual(logInfo.getDate(), date);
+		assertEquals(logInfo.getDate(), date);
 	}
 
 	/*

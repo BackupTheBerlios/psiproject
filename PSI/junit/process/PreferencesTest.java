@@ -1,7 +1,5 @@
 package process;
 
-import com.sun.rsasign.p;
-
 import process.Preferences;
 import junit.framework.TestCase;
 
@@ -34,7 +32,7 @@ public class PreferencesTest extends TestCase
 	public boolean boolRandom ()
 	{
 		boolean bool;
-		int local_integer = Math.random();
+		double local_integer = Math.random();
 		if (local_integer <= 0.5)
 		{
 			bool = true;
@@ -58,7 +56,7 @@ public class PreferencesTest extends TestCase
 		preference_LoadLastProject = boolRandom();
 		preference_LoadHelp = boolRandom();
 		
-		preference = new Preferences();
+		preference = Preferences.getInstance();
 		preference.setExportDirectory("preference_ExportDirectory");
 		preference.setHeight(preference_Height);
 		preference.setLastProject("preference_LastProject");
@@ -129,7 +127,7 @@ public class PreferencesTest extends TestCase
 	 */
 	public void testGetLogHeight ()
 	{
-		assertEquals(preference.getLogHeight(), preference_Height);
+		assertEquals(preference.getLogHeight(), preference_LogHeight);
 	}
 
 	/*

@@ -1,9 +1,10 @@
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * AllTests : TODO type description
  *
- * @author Chez Maggy
+ * @author l3isi21
  * @version 1.0
  *
  */

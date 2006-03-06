@@ -5,7 +5,7 @@ import junit.framework.TestSuite;
 import junit.awtui.*;
 
 /**
- * AllTests : Test suite for all tests of the package junit.model.spem2
+ * AllTests : Test suite for all tests of the package junit.model
  *
  * @author KOUCH Hassan
  * @version 1.0

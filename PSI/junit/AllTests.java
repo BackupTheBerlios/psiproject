@@ -16,6 +16,7 @@ public class AllTests
 		//$JUnit-BEGIN$
 		suite.addTest(model.spem2.AllTests.suite());
 		suite.addTest(model.AllTests.suite());
+		suite.addTest(process.AllTests.suite());
 		//$JUnit-END$
 		return suite ;
 	}

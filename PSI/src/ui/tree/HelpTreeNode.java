@@ -1,4 +1,4 @@
-package ui.window;
+package ui.tree;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 

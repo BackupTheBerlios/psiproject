@@ -159,7 +159,7 @@ public class PreferencesTest extends TestCase
 	 */
 	public void testGetInstance ()
 	{
-		assertEquals(preference.getInstance(), preference);
+		assertEquals(Preferences.getInstance(), preference);
 	}
 
 	/*

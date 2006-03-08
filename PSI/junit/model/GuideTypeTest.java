@@ -25,7 +25,7 @@ public class GuideTypeTest extends TestCase
 	{
 		super.setUp() ;
 		guideType = new GuideType("guideType_Id","guideType_Name");
-		guideType.setDescription("guideType_Desc");
+		guideType.setDescription("");
 	}
 
 	/*
@@ -57,7 +57,7 @@ public class GuideTypeTest extends TestCase
 	 */
 	public void testGetDescription ()
 	{
-		assertEquals(guideType.getDescription(), "guideType_Desc");
+		assertEquals(guideType.getDescription(), "");
 	}
 
 }

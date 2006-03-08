@@ -1,7 +1,5 @@
 package model;
 
-import java.io.File;
-
 import model.Guide;
 import model.GuideType;
 import model.Presentation;
@@ -32,7 +30,7 @@ public class GuideTest extends TestCase
 		presentation = new Presentation("presentation_Id","presentation_Name","presentation_Desc","presentation_IconPath","presentation_ContentPath","presentation_PagePath");
 		guideType = new GuideType("guideType_Id","guideType_Name");
 		guide = new Guide("guide_Id","guide_Name");
-		guide.setDescription("guide_Desc");
+		guide.setDescription("");
 		guide.setType(guideType);
 		guide.setPresentationElement(presentation);
 	}
@@ -66,7 +64,7 @@ public class GuideTest extends TestCase
 	 */
 	public void testGetDescription ()
 	{
-		assertEquals(guide.getDescription(), "guide_Desc");
+		assertEquals(guide.getDescription(), "");
 	}
 
 	/*

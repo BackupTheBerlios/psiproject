@@ -23,7 +23,6 @@ public class StateTest extends TestCase
 	{
 		super.setUp() ;
 		state = new State("state_Id","state_Name");
-		state.setDescription("state_Desc");
 	}
 
 	/*
@@ -55,7 +54,7 @@ public class StateTest extends TestCase
 	 */
 	public void testGetDescription ()
 	{
-		assertEquals(state.getDescription(), "state_Desc");
+		assertEquals(state.getDescription(), null);
 	}
 
 }

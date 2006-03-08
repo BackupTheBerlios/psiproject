@@ -1,9 +1,6 @@
 package model;
 
-import java.util.Collection;
-
 import model.HumanResource;
-import model.spem2.RoleDescriptor;
 import junit.framework.TestCase;
 
 /**

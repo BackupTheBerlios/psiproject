@@ -2,7 +2,6 @@ package model;
 
 import model.Component;
 import model.Interface;
-import model.spem2.ProductType;
 import junit.framework.TestCase;
 
 /**
@@ -54,7 +53,7 @@ public class InterfaceTest extends TestCase
 	 */
 	public void testGetName ()
 	{
-		assertEquals(interFace.getName(), "interface_Name");
+		assertEquals(interFace.getName(), "interFace_Name");
 	}
 
 	/*

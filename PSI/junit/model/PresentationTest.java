@@ -87,7 +87,7 @@ public class PresentationTest extends TestCase
 	 */
 	public void testGetIconPath ()
 	{
-		assertEquals(presentation.getContentPath(), "presentation_IconPath" );
+		assertEquals(presentation.getIconPath(), "presentation_IconPath" );
 	}
 
 	/*
@@ -95,7 +95,7 @@ public class PresentationTest extends TestCase
 	 */
 	public void testGetPagePath ()
 	{
-		assertEquals(presentation.getContentPath(), "presentation_PagePath" );
+		assertEquals(presentation.getPagePath(), "presentation_PagePath" );
 	}
 
 }

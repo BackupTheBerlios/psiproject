@@ -2,11 +2,14 @@
 package ui.dialog ;
 
 import java.awt.BorderLayout ;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JFrame ;
 import javax.swing.JPanel ;
 import javax.swing.JDialog ;
 import javax.swing.JProgressBar ;
+import javax.swing.Timer;
 
 /**
  * ProgressDialog : A progress bar simulation
@@ -20,13 +23,16 @@ public class ProgressDialog extends JDialog
 	private static final long serialVersionUID = -8283875527881698361L ;
 	private JPanel mainPanel = null;
 	private JProgressBar progressBar = null;
+	private Timer timer = null;
+	
+	
 	/**
 	 * This is the default constructor
 	 */
 	public ProgressDialog (JFrame _owner)
 	{
 		super(_owner) ;
-		initialize() ;
+		//initialize() ;
 	}
 
 	/**
@@ -34,13 +40,27 @@ public class ProgressDialog extends JDialog
 	 * 
 	 * @return void
 	 */
-	private void initialize ()
+	public void initialize ()
 	{
         this.setContentPane(getMainPanel());
+        
 		this.setVisible(true) ;
 		this.setModal(true);
-		this.setPreferredSize(new java.awt.Dimension(250,100));
-		this.setSize(new java.awt.Dimension(250,100));
+		this.setPreferredSize(new java.awt.Dimension(250,50));
+		this.pack(); 
+	//	this.setSize(new java.awt.Dimension(250,100));
+		this.timer = new Timer(1000,new ActionListener(){
+			public void actionPerformed (ActionEvent _e)
+			{
+				progressBar.setString("Waiting...");
+				
+			}
+		});
+		this.timer.start();
+		
+		
+		
+
 	}
 
 	/**
@@ -68,12 +88,16 @@ public class ProgressDialog extends JDialog
 	{
 		if (progressBar == null)
 		{
-			progressBar = new JProgressBar() ;
+			progressBar = new JProgressBar(0,100) ;
+			progressBar.setStringPainted(true);
+			
 			progressBar.setIndeterminate(true);
 		}
 		return progressBar ;
 	}
 
-	
+	public void stopTimer(){
+		timer.stop(); 
+	}
 
 }

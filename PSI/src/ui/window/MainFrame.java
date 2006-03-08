@@ -35,6 +35,7 @@ import process.utility.ProcessControler;
 import process.utility.ProjectControler;
 import ui.dialog.AboutDialog;
 import ui.dialog.PreferenceDialog;
+import ui.dialog.ProgressDialog;
 import ui.misc.LogPanel;
 import ui.misc.MainTabbedPane;
 import ui.resource.Bundle;
@@ -109,7 +110,8 @@ public class MainFrame extends JFrame
 	private Project currentProject = null ;
 
 	private boolean projectModified = false ;
-
+	
+	
 	/*
 	 * Here are defined actions which can be performed by the user. Abstract Actions are used to
 	 * group the same actions being performed from different components
@@ -118,10 +120,12 @@ public class MainFrame extends JFrame
 	{
 		private static final long serialVersionUID = -2015126209086384143L ;
 
+		
 		public void actionPerformed (ActionEvent e)
 		{
 			actionOpen(e) ;
 		}
+		
 	} ;
 
 	private AbstractAction actionImport = new AbstractAction()
@@ -324,6 +328,8 @@ public class MainFrame extends JFrame
 			}
 		}) ;
 		localFileChooser.showOpenDialog(MainFrame.this) ;
+		
+		
 
 		/*
 		 * Working on a selected file
@@ -331,6 +337,9 @@ public class MainFrame extends JFrame
 		File localFile ;
 		if ( (localFile = localFileChooser.getSelectedFile()) != null)
 		{
+			ProgressDialog progressbar = new ProgressDialog(this);
+			progressbar.initialize(); 
+			
 			actionImport.setEnabled(false) ;
 
 			if (Preferences.getInstance().getWorkDirectory().trim().equals(""))
@@ -352,6 +361,9 @@ public class MainFrame extends JFrame
 			{
 				JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileCreateIncorrectFormat"), "PSI", JOptionPane.ERROR_MESSAGE) ;
 			}
+			
+			progressbar.stopTimer() ;
+			progressbar.dispose();
 		}
 	}
 
@@ -407,8 +419,12 @@ public class MainFrame extends JFrame
 		File localFile ;
 		if ( (localFile = localFileChooser.getSelectedFile()) != null)
 		{
+			ProgressDialog progressbar = new ProgressDialog(this);
+			progressbar.initialize(); 
+			
 			try
 			{
+								
 				if ((currentProject == null)||(currentProject.getProcess() == null)){
 					currentProject.setProcess(ProcessControler.load(localFile)) ;
 					if (currentProject != null && currentProject.getProcess() != null)
@@ -432,6 +448,9 @@ public class MainFrame extends JFrame
 			{
 				JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileImportIncorrectFormat"), "PSI", JOptionPane.ERROR_MESSAGE) ;
 			}
+			
+			progressbar.stopTimer() ;
+			progressbar.dispose();
 		}
 	}
 
@@ -448,6 +467,7 @@ public class MainFrame extends JFrame
 	{
 		JFileChooser localFileChooser = new JFileChooser() ;
 		localFileChooser.showOpenDialog(MainFrame.this) ;
+		
 	}
 
 	/**
@@ -555,6 +575,9 @@ public class MainFrame extends JFrame
 		File localFile = null ;
 		if ( (localFile = localFileChooser.getSelectedFile()) != null)
 		{
+			ProgressDialog progressbar = new ProgressDialog(this);
+			progressbar.initialize(); 
+			
 			// Adding extension if necessary
 			if (!localFile.getName().endsWith(".xml"))
 			{
@@ -579,6 +602,8 @@ public class MainFrame extends JFrame
 					JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileSaveError"), "PSI", JOptionPane.ERROR_MESSAGE) ;
 				}
 			}
+			progressbar.stopTimer() ;
+			progressbar.dispose();
 		}
 	}
 

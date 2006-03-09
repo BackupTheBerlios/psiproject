@@ -196,7 +196,7 @@ public class MainFrame extends JFrame
 	public MainFrame () throws HeadlessException
 	{
 		super() ;
-		new SplashScreen(this, 5);
+		new SplashScreen(this, 4);
 		initialize() ;
 		LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageAppStarted"))) ;
 	}

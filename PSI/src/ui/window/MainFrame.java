@@ -3,6 +3,7 @@ package ui.window ;
 
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.HeadlessException;
@@ -1131,8 +1132,9 @@ public class MainFrame extends JFrame
 		jPanelFlowNorth.add(jLabelLogo);
 		JTextArea jTextAreaWelcom = new JTextArea(Bundle.getText("MainFrameDefaultPanelDescription"));
 		jTextAreaWelcom.setPreferredSize(new Dimension(400, 250));
-		jTextAreaWelcom.setBackground(new java.awt.Color(238,238,238));
+		jTextAreaWelcom.setBackground(Color.WHITE);
 		jPanelFlowNorth.add(jTextAreaWelcom);
+		jPanelFlowNorth.setBackground(Color.WHITE);
 		//center.
 		JPanel jPanelFlowCenter = new JPanel(new FlowLayout());
 		JButton jButtonCreate = new JButton() ;
@@ -1165,10 +1167,12 @@ public class MainFrame extends JFrame
 		jPanelFlowCenter.add(jButtonOpen);
 		jPanelFlowCenter.add(Box.createRigidArea(new Dimension(75, 1)));
 		jPanelFlowCenter.add(jButtonHelp);
+		jPanelFlowCenter.setBackground(Color.WHITE);
 		//main.
 		defaultPanel.setLayout(new BorderLayout());
 		defaultPanel.add(jPanelFlowCenter, BorderLayout.CENTER);
 		defaultPanel.add(jPanelFlowNorth, BorderLayout.NORTH);
+		defaultPanel.setBackground(Color.WHITE);
 		MainTabbedPane.getInstance().addTab(Bundle.getText("MainFrameDefaultPanelTitle"), defaultPanel);
 	}
 	

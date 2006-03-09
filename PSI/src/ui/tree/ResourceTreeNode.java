@@ -1,6 +1,7 @@
 
 package ui.tree ;
 
+import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -38,6 +39,12 @@ public class ResourceTreeNode extends DefaultMutableTreeNode implements Observer
 		this.resource = _resource ;
 		this.resource.addObserver(this) ;
 		this.setUserObject(resource) ;
+		
+		Iterator<RoleDescriptor> localIterator = resource.getPerformingRoles().iterator() ;
+		while (localIterator.hasNext())
+		{
+			this.add(new RoleDescriptorTreeNode(localIterator.next(), tree)) ;
+		}
 	}
 
 	/**

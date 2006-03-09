@@ -2,11 +2,14 @@
 package ui.tree ;
 
 import java.util.Iterator;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import model.HumanResource;
 import model.Project;
+import model.spem2.Iteration;
 import ui.resource.Bundle;
 
 /**
@@ -16,7 +19,7 @@ import ui.resource.Bundle;
  * @version 1.0
  * 
  */
-public class ProjectTreeNode extends DefaultMutableTreeNode
+public class ProjectTreeNode extends DefaultMutableTreeNode implements Observer
 {
 	private static final long serialVersionUID = -3196033141454374573L ;
 
@@ -37,7 +40,17 @@ public class ProjectTreeNode extends DefaultMutableTreeNode
 
 		this.tree = _tree ;
 		this.project = _project ;
-		this.setUserObject(project.getName()) ;
+		this.project.addObserver(this) ;
+		if (this.project.getIterations().size() == 0)
+		{
+			this.setUserObject(project.getName()) ;
+		}
+		
+		else
+		{
+			Iteration localIts[] = this.project.getIterations().toArray(new Iteration[0]) ;
+			this.setUserObject(project.getName() + " (" + Bundle.getText("MainTreeNodeIterations") + localIts[localIts.length - 1].getDescriptor().getName() + ")") ;
+		}
 
 		// Process information
 		if (project.getProcess() != null)
@@ -78,6 +91,15 @@ public class ProjectTreeNode extends DefaultMutableTreeNode
 	public void setProject (Project _project)
 	{
 		this.project = _project ;
+	}
+
+	/**
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 */
+	public void update (Observable _observable, Object _object)
+	{
+		Iteration localIt = (Iteration)_object ;
+		this.setUserObject(project.getName() + " (" + Bundle.getText("MainTreeNodeIterations") + localIt.getDescriptor().getName() + ")") ;		
 	}
 
 }

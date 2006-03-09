@@ -99,8 +99,11 @@ public class ProcessControler
 				/*
 				 * Parsing the data and checking the file format
 				 */
-				Document localDocument = localDB.parse(localBIS) ;
-				if (!localDocument.getDocumentElement().getTagName().equalsIgnoreCase("exportExecution")) { throw new FileParseException() ; }
+				Document localDocument = localDB.parse(localBIS) ;				
+				if (!localDocument.getDocumentElement().getTagName().equalsIgnoreCase("exportExecution"))
+				{
+					if (localDocument.getDocumentElement().getElementsByTagName("exportExecution").getLength() != 1) { throw new FileParseException() ; }
+				}
 
 				/*
 				 * NOTES : General process information variables and temporary variables Other
@@ -258,9 +261,6 @@ public class ProcessControler
 				 * Guide types [optional]
 				 */
 				NodeList localGuideTypesListRoot = localDocument.getElementsByTagName("liste_typeGuide") ;
-				// if (localGuideTypesListRoot.getLength() != 1 ||
-				// localGuideTypesListRoot.item(0).getChildNodes().getLength() == 0) {
-				// System.out.println("hu") ;throw new FileParseException() ; }
 				NodeList localGuideTypesList = localGuideTypesListRoot.item(0).getChildNodes() ;
 				Node localGuideType ;
 
@@ -918,7 +918,7 @@ public class ProcessControler
 								localTempActivity.setPresentationElement((Presentation) localNested.get(j)) ;
 							}
 						}
-
+						
 						localNested.add(localTempActivity) ;
 
 					} // End If
@@ -1838,4 +1838,5 @@ public class ProcessControler
 			throw new FileParseException() ;
 		}
 	}
+
 }

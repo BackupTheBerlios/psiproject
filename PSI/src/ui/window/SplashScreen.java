@@ -22,6 +22,7 @@ import javax.swing.Timer;
  */
 public class SplashScreen extends JWindow
 {
+	private static final long serialVersionUID = -6611575714213200749L ;
 	private JPanel jPanelImage = null;
 	private JLabel jLabelImage = null;
 	

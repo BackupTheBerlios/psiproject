@@ -9,6 +9,7 @@ import java.util.ArrayList ;
 import java.util.Collection ;
 import java.util.Observable;
 
+import model.spem2.Artifact;
 import model.spem2.RoleDescriptor ;
 import model.spem2.TaskDefinition;
 
@@ -46,6 +47,8 @@ public class HumanResource extends Observable implements Transferable
 	private Collection <RoleDescriptor> performingRoles ;
 	
 	private Collection <TaskDefinition> performingTasks ;
+	
+	private Collection <Artifact> producingArtifacts ;
 
 	/**
 	 * Constructor
@@ -62,6 +65,7 @@ public class HumanResource extends Observable implements Transferable
 
 		performingRoles = new ArrayList <RoleDescriptor>() ;
 		performingTasks = new ArrayList <TaskDefinition>() ;
+		producingArtifacts = new ArrayList <Artifact>() ;
 	}
 
 	/**
@@ -230,6 +234,26 @@ public class HumanResource extends Observable implements Transferable
 	public synchronized void setChanged ()
 	{
 		super.setChanged() ;
+	}
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the producingArtifacts.
+	 */
+	public Collection <Artifact> getProducingArtifacts ()
+	{
+		return this.producingArtifacts ;
+	}
+
+	/**
+	 * Setter
+	 *
+	 * @param _producingArtifacts The producingArtifacts to set.
+	 */
+	public void setProducingArtifacts (Collection <Artifact> _producingArtifacts)
+	{
+		this.producingArtifacts = _producingArtifacts ;
 	}
 	
 	

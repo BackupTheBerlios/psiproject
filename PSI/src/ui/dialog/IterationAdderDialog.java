@@ -96,7 +96,7 @@ public class IterationAdderDialog extends JDialog
 		if (mainPanel == null)
 		{
 			numberLabel = new JLabel();
-			numberLabel.setText("JLabel");
+			numberLabel.setText(Bundle.getText("IterationAdderDialogNum"));
 			mainPanel = new JPanel() ;
 			mainPanel.add(numberLabel, null);
 			mainPanel.add(getNumberTextField(), null);

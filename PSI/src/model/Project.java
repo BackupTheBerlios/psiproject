@@ -1,10 +1,13 @@
 
 package model ;
 
+import java.util.ArrayList ;
 import java.util.Collection ;
 import java.util.Date ;
+import java.util.Observable;
 
 import model.spem2.DeliveryProcess ;
+import model.spem2.Iteration;
 
 /**
  * Project : a project common class.
@@ -13,7 +16,7 @@ import model.spem2.DeliveryProcess ;
  * @version 1.0
  * 
  */
-public class Project
+public class Project extends Observable
 {
 	/**
 	 * The unique ID of the project
@@ -56,6 +59,11 @@ public class Project
 	 * Resources working within a project
 	 */
 	private Collection <HumanResource> resources = null ;
+	
+	/**
+	 * All iterations
+	 */
+	private Collection <Iteration> iterations = new ArrayList <Iteration>() ;
 
 	/**
 	 * The delivery process associated to the project
@@ -254,4 +262,36 @@ public class Project
 		this.resources = _resources ;
 	}
 
+	/**
+	 * Getter
+	 *
+	 * @return Returns the iterations.
+	 */
+	public Collection <Iteration> getIterations ()
+	{
+		return this.iterations ;
+	}
+
+	/**
+	 * Setter
+	 *
+	 * @param _iterations The iterations to set.
+	 */
+	public void setIterations (Collection <Iteration> _iterations)
+	{
+		this.iterations = _iterations ;
+	}
+
+	
+	/**
+	 * @see java.util.Observable#setChanged()
+	 */
+	@ Override
+	public synchronized void setChanged ()
+	{
+		super.setChanged() ;
+	}
+
+	
+	
 }

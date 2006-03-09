@@ -34,6 +34,8 @@ import model.spem2.Activity;
 import model.spem2.Artifact;
 import model.spem2.BreakdownElement;
 import model.spem2.DeliveryProcess;
+import model.spem2.Iteration;
+import model.spem2.PlanningData;
 import model.spem2.ProductType;
 import model.spem2.RoleDescriptor;
 import model.spem2.TaskDefinition;
@@ -47,6 +49,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import process.GlobalController;
 import process.exception.FileParseException;
 import process.exception.FileSaveException;
 
@@ -249,7 +252,8 @@ public class ProjectControler
 					}
 				}
 
-				localProject.setResources(localRessources) ;
+				localProject.setResources(localRessources) ;				
+				BreakdownElementsControler.addIterationIntoProject(localProject) ;
 				return localProject ;
 
 			}
@@ -285,11 +289,1062 @@ public class ProjectControler
 	 */
 	public static Project open (File _source) throws FileParseException
 	{
-		return null ;
+		try
+		{
+			FileInputStream localFIS = new FileInputStream(_source) ;
+			BufferedInputStream localBIS = new BufferedInputStream(localFIS) ;
+			DocumentBuilderFactory localDBF = DocumentBuilderFactory.newInstance() ;
+
+			try
+			{
+				DocumentBuilder localDB = localDBF.newDocumentBuilder() ;
+				localDB.setErrorHandler(new org.xml.sax.ErrorHandler()
+				{
+					/*
+					 * Even if nothing is done, an exception will be thrown
+					 * 
+					 * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
+					 */
+					public void fatalError (SAXParseException e) throws SAXException
+					{
+					}
+
+					/*
+					 * Making sure that SAX exception is thrown
+					 * 
+					 * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
+					 */
+					public void error (SAXParseException e) throws SAXParseException
+					{
+						throw e ;
+					}
+
+					/*
+					 * Warnings are not importants
+					 * 
+					 * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
+					 */
+					public void warning (SAXParseException e) throws SAXParseException
+					{
+
+					}
+				}) ;
+				
+				Project localProject ;
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd'/'MM'/'yyyy") ;
+
+				/*
+				 * Parsing the data and checking the file format
+				 */
+				Document localDocument = localDB.parse(localBIS) ;
+				if (!localDocument.getDocumentElement().getTagName().equalsIgnoreCase("exportProjet")) { throw new FileParseException() ; }
+				
+				// Getting process
+				DeliveryProcess localProcess = ProcessControler.load(_source) ;
+				ArrayList <BreakdownElement> localNested = new ArrayList <BreakdownElement>(localProcess.getNestedElements()) ;
+				
+				// Variables for loops
+				String localPID = "" ;
+				String localID = "" ;
+				String localName = "" ;
+				String localDescription = "" ;
+				
+				Date localStartDate = null ;
+				Date localFinishDate = null ;
+				Date localRStartDate = null ;
+				Date localRFinishDate = null ;
+				
+				int localChildMax ;
+				
+				ArrayList <String> localIDS = new ArrayList <String>() ;
+				
+				NodeList localChildList ;
+				
+				// Getting project info
+				NodeList localProjectNodeList = localDocument.getElementsByTagName("projet") ;
+				if (localProjectNodeList.getLength() != 1 || !localProjectNodeList.item(0).getParentNode().getNodeName().equalsIgnoreCase("elementProjet"))
+				{
+					throw new FileParseException() ;
+				}
+
+				Node localProjectNode = localProjectNodeList.item(0) ;
+				NodeList localProjectElements = localProjectNode.getChildNodes() ;
+				localChildMax = localProjectElements.getLength() ;
+				
+				for (int i = 0 ; i < localChildMax ; i++)
+				{
+					if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE && localProjectElements.item(i).getNodeName().equalsIgnoreCase("id"))
+					{
+						try
+						{
+							localID = localProjectElements.item(i).getFirstChild().getNodeValue() ;
+						}
+						catch (NullPointerException exc)
+						{
+							localID = "" ;
+						}
+					}
+					
+					else if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE && localProjectElements.item(i).getNodeName().equalsIgnoreCase("nom"))
+					{
+						try
+						{
+							localName = localProjectElements.item(i).getFirstChild().getNodeValue() ;
+						}
+						catch (NullPointerException exc)
+						{
+							localName = "" ;
+						}
+					}
+					
+					else if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE && localProjectElements.item(i).getNodeName().equalsIgnoreCase("description"))
+					{
+						try
+						{
+							localDescription = localProjectElements.item(i).getFirstChild().getNodeValue() ;
+						}
+						catch (NullPointerException exc)
+						{
+							localDescription = "" ;
+						}
+					}
+					
+					else if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE && localProjectElements.item(i).getNodeName().equalsIgnoreCase("dateDebut"))
+					{
+						try
+						{
+							localStartDate = dateFormat.parse(localProjectElements.item(i).getFirstChild().getNodeValue()) ;
+						}
+						catch (Exception exc)
+						{
+							localStartDate = new Date() ;
+						}						
+					}
+					
+					else if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE && localProjectElements.item(i).getNodeName().equalsIgnoreCase("dateFin"))
+					{
+						try
+						{
+							localFinishDate = dateFormat.parse(localProjectElements.item(i).getFirstChild().getNodeValue()) ;
+						}
+						catch (Exception exc)
+						{
+							localFinishDate = new Date() ;
+						}						
+					}
+				}
+				localProject = new Project(localID, localName, localDescription, localStartDate, localFinishDate) ;
+				localProject.setProcess(localProcess) ;
+				
+				// Getting resources
+				ArrayList<HumanResource> localResources = new ArrayList <HumanResource>() ;
+				NodeList localResourcesNodeListRoot = localDocument.getElementsByTagName("listeMembres") ;
+				if (localResourcesNodeListRoot.getLength() != 1) { throw new FileParseException() ; }
+				NodeList localResourcesNodeList = localResourcesNodeListRoot.item(0).getChildNodes() ;
+				localChildMax = localResourcesNodeList.getLength() ;
+				Node localResourcesNode ;
+				String localMail = "" ;
+
+				for (int i = 0 ; i < localChildMax ; i++)
+				{
+					if (localResourcesNodeList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localResourcesNodeList.item(i).getNodeName().equalsIgnoreCase("eltMembre"))
+					{
+						localResourcesNode = localResourcesNodeList.item(i) ;
+						localChildList = localResourcesNode.getChildNodes() ;
+						localID = "" ;
+						localName = "" ;
+						localMail = "" ;
+						
+						for (int j = 0 ; j < localChildList.getLength() ; j++)
+						{
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							{
+								try
+								{
+									localID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localID = "" ;
+								}
+							}
+							
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
+							{
+								try
+								{
+									localName = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localName = "" ;
+								}
+							}
+							
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("mail"))
+							{
+								try
+								{
+									localMail = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localMail = "" ;
+								}
+							}
+						}
+
+						localResources.add(new HumanResource(localID, localName, localMail)) ;
+					}
+				}
+				
+				localProject.setResources(localResources) ;
+
+				
+				// Getting iterations
+				ArrayList<Iteration> localIterations = new ArrayList <Iteration>() ;
+				NodeList localIterationsNodeListRoot = localDocument.getElementsByTagName("listeIterations") ;
+				if (localIterationsNodeListRoot.getLength() != 1) { throw new FileParseException() ; }
+				NodeList localIterationsNodeList = localIterationsNodeListRoot.item(0).getChildNodes() ;
+				localChildMax = localIterationsNodeList.getLength() ;
+				Node localIterationsNode ;
+				
+				int localItNumber ;
+				for (int i = 0 ; i < localChildMax ; i++)
+				{
+					if (localIterationsNodeList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localIterationsNodeList.item(i).getNodeName().equalsIgnoreCase("eltIteration"))
+					{
+						localIterationsNode = localIterationsNodeList.item(i) ;
+						localChildList = localIterationsNode.getChildNodes() ;
+						localID = "" ;
+						localItNumber = 1 ;
+						
+						for (int j = 0 ; j < localChildList.getLength() ; j++)
+						{
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							{
+								try
+								{
+									localID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localID = "" ;
+								}
+							}
+							
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("numero"))
+							{
+								try
+								{
+									localItNumber = Integer.parseInt(localChildList.item(j).getFirstChild().getNodeValue()) ;
+								}
+								catch (Exception exc)
+								{
+									localItNumber = 1 ;
+								}
+							}
+						}
+						
+						localIterations.add(new Iteration(localID, localItNumber)) ;
+					}
+				}
+				
+				localProject.setIterations(localIterations) ;
+				GlobalController.currentIteration = localIterations.get(localIterations.size() - 1) ;
+
+				// Getting tasks
+				ArrayList<TaskDefinition> localTasks = new ArrayList <TaskDefinition>() ;
+				NodeList localTasksNodeListRoot = localDocument.getElementsByTagName("listeTaches") ;
+				if (localTasksNodeListRoot.getLength() != 1) { throw new FileParseException() ; }
+				NodeList localTasksNodeList = localTasksNodeListRoot.item(0).getChildNodes() ;
+				localChildMax = localTasksNodeList.getLength() ;
+				Node localTasksNode ;
+				
+				int localDuration = 0 ;
+				int localRDuration = 0 ;
+				TaskDefinition localTaskDefinition ;
+
+				for (int i = 0 ; i < localChildMax ; i++)
+				{
+					if (localTasksNodeList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localTasksNodeList.item(i).getNodeName().equalsIgnoreCase("eltTache"))
+					{
+						localTasksNode = localTasksNodeList.item(i) ;
+						localChildList = localTasksNode.getChildNodes() ;
+						localID = "" ;
+						localName = "" ;
+						localDuration = 0 ;
+						localRDuration = 0 ;
+						localStartDate = new Date() ;
+						localFinishDate = new Date() ;
+						localRStartDate = new Date() ;
+						localRFinishDate = new Date() ;
+						
+						for (int j = 0 ; j < localChildList.getLength() ; j++)
+						{
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							{
+								try
+								{
+									localID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localID = "" ;
+								}
+							}
+							
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
+							{
+								try
+								{
+									localName = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localName = "" ;
+								}
+							}
+							
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("tempsPasse"))
+							{
+								try
+								{
+									localRDuration = Integer.parseInt(localChildList.item(j).getFirstChild().getNodeValue()) ;
+								}
+								catch (Exception exc)
+								{
+								}
+							}
+							
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("tempsPrevu"))
+							{
+								try
+								{
+									localDuration = Integer.parseInt(localChildList.item(j).getFirstChild().getNodeValue()) ;
+								}
+								catch (Exception exc)
+								{
+								}
+							}
+							
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("dateDebutReelle"))
+							{
+								try
+								{
+									localRStartDate = dateFormat.parse(localChildList.item(j).getFirstChild().getNodeValue()) ;
+								}
+								catch (Exception exc)
+								{
+								}
+							}
+							
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("dateDebutPrevisionnelle"))
+							{
+								try
+								{
+									localStartDate = dateFormat.parse(localChildList.item(j).getFirstChild().getNodeValue()) ;
+								}
+								catch (Exception exc)
+								{
+								}
+							}
+							
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("dateFinReelle"))
+							{
+								try
+								{
+									localRFinishDate = dateFormat.parse(localChildList.item(j).getFirstChild().getNodeValue()) ;
+								}
+								catch (Exception exc)
+								{
+								}
+							}
+							
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("dateFinPrevisionnelle"))
+							{
+								try
+								{
+									localFinishDate = dateFormat.parse(localChildList.item(j).getFirstChild().getNodeValue()) ;
+								}
+								catch (Exception exc)
+								{
+								}
+							}
+						}
+
+						localTaskDefinition = new TaskDefinition(localID, localName, "", "") ;
+						
+						localTaskDefinition.setPlanningData(new PlanningData(localStartDate, localFinishDate, 0, (float)localDuration)) ;
+						localTaskDefinition.setRealData(new PlanningData(localRStartDate, localRFinishDate, 0, (float)localRDuration)) ;
+						
+						localTasks.add(localTaskDefinition) ;
+					}
+				}
+
+				// Getting artifacts
+				ArrayList<Artifact> localArtifacts = new ArrayList <Artifact>() ;
+				NodeList localArtifactsNodeListRoot = localDocument.getElementsByTagName("listeArtefacts") ;
+				if (localArtifactsNodeListRoot.getLength() != 1) { throw new FileParseException() ; }
+				NodeList localArtifactsNodeList = localArtifactsNodeListRoot.item(0).getChildNodes() ;
+				localChildMax = localArtifactsNodeList.getLength() ;
+				Node localArtifactsNode ;
+
+				for (int i = 0 ; i < localChildMax ; i++)
+				{
+					if (localArtifactsNodeList.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localArtifactsNodeList.item(i).getNodeName().equalsIgnoreCase("eltArtefact"))
+					{
+						localArtifactsNode = localArtifactsNodeList.item(i) ;
+						localChildList = localArtifactsNode.getChildNodes() ;
+						localID = "" ;
+						localName = "" ;
+						
+						for (int j = 0 ; j < localChildList.getLength() ; j++)
+						{
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							{
+								try
+								{
+									localID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+							
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
+							{
+								try
+								{
+									localName = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (Exception exc)
+								{
+								}
+							}
+						}
+						
+						localArtifacts.add(new Artifact(localID, localName, "", "")) ;
+					}
+				}
+				
+				// Linking project with process
+				// Iteration and tasks
+				NodeList localITTaskRoot = localDocument.getElementsByTagName("listeIterationTache") ;
+				NodeList localITTaskElts = localITTaskRoot.item(0).getChildNodes() ;
+				NodeList localInnerIdentifiers ;
+				localChildMax = localITTaskElts.getLength() ;	
+
+				for (int i = 0 ; i < localChildMax ; i++)
+				{
+					if (localITTaskElts.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localITTaskElts.item(i).getNodeName().equalsIgnoreCase("iterationTache"))
+					{
+						localChildList = localITTaskElts.item(i).getChildNodes() ;
+						localPID = "";
+						localIDS.clear() ;
+						
+						for (int j = 0 ; j < localChildList.getLength() ; j++)
+						{
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idIteration"))
+							{
+								try
+								{
+									localPID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+							
+							/*
+							 * The tasks
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("listeIdTache"))
+							{
+								try
+								{
+									localInnerIdentifiers = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localInnerIdentifiers.getLength(); k++ )
+									{
+										if (localInnerIdentifiers.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localInnerIdentifiers.item(k).getNodeName().equalsIgnoreCase("id"))
+										{
+											localIDS.add(localInnerIdentifiers.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+						}
+						
+						// Linking
+						for (int j = 0 ; j < localIterations.size() ; j++)
+						{
+							if (localIterations.get(j).getDescriptor().getId().equals(localPID))
+							{
+								for (int k = 0 ; k < localTasks.size() ; k++)
+								{
+									if (localIDS.contains(localTasks.get(k).getId()))
+									{
+										localIterations.get(j).getTasks().add(localTasks.get(k)) ;
+									}
+								}
+								break ;
+							}
+						}
+					}
+				}
+				
+				// Members and artifacts
+				NodeList localMemArtifactRoot = localDocument.getElementsByTagName("listeMembreArtefact") ;
+				NodeList localMemArtifactElts = localMemArtifactRoot.item(0).getChildNodes() ;
+				localChildMax = localMemArtifactElts.getLength() ;	
+
+				for (int i = 0 ; i < localChildMax ; i++)
+				{
+					if (localMemArtifactElts.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localMemArtifactElts.item(i).getNodeName().equalsIgnoreCase("membreArtefact"))
+					{
+						localChildList = localMemArtifactElts.item(i).getChildNodes() ;
+						localPID = "";
+						localIDS.clear() ;
+						
+						for (int j = 0 ; j < localChildList.getLength() ; j++)
+						{
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idArtefact"))
+							{
+								try
+								{
+									localPID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+							
+							/*
+							 * The tasks
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("listeArtefact"))
+							{
+								try
+								{
+									localInnerIdentifiers = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localInnerIdentifiers.getLength(); k++ )
+									{
+										if (localInnerIdentifiers.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localInnerIdentifiers.item(k).getNodeName().equalsIgnoreCase("id"))
+										{
+											localIDS.add(localInnerIdentifiers.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+						}
+						
+						// Linking
+						for (int j = 0 ; j < localResources.size() ; j++)
+						{
+							if (localResources.get(j).getId().equals(localPID))
+							{
+								for (int k = 0 ; k < localArtifacts.size() ; k++)
+								{
+									if (localIDS.contains(localArtifacts.get(k).getId()))
+									{
+										localResources.get(j).getProducingArtifacts().add(localArtifacts.get(k)) ;
+									}
+								}
+								break ;
+							}
+						}
+					}
+				}
+				
+				// Members and tasks
+				NodeList localMemTaskRoot = localDocument.getElementsByTagName("listeMembreTache") ;
+				NodeList localMemTaskElts = localMemTaskRoot.item(0).getChildNodes() ;
+				localChildMax = localMemTaskElts.getLength() ;	
+
+				for (int i = 0 ; i < localChildMax ; i++)
+				{
+					if (localMemTaskElts.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localMemTaskElts.item(i).getNodeName().equalsIgnoreCase("membreTache"))
+					{
+						localChildList = localMemTaskElts.item(i).getChildNodes() ;
+						localPID = "";
+						localIDS.clear() ;
+						
+						for (int j = 0 ; j < localChildList.getLength() ; j++)
+						{
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idMembre"))
+							{
+								try
+								{
+									localPID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+							
+							/*
+							 * The tasks
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("listeTache"))
+							{
+								try
+								{
+									localInnerIdentifiers = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localInnerIdentifiers.getLength(); k++ )
+									{
+										if (localInnerIdentifiers.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localInnerIdentifiers.item(k).getNodeName().equalsIgnoreCase("id"))
+										{
+											localIDS.add(localInnerIdentifiers.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+						}
+						
+						// Linking
+						for (int j = 0 ; j < localResources.size() ; j++)
+						{
+							if (localResources.get(j).getId().equals(localPID))
+							{
+								for (int k = 0 ; k < localTasks.size() ; k++)
+								{
+									if (localIDS.contains(localTasks.get(k).getId()))
+									{
+										localResources.get(j).getPerformingTasks().add(localTasks.get(k)) ;
+									}
+								}
+								break ;
+							}
+						}
+					}
+				}
+				
+				// Artifacts/tasks in
+				NodeList localArtifactTaskInRoot = localDocument.getElementsByTagName("listeTacheArtefact_Entree") ;
+				NodeList localArtifactTaskInElts = localArtifactTaskInRoot.item(0).getChildNodes() ;
+				localChildMax = localArtifactTaskInElts.getLength() ;	
+
+				for (int i = 0 ; i < localChildMax ; i++)
+				{
+					if (localArtifactTaskInElts.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localArtifactTaskInElts.item(i).getNodeName().equalsIgnoreCase("TacheArtefact_Entree"))
+					{
+						localChildList = localArtifactTaskInElts.item(i).getChildNodes() ;
+						localPID = "";
+						localIDS.clear() ;
+						
+						for (int j = 0 ; j < localChildList.getLength() ; j++)
+						{
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idTache"))
+							{
+								try
+								{
+									localPID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+							
+							/*
+							 * The tasks
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("listeArtefact"))
+							{
+								try
+								{
+									localInnerIdentifiers = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localInnerIdentifiers.getLength(); k++ )
+									{
+										if (localInnerIdentifiers.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localInnerIdentifiers.item(k).getNodeName().equalsIgnoreCase("id"))
+										{
+											localIDS.add(localInnerIdentifiers.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+						}
+						
+						// Linking
+						for (int j = 0 ; j < localTasks.size() ; j++)
+						{
+							if (localTasks.get(j).getId().equals(localPID))
+							{
+								for (int k = 0 ; k < localArtifacts.size() ; k++)
+								{
+									if (localIDS.contains(localArtifacts.get(k).getId()))
+									{
+										localTasks.get(j).getInputProducts().add(localArtifacts.get(k)) ;
+										localArtifacts.get(k).getUsingTasks().add(localTasks.get(j)) ;
+									}
+								}
+								break ;
+							}
+						}
+					}
+				}
+				
+				// Artifacts/tasks out
+				NodeList localArtifactTaskOutRoot = localDocument.getElementsByTagName("listeTacheArtefact_Sortie") ;
+				NodeList localArtifactTaskOutElts = localArtifactTaskOutRoot.item(0).getChildNodes() ;
+				localChildMax = localArtifactTaskOutElts.getLength() ;	
+
+				for (int i = 0 ; i < localChildMax ; i++)
+				{
+					if (localArtifactTaskOutElts.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localArtifactTaskOutElts.item(i).getNodeName().equalsIgnoreCase("TacheArtefact_Sortie"))
+					{
+						localChildList = localArtifactTaskOutElts.item(i).getChildNodes() ;
+						localPID = "";
+						localIDS.clear() ;
+						
+						for (int j = 0 ; j < localChildList.getLength() ; j++)
+						{
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idTache"))
+							{
+								try
+								{
+									localPID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+							
+							/*
+							 * The artifacts
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("listeArtefact"))
+							{
+								try
+								{
+									localInnerIdentifiers = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localInnerIdentifiers.getLength(); k++ )
+									{
+										if (localInnerIdentifiers.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localInnerIdentifiers.item(k).getNodeName().equalsIgnoreCase("id"))
+										{
+											localIDS.add(localInnerIdentifiers.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+						}
+						
+						// Linking
+						for (int j = 0 ; j < localTasks.size() ; j++)
+						{
+							if (localTasks.get(j).getId().equals(localPID))
+							{
+								for (int k = 0 ; k < localArtifacts.size() ; k++)
+								{
+									if (localIDS.contains(localArtifacts.get(k).getId()))
+									{
+										localTasks.get(j).getOutputProducts().add(localArtifacts.get(k)) ;
+										localArtifacts.get(k).getProducingTasks().add(localTasks.get(j)) ;
+									}
+								}
+								break ;
+							}
+						}
+					}
+				}
+				
+				// Products / artifacts
+				NodeList localProductArtifactRoot = localDocument.getElementsByTagName("listeProduitArtefact") ;
+				NodeList localProductArtifactElts = localProductArtifactRoot.item(0).getChildNodes() ;
+				localChildMax = localProductArtifactElts.getLength() ;	
+
+				for (int i = 0 ; i < localChildMax ; i++)
+				{
+					if (localProductArtifactElts.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localProductArtifactElts.item(i).getNodeName().equalsIgnoreCase("ProduitArtefact"))
+					{
+						localChildList = localProductArtifactElts.item(i).getChildNodes() ;
+						localPID = "";
+						localIDS.clear() ;
+						
+						for (int j = 0 ; j < localChildList.getLength() ; j++)
+						{
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idProduit"))
+							{
+								try
+								{
+									localPID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+							
+							/*
+							 * The artifacts
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("listeIdArtefact"))
+							{
+								try
+								{
+									localInnerIdentifiers = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localInnerIdentifiers.getLength(); k++ )
+									{
+										if (localInnerIdentifiers.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localInnerIdentifiers.item(k).getNodeName().equalsIgnoreCase("id"))
+										{
+											localIDS.add(localInnerIdentifiers.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+						}
+						
+						// Linking
+						for (int j = 0 ; j < localNested.size() ; j++)
+						{
+							if (localNested.get(j) instanceof WorkProductDescriptor && ((WorkProductDescriptor)localNested.get(j)).getId().equals(localPID))
+							{
+								for (int k = 0 ; k < localArtifacts.size() ; k++)
+								{
+									if (localIDS.contains(localArtifacts.get(k).getId()))
+									{
+										((WorkProductDescriptor)localNested.get(j)).getArtifacts().add(localArtifacts.get(k)) ;
+										localArtifacts.get(k).setProduct((WorkProductDescriptor)localNested.get(j)) ;
+									}
+								}
+								break ;
+							}
+						}
+					}
+				}
+				
+				// Task descriptors / task definitions
+				NodeList localActivityTaskRoot = localDocument.getElementsByTagName("listeActiviteTache") ;
+				NodeList localActivityTaskElts = localActivityTaskRoot.item(0).getChildNodes() ;
+				localChildMax = localActivityTaskElts.getLength() ;	
+
+				for (int i = 0 ; i < localChildMax ; i++)
+				{
+					if (localActivityTaskElts.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localActivityTaskElts.item(i).getNodeName().equalsIgnoreCase("ActiviteTache"))
+					{
+						localChildList = localActivityTaskElts.item(i).getChildNodes() ;
+						localPID = "";
+						localIDS.clear() ;
+						
+						for (int j = 0 ; j < localChildList.getLength() ; j++)
+						{
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idActivite"))
+							{
+								try
+								{
+									localPID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+							
+							/*
+							 * The tasks
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("listeIdTache"))
+							{
+								try
+								{
+									localInnerIdentifiers = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localInnerIdentifiers.getLength(); k++ )
+									{
+										if (localInnerIdentifiers.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localInnerIdentifiers.item(k).getNodeName().equalsIgnoreCase("id"))
+										{
+											localIDS.add(localInnerIdentifiers.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+						}
+						
+						// Linking
+						for (int j = 0 ; j < localNested.size() ; j++)
+						{
+							if (localNested.get(j) instanceof TaskDescriptor && ((TaskDescriptor)localNested.get(j)).getId().equals(localPID))
+							{
+								for (int k = 0 ; k < localTasks.size() ; k++)
+								{
+									if (localIDS.contains(localTasks.get(k).getId()))
+									{
+										((TaskDescriptor)localNested.get(j)).getTasks().add(localTasks.get(k)) ;
+										localTasks.get(k).setTask((TaskDescriptor)localNested.get(j)) ;
+									}
+								}
+								break ;
+							}
+						}
+					}
+				}
+				
+				// Members / roles
+				NodeList localMemberRoleRoot = localDocument.getElementsByTagName("listeMembre") ;
+				NodeList localMemberRoleElts = localMemberRoleRoot.item(0).getChildNodes() ;
+				localChildMax = localMemberRoleElts.getLength() ;	
+
+				for (int i = 0 ; i < localChildMax ; i++)
+				{
+					if (localMemberRoleElts.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localMemberRoleElts.item(i).getNodeName().equalsIgnoreCase("Membre"))
+					{
+						localChildList = localMemberRoleElts.item(i).getChildNodes() ;
+						localPID = "";
+						localIDS.clear() ;
+						
+						for (int j = 0 ; j < localChildList.getLength() ; j++)
+						{
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							{
+								try
+								{
+									localPID = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+							
+							/*
+							 * The tasks
+							 */
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
+									&& localChildList.item(j).getNodeName().equalsIgnoreCase("listeRole"))
+							{
+								try
+								{
+									localInnerIdentifiers = localChildList.item(j).getChildNodes() ;
+
+									for (int k = 0; k < localInnerIdentifiers.getLength(); k++ )
+									{
+										if (localInnerIdentifiers.item(k).getNodeType() == Node.ELEMENT_NODE
+												&& localInnerIdentifiers.item(k).getNodeName().equalsIgnoreCase("id"))
+										{
+											localIDS.add(localInnerIdentifiers.item(k).getFirstChild().getNodeValue()) ;
+										}
+									}
+								}
+								catch (NullPointerException exc)
+								{
+								}
+							}
+						}
+						
+						// Linking
+						for (int j = 0 ; j < localResources.size() ; j++)
+						{
+							if (localResources.get(j).getId().equals(localPID))
+							{
+								for (int k = 0 ; k < localNested.size() ; k++)
+								{
+									if (localNested.get(k) instanceof RoleDescriptor && localIDS.contains(((RoleDescriptor)localNested.get(k)).getId()))
+									{
+										localResources.get(j).getPerformingRoles().add((RoleDescriptor)localNested.get(k)) ;
+									}
+								}
+								break ;
+							}
+						}
+					}
+				}
+				
+				return localProject ;
+		
+			}
+			catch (ParserConfigurationException eDBF)
+			{
+				throw new FileParseException() ;
+			}
+			catch (SAXException eDB)
+			{
+				throw new FileParseException() ;
+			}
+			catch (IOException eDB)
+			{
+				throw new FileParseException() ;
+			}
+		}
+		catch (FileNotFoundException eIS)
+		{
+			throw new FileParseException() ;
+		}
 	}
 
 	/**
-	 * Saves the project in domino format, PSI also uses this format as save files
+	 * Saves the project in domino (hapi) format, PSI also uses this format as save files
 	 * 
 	 * @author Conde Mickael K.
 	 * @version 1.0
@@ -319,6 +1374,7 @@ public class ProjectControler
 			BreakdownElement localTempElement ;
 			ArrayList <Component> localComponents = new ArrayList <Component>() ;
 			HumanResource localTempResource ;
+			Iteration localIteration ;
 			
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy") ;
 
@@ -334,6 +1390,7 @@ public class ProjectControler
 			Iterator <Artifact> artifactIterator ;
 			Iterator <Guide> guideIterator ;
 			Iterator <HumanResource> resourceIterator ;
+			Iterator <Iteration> iterationIterator ;
 			String productsInfo = "" ;
 			String productsIds = "" ;
 
@@ -357,6 +1414,8 @@ public class ProjectControler
 			
 			String taskDefsInfo = "" ;
 			String taskDefsIds = "" ;
+			
+			String taskDefsItInfo = "" ;
 
 			// Initializing components
 			localIterator = _project.getProcess().getNestedElements().iterator() ;
@@ -453,7 +1512,7 @@ public class ProjectControler
 						} // End of product
 
 						// For activities
-						else if (localTempElement instanceof Activity)
+						else if (localTempElement instanceof Activity && !(localTempElement instanceof Component))
 						{
 							activitiesIds = activitiesIds + "<definitionTravailId>" + ((Activity) localTempElement).getDescriptor().getId()
 									+ "</definitionTravailId>\n" ;
@@ -706,7 +1765,7 @@ public class ProjectControler
 				} // End of product
 
 				// For activities
-				else if (localElement instanceof Activity)
+				else if (localElement instanceof Activity && !(localElement instanceof Component))
 				{
 					activitiesInfo = activitiesInfo + "<definitionTravail>\n" ;
 					activitiesInfo = activitiesInfo + "<id>" + ((Activity) localElement).getDescriptor().getId() + "</id>\n" ;
@@ -730,7 +1789,7 @@ public class ProjectControler
 								+ "</cheminDiagrammeFlots>\n" ;
 					}
 					
-					//activitiesInfo = activitiesInfo + "<agregatComposant>" + ((Activity) localElement) + "</agregatComposant>\n" ;
+					activitiesInfo = activitiesInfo + "<agregatComposant>" + ((Activity) localElement).getDescriptor().getParentId() + "</agregatComposant>\n" ;
 
 					// Tasks
 					if ( ((Activity) localElement).getNestedElements().size() == 0)
@@ -747,7 +1806,7 @@ public class ProjectControler
 							localTempElement = internIterator.next() ;
 							if (localTempElement instanceof TaskDescriptor)
 							{
-								activitiesInfo = activitiesInfo + "<activite>" + ((TaskDescriptor) localTempElement).getId() + "</activite>\n" ;
+								activitiesInfo = activitiesInfo + "<activiteId>" + ((TaskDescriptor) localTempElement).getId() + "</activiteId>\n" ;
 							}
 						}
 						activitiesInfo = activitiesInfo + "</liste_activiteId>\n" ;
@@ -1205,8 +2264,73 @@ public class ProjectControler
 
 			}
 
-			// Iterations : TODO how it works
-			localOSW.write("<listeIterations/>\n") ;
+			// Iterations
+			if (_project.getIterations().size() == 0)
+			{
+				localOSW.write("<listeIterations/>\n") ;
+			}
+			else
+			{
+				iterationIterator = _project.getIterations().iterator() ;
+				localOSW.write("<listeIterations>\n") ;
+				
+				Date localITStartDate = null ;
+				Date localITFinishDate = null ;
+				
+				TaskDefinition localItTaskDefinition ;
+				
+				while (iterationIterator.hasNext())
+				{
+					localIteration = iterationIterator.next() ;
+					
+					// Generating tasks for the current iteration
+					if (localIteration.getTasks().size() == 0)
+					{
+						localITStartDate = new Date() ;
+						localITFinishDate = new Date() ;
+					}
+					else
+					{
+						taskDIterator = localIteration.getTasks().iterator() ;
+						
+						taskDefsItInfo += "<iterationTache>\n" ;
+						taskDefsItInfo += "<idIteration>"+localIteration.getDescriptor().getId()+"</idIteration>\n" ;
+						taskDefsItInfo += "<listeIdTache>\n" ;
+						
+						while (taskDIterator.hasNext())
+						{
+							localItTaskDefinition = taskDIterator.next() ;
+							
+							// Generating strings
+							taskDefsItInfo += "<id>"+localItTaskDefinition.getId()+"</id>\n" ;
+							
+							// Updating iteration date
+							if (localITStartDate == null || localITStartDate.before(localItTaskDefinition.getRealData().getStartDate()))
+							{
+								localITStartDate = localItTaskDefinition.getRealData().getStartDate() ;
+							}
+							
+							if (localITFinishDate == null || localITFinishDate.after(localItTaskDefinition.getRealData().getFinishDate()))
+							{
+								localITFinishDate = localItTaskDefinition.getRealData().getFinishDate() ;
+							}
+							
+						}
+						taskDefsItInfo += "</listeIdTache>\n" ;
+						taskDefsItInfo += "</iterationTache>\n" ;
+						
+					}
+					
+					localOSW.write("<eltIteration>\n") ;
+					localOSW.write("<id>" + localIteration.getDescriptor().getId() + "</id>\n") ;
+					localOSW.write("<numero>" + localIteration.getDescriptor().getName() + "</numero>\n") ;
+					localOSW.write("<dateDebutReelle>" + dateFormat.format(localITStartDate) + "</dateDebutReelle>\n") ;
+					localOSW.write("<dateFinReelle>" + dateFormat.format(localITFinishDate) + "</dateFinReelle>\n") ;
+					localOSW.write("</eltIteration>\n") ;
+				}
+				localOSW.write("</listeIterations>\n") ;
+
+			}
 
 			// Tasks
 			if (taskDefsInfo.equals(""))
@@ -1235,7 +2359,14 @@ public class ProjectControler
 			 */
 			localOSW.write("<lienProjet>\n") ;
 			// Between iterations and tasks
-			localOSW.write("<listeIterationTache/>\n") ;
+			if (taskDefsItInfo.equals(""))
+			{
+				localOSW.write("<listeIterationTache/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<listeIterationTache>\n" + taskDefsItInfo + "</listeIterationTache>\n") ;				
+			}
 
 			// Between members and artifacts
 			localOSW.write("<listeMembreArtefact/>\n") ;
@@ -1299,10 +2430,10 @@ public class ProjectControler
 			{
 				resourceIterator = _project.getResources().iterator() ;
 				localOSW.write("<MembreRole>\n") ;
+				localOSW.write("<listeMembre>\n") ;
 				while (resourceIterator.hasNext())
 				{
 					localTempResource = resourceIterator.next() ;
-					localOSW.write("<listeMembre>\n") ;
 					localOSW.write("<Membre>\n") ;
 					localOSW.write("<id>" + localTempResource.getId() + "</id>\n") ;
 
@@ -1323,8 +2454,8 @@ public class ProjectControler
 
 					}
 					localOSW.write("</Membre>\n") ;
-					localOSW.write("</listeMembre>\n") ;
 				}
+				localOSW.write("</listeMembre>\n") ;
 				localOSW.write("</MembreRole>\n") ;
 			}
 

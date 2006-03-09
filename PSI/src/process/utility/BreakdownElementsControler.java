@@ -6,11 +6,14 @@ import java.util.Date;
 import java.util.Iterator ;
 
 import model.HumanResource ;
+import model.Project;
 import model.spem2.Artifact ;
+import model.spem2.Iteration;
 import model.spem2.RoleDescriptor ;
 import model.spem2.TaskDefinition;
 import model.spem2.TaskDescriptor ;
 import model.spem2.WorkProductDescriptor ;
+import process.GlobalController;
 import process.exception.DuplicateElementException ;
 
 /**
@@ -43,6 +46,8 @@ public class BreakdownElementsControler
 			_resource.getPerformingRoles().add(_role) ;
 			_resource.setChanged() ;
 			_resource.notifyObservers(_role) ;
+			
+			GlobalController.projectChanged = true ;
 		}
 	}
 	
@@ -66,6 +71,8 @@ public class BreakdownElementsControler
 			_resource.getPerformingRoles().remove(_role) ;
 			_resource.setChanged() ;
 			_resource.notifyObservers(_role) ;
+			
+			GlobalController.projectChanged = true ;
 		}
 	}
 	
@@ -85,6 +92,8 @@ public class BreakdownElementsControler
 			_resource.getPerformingTasks().add(_task) ;
 			_resource.setChanged() ;
 			_resource.notifyObservers(_task) ;
+			
+			GlobalController.projectChanged = true ;
 		}
 	}
 	
@@ -104,6 +113,8 @@ public class BreakdownElementsControler
 			_resource.getPerformingTasks().remove(_task) ;
 			_resource.setChanged() ;
 			_resource.notifyObservers(_task) ;
+			
+			GlobalController.projectChanged = true ;
 		}
 	}
 
@@ -137,6 +148,8 @@ public class BreakdownElementsControler
 		_product.getArtifacts().add(localArtifact) ;
 		_product.setChanged() ;
 		_product.notifyObservers(localArtifact) ;
+		
+		GlobalController.projectChanged = true ;
 	}
 
 	/**
@@ -167,6 +180,34 @@ public class BreakdownElementsControler
 		_task.getTasks().add(localTask) ;
 		_task.setChanged() ;
 		_task.notifyObservers(localTask) ;
+		
+		GlobalController.projectChanged = true ;
+		GlobalController.currentIteration.getTasks().add(localTask) ;
+	}
+	
+	/**
+	 * Adds a new iteration
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _proj
+	 */
+	public static void addIterationIntoProject(Project _proj)
+	{
+		Calendar localCalendar = Calendar.getInstance() ;
+		String localID = "_" + localCalendar.get(Calendar.MILLISECOND) + localCalendar.get(Calendar.DAY_OF_MONTH) + localCalendar.get(Calendar.MONTH)
+				+ localCalendar.get(Calendar.YEAR) + localCalendar.get(Calendar.HOUR) + localCalendar.get(Calendar.MINUTE) + localCalendar.get(Calendar.SECOND)
+				+ "_iter" ;
+		
+		Iteration localIteration = new Iteration(localID, _proj.getIterations().size() + 1) ;
+		_proj.getIterations().add(localIteration) ;
+		_proj.setChanged() ;
+		_proj.notifyObservers(localIteration) ;
+		
+		GlobalController.projectChanged = true ;
+		GlobalController.currentIteration = localIteration ;
+		
 	}
 
 	/**
@@ -185,6 +226,8 @@ public class BreakdownElementsControler
 		_artifact.setDescription(_description) ;
 		_artifact.setChanged() ;
 		_artifact.notifyObservers() ;
+		
+		GlobalController.projectChanged = true ;
 		
 	}
 	
@@ -216,6 +259,8 @@ public class BreakdownElementsControler
 			((TaskDefinition)_tasks[i]).notifyObservers(_artifact) ;
 			_artifact.setChanged() ;
 			_artifact.notifyObservers(_tasks[i]) ;
+			
+			GlobalController.projectChanged = true ;
 		}		
 	}
 	
@@ -247,6 +292,8 @@ public class BreakdownElementsControler
 			((TaskDefinition)_tasks[i]).notifyObservers(_artifact) ;
 			_artifact.setChanged() ;
 			_artifact.notifyObservers(_tasks[i]) ;
+			
+			GlobalController.projectChanged = true ;
 		}		
 	}
 	
@@ -278,6 +325,8 @@ public class BreakdownElementsControler
 			((Artifact)_artifacts[i]).notifyObservers(_task) ;
 			_task.setChanged() ;
 			_task.notifyObservers(_artifacts[i]) ;
+			
+			GlobalController.projectChanged = true ;
 		}		
 	}
 	
@@ -309,6 +358,8 @@ public class BreakdownElementsControler
 			((Artifact)_artifacts[i]).notifyObservers(_task) ;
 			_task.setChanged() ;
 			_task.notifyObservers(_artifacts[i]) ;
+			
+			GlobalController.projectChanged = true ;
 		}		
 	}
 	
@@ -350,6 +401,8 @@ public class BreakdownElementsControler
 		
 		_task.setChanged() ;
 		_task.notifyObservers() ;
+		
+		GlobalController.projectChanged = true ;
 	}
 	
 	/**
@@ -376,6 +429,8 @@ public class BreakdownElementsControler
 		
 		_task.setChanged() ;
 		_task.notifyObservers() ;
+		
+		GlobalController.projectChanged = true ;
 		
 	}
 }

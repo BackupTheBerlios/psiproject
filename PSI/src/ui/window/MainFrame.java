@@ -36,6 +36,7 @@ import model.Project;
 import process.Preferences;
 import process.exception.FileParseException;
 import process.exception.FileSaveException;
+import process.utility.BreakdownElementsControler;
 import process.utility.ProcessControler;
 import process.utility.ProjectControler;
 import ui.dialog.AboutDialog;
@@ -104,19 +105,17 @@ public class MainFrame extends JFrame
 	private MainTree projectTree = null ;
 
 	private JSplitPane rightSplitPane = null ;
-	
+
 	private JScrollPane treeScrollPane = null ;
 
-	//private JTabbedPane mainContainer = null ;
+	// private JTabbedPane mainContainer = null ;
 
 	private JTabbedPane logContainer = null ;
 
-	
 	private Project currentProject = null ;
 
 	private boolean projectModified = false ;
-	
-	
+
 	/*
 	 * Here are defined actions which can be performed by the user. Abstract Actions are used to
 	 * group the same actions being performed from different components
@@ -125,12 +124,11 @@ public class MainFrame extends JFrame
 	{
 		private static final long serialVersionUID = -2015126209086384143L ;
 
-		
 		public void actionPerformed (ActionEvent e)
 		{
 			actionOpen(e) ;
 		}
-		
+
 	} ;
 
 	private AbstractAction actionImport = new AbstractAction()
@@ -173,21 +171,21 @@ public class MainFrame extends JFrame
 		}
 	} ;
 
-	private JPanel mainContentPane = null;
+	private JPanel mainContentPane = null ;
 
-	private JPanel statusPanel = null;
+	private JPanel statusPanel = null ;
 
-	private JLabel statusLabel = null;
+	private JLabel statusLabel = null ;
 
-	private JToolBar mainToolBar = null;
+	private JToolBar mainToolBar = null ;
 
-	private JButton createButton = null;
+	private JButton createButton = null ;
 
-	private JButton openButton = null;
+	private JButton openButton = null ;
 
-	private JButton saveButton = null;
+	private JButton saveButton = null ;
 
-	private JButton iterationButton = null;
+	private JButton iterationButton = null ;
 
 	private JButton saveAsButton = null;
 	
@@ -215,14 +213,17 @@ public class MainFrame extends JFrame
 		this.setBounds(localPrefs.getXPosition(), localPrefs.getYPosition(), localPrefs.getWidth(), localPrefs.getHeight()) ;
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE) ;
 
+		this.setContentPane(getMainContentPane()) ;
+
 		/*
 		 * Actions deactivation
 		 */
 		actionImport.setEnabled(false) ;
 		actionSave.setEnabled(false) ;
 		actionSaveAs.setEnabled(false) ;
+		getIterationButton().setEnabled(false) ;
+		getExportFileMenu().setEnabled(false) ;
 
-			this.setContentPane(getMainContentPane());
 		this.addWindowListener(new java.awt.event.WindowAdapter()
 		{
 			/**
@@ -254,7 +255,7 @@ public class MainFrame extends JFrame
 				Preferences.getInstance().setYPosition(e.getComponent().getY()) ;
 			}
 		}) ;
-		
+
 	}
 
 	/**
@@ -267,7 +268,7 @@ public class MainFrame extends JFrame
 	private void actionExit ()
 	{
 		Preferences.getInstance().save() ;
-		
+
 		if (projectModified)
 		{
 			int localChoice = JOptionPane.showConfirmDialog(this, Bundle.getText("MainFrameConfirmExitMessage"), "PSI", JOptionPane.YES_NO_CANCEL_OPTION,
@@ -345,9 +346,9 @@ public class MainFrame extends JFrame
 		File localFile ;
 		if ( (localFile = localFileChooser.getSelectedFile()) != null)
 		{
-			ProgressDialog progressbar = new ProgressDialog(this);
-			progressbar.initialize(); 
-			
+			ProgressDialog progressbar = new ProgressDialog(this) ;
+			progressbar.initialize() ;
+
 			actionImport.setEnabled(false) ;
 
 			if (Preferences.getInstance().getWorkDirectory().trim().equals(""))
@@ -356,22 +357,23 @@ public class MainFrame extends JFrame
 			}
 
 			try
-			{				
+			{
 				currentProject = ProjectControler.create(localFile) ;
 				if (currentProject != null)
-				{					
+				{
 					getProjectTree().loadProject(currentProject) ;
 					actionImport.setEnabled(true) ;
-					LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectCreated") + " : " + currentProject.getName())) ;
+					LogPanel.getInstance().addInformation(
+							new LogInformation(Bundle.getText("MainFrameLogMessageProjectCreated") + " : " + currentProject.getName())) ;
 				}
 			}
 			catch (FileParseException exc)
 			{
 				JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileCreateIncorrectFormat"), "PSI", JOptionPane.ERROR_MESSAGE) ;
 			}
-			
+
 			progressbar.stopTimer() ;
-			progressbar.dispose();
+			progressbar.dispose() ;
 		}
 	}
 
@@ -413,7 +415,7 @@ public class MainFrame extends JFrame
 			{
 				String localFileName = _file.getName() ;
 				String localFileExtension = localFileName.substring(localFileName.lastIndexOf(".") + 1) ;
-				return (_file.isDirectory() || (_file.isFile() && _file.canRead() && ((localFileExtension.equalsIgnoreCase("dpe")) || (localFileExtension.equalsIgnoreCase("xml"))))) ;
+				return (_file.isDirectory() || (_file.isFile() && _file.canRead() && localFileExtension.equalsIgnoreCase("dpe"))) ;
 			}
 
 			/*
@@ -432,12 +434,13 @@ public class MainFrame extends JFrame
 		File localFile ;
 		if ( (localFile = localFileChooser.getSelectedFile()) != null)
 		{
-			ProgressDialog progressbar = new ProgressDialog(this);
-			progressbar.initialize(); 
-			
+			ProgressDialog progressbar = new ProgressDialog(this) ;
+			progressbar.initialize() ;
+
 			try
 			{
-				if ((currentProject == null)||(currentProject.getProcess() == null)){
+				if ( (currentProject == null) || (currentProject.getProcess() == null))
+				{
 					currentProject.setProcess(ProcessControler.load(localFile)) ;
 					if (currentProject != null && currentProject.getProcess() != null)
 					{
@@ -445,24 +448,28 @@ public class MainFrame extends JFrame
 						actionImport.setEnabled(true) ;
 						actionSave.setEnabled(true) ;
 						actionSaveAs.setEnabled(true) ;
+						getIterationButton().setEnabled(true) ;
+						getExportFileMenu().setEnabled(true) ;
 
 						// Updating UI
 						getProjectTree().loadProject(currentProject) ;
-						LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProcessImported") + " : "
-								+ currentProject.getProcess().getDescriptor().getName())) ;
+						LogPanel.getInstance().addInformation(
+								new LogInformation(Bundle.getText("MainFrameLogMessageProcessImported") + " : "
+										+ currentProject.getProcess().getDescriptor().getName())) ;
 					}
 				}
-				else{
-					ProjectControler.importFromOpenWorkbench(localFile, currentProject);
+				else
+				{
+					ProjectControler.importFromOpenWorkbench(localFile, currentProject) ;
 				}
 			}
 			catch (FileParseException exc)
 			{
 				JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileImportIncorrectFormat"), "PSI", JOptionPane.ERROR_MESSAGE) ;
 			}
-			
+
 			progressbar.stopTimer() ;
-			progressbar.dispose();
+			progressbar.dispose() ;
 		}
 	}
 
@@ -482,7 +489,70 @@ public class MainFrame extends JFrame
 		if((mainTabbedPane.getTabCount()>0)&&(mainTabbedPane.getTitleAt(0).equals(Bundle.getText("MainFrameDefaultPanelTitle"))))
 			mainTabbedPane.remove(0);
 		JFileChooser localFileChooser = new JFileChooser() ;
+		localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileOpenProjectTitle")) ;
+		localFileChooser.setAcceptAllFileFilterUsed(false) ;
+		File localDirectory = new File(Preferences.getInstance().getWorkDirectory()) ;
+		if (localDirectory != null)
+		{
+			localFileChooser.setCurrentDirectory(localDirectory) ;
+		}
+		localFileChooser.setFileFilter(new FileFilter()
+		{
+			/*
+			 * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
+			 */
+			public boolean accept (File _file)
+			{
+				String localFileName = _file.getName() ;
+				String localFileExtension = localFileName.substring(localFileName.lastIndexOf(".") + 1) ;
+				return (_file.isDirectory() || (_file.isFile() && _file.canRead() && localFileExtension.equalsIgnoreCase("xml"))) ;
+			}
+
+			/*
+			 * @see javax.swing.filechooser.FileFilter#getDescription()
+			 */
+			public String getDescription ()
+			{
+				return Bundle.getText("MainFrameFilePSIFilesDescription") ;
+			}
+		}) ;
 		localFileChooser.showOpenDialog(MainFrame.this) ;
+
+		/*
+		 * Working on a selected file
+		 */
+		File localFile ;
+		if ( (localFile = localFileChooser.getSelectedFile()) != null)
+		{
+
+			if (Preferences.getInstance().getWorkDirectory().trim().equals(""))
+			{
+				Preferences.getInstance().setWorkDirectory(localDirectory.getAbsolutePath()) ;
+				Preferences.getInstance().setLastProject(localFile.getAbsolutePath()) ;
+			}
+
+			try
+			{
+				currentProject = ProjectControler.open(localFile) ;
+				if (currentProject != null)
+				{
+					// Updating actions
+					actionImport.setEnabled(true) ;
+					actionSave.setEnabled(true) ;
+					actionSaveAs.setEnabled(true) ;
+					getIterationButton().setEnabled(true) ;
+					getExportFileMenu().setEnabled(true) ;
+
+					getProjectTree().loadProject(currentProject) ;
+					LogPanel.getInstance().addInformation(
+							new LogInformation(Bundle.getText("MainFrameLogMessageProjectCreated") + " : " + currentProject.getName())) ;
+				}
+			}
+			catch (FileParseException exc)
+			{
+				JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileOpenIncorrectFormat"), "PSI", JOptionPane.ERROR_MESSAGE) ;
+			}
+		}
 	}
 
 	/**
@@ -498,7 +568,7 @@ public class MainFrame extends JFrame
 	{
 		actionSave() ;
 	}
-	
+
 	/**
 	 * Saves the current project (quick save)
 	 * 
@@ -541,7 +611,7 @@ public class MainFrame extends JFrame
 	{
 		actionSaveAs() ;
 	}
-	
+
 	/**
 	 * Saves the current project [under another name]
 	 * 
@@ -590,9 +660,9 @@ public class MainFrame extends JFrame
 		File localFile = null ;
 		if ( (localFile = localFileChooser.getSelectedFile()) != null)
 		{
-			ProgressDialog progressbar = new ProgressDialog(this);
-			progressbar.initialize(); 
-			
+			ProgressDialog progressbar = new ProgressDialog(this) ;
+			progressbar.initialize() ;
+
 			// Adding extension if necessary
 			if (!localFile.getName().endsWith(".xml"))
 			{
@@ -618,7 +688,7 @@ public class MainFrame extends JFrame
 				}
 			}
 			progressbar.stopTimer() ;
-			progressbar.dispose();
+			progressbar.dispose() ;
 		}
 	}
 
@@ -755,7 +825,7 @@ public class MainFrame extends JFrame
 	{
 		if (createFileMenuItem == null)
 		{
-			createFileMenuItem = new JMenuItem() ;			
+			createFileMenuItem = new JMenuItem() ;
 			createFileMenuItem.setAction(actionCreate) ;
 			createFileMenuItem.setText(Bundle.getText("MainFrameFileMenuCreate")) ;
 			createFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuCreateMn").charAt(0)) ;
@@ -828,7 +898,7 @@ public class MainFrame extends JFrame
 	{
 		if (closeFileMenuItem == null)
 		{
-			closeFileMenuItem = new JMenuItem() ;			
+			closeFileMenuItem = new JMenuItem() ;
 			closeFileMenuItem.setText(Bundle.getText("MainFrameFileMenuClose")) ;
 			closeFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuCloseMn").charAt(0)) ;
 			closeFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.CTRL_MASK)) ;
@@ -874,7 +944,7 @@ public class MainFrame extends JFrame
 			helpAboutMenuItem.setMnemonic(Bundle.getText("MainFrameAboutMenuHelpMn").charAt(0)) ;
 			helpAboutMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK)) ;
 			helpAboutMenuItem.addActionListener(new java.awt.event.ActionListener()
-					{
+			{
 						public void actionPerformed (java.awt.event.ActionEvent e)
 						{
 							MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance();
@@ -903,10 +973,10 @@ public class MainFrame extends JFrame
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
 				{
+					AboutDialog aboutDialog = new AboutDialog() ;
 					MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance();
 					if((mainTabbedPane.getTabCount()>0)&&(mainTabbedPane.getTitleAt(0).equals(Bundle.getText("MainFrameDefaultPanelTitle"))))
 						mainTabbedPane.remove(0);
-					AboutDialog aboutDialog = new AboutDialog();
 				}
 			}) ;
 		}
@@ -946,15 +1016,14 @@ public class MainFrame extends JFrame
 	 * @return javax.swing.JTree
 	 */
 	private MainTree getProjectTree ()
-	{                          
+	{
 		if (projectTree == null)
 		{
-			projectTree = new MainTree(currentProject, this) ;			
-					
+			projectTree = new MainTree(currentProject, this) ;
+
 		}
 		return projectTree ;
 	}
-	
 
 	/**
 	 * This method initializes exportFileMenu
@@ -1073,6 +1142,75 @@ public class MainFrame extends JFrame
 			export2DBFileMenuItem = new JMenuItem() ;
 			export2DBFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExport2DB")) ;
 			export2DBFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExport2DBMn").charAt(0)) ;
+			export2DBFileMenuItem.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+					/*
+					 * Setting up a specific JFileChooser
+					 */
+					JFileChooser localFileChooser = new JFileChooser() ;
+					localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileExportProjectTitle")) ;
+					localFileChooser.setAcceptAllFileFilterUsed(false) ;
+					localFileChooser.setApproveButtonText(Bundle.getText("MainFrameFileExportProjectButton")) ;
+					File localDirectory = new File(Preferences.getInstance().getExportDirectory()) ;
+					if (localDirectory != null)
+					{
+						localFileChooser.setCurrentDirectory(localDirectory) ;
+					}
+					localFileChooser.setFileFilter(new FileFilter()
+					{
+						/*
+						 * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
+						 */
+						public boolean accept (File _file)
+						{
+							String localFileName = _file.getName() ;
+							String localFileExtension = localFileName.substring(localFileName.lastIndexOf(".") + 1) ;
+							return (_file.isDirectory() || (_file.isFile() && _file.canRead() && localFileExtension.equalsIgnoreCase("xml"))) ;
+						}
+
+						/*
+						 * @see javax.swing.filechooser.FileFilter#getDescription()
+						 */
+						public String getDescription ()
+						{
+							return Bundle.getText("MainFrameFile2DBDescription") ;
+						}
+					}) ;
+					localFileChooser.showSaveDialog(MainFrame.this) ;
+
+					/*
+					 * Working on a selected file
+					 */
+					File localFile = null ;
+					if ( (localFile = localFileChooser.getSelectedFile()) != null)
+					{
+						// Adding extension if necessary
+						if (!localFile.getName().endsWith(".xml"))
+						{
+							localFile = new File(localFile.getAbsolutePath() + ".xml") ;
+						}
+
+						// Checking if the file already exists before saving
+						if (!localFile.exists()
+								|| JOptionPane.showConfirmDialog(MainFrame.this, Bundle.getText("MainFrameFileSaveConfirm"), "PSI", JOptionPane.YES_NO_OPTION,
+										JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+						{
+							try
+							{
+								ProjectControler.exportTo2DB(currentProject, localFile) ;
+								LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectExportedTo2DB"))) ;
+
+							}
+							catch (FileSaveException exc)
+							{
+								JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileExportError"), "PSI", JOptionPane.ERROR_MESSAGE) ;
+							}
+						}
+					}
+				}
+			}) ;
 		}
 		return export2DBFileMenuItem ;
 	}
@@ -1089,6 +1227,75 @@ public class MainFrame extends JFrame
 			exportOWFileMenuItem = new JMenuItem() ;
 			exportOWFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExportOW")) ;
 			exportOWFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExportOWMn").charAt(0)) ;
+			exportOWFileMenuItem.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+					/*
+					 * Setting up a specific JFileChooser
+					 */
+					JFileChooser localFileChooser = new JFileChooser() ;
+					localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileExportProjectTitle")) ;
+					localFileChooser.setAcceptAllFileFilterUsed(false) ;
+					localFileChooser.setApproveButtonText(Bundle.getText("MainFrameFileExportProjectButton")) ;
+					File localDirectory = new File(Preferences.getInstance().getExportDirectory()) ;
+					if (localDirectory != null)
+					{
+						localFileChooser.setCurrentDirectory(localDirectory) ;
+					}
+					localFileChooser.setFileFilter(new FileFilter()
+					{
+						/*
+						 * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
+						 */
+						public boolean accept (File _file)
+						{
+							String localFileName = _file.getName() ;
+							String localFileExtension = localFileName.substring(localFileName.lastIndexOf(".") + 1) ;
+							return (_file.isDirectory() || (_file.isFile() && _file.canRead() && localFileExtension.equalsIgnoreCase("xml"))) ;
+						}
+
+						/*
+						 * @see javax.swing.filechooser.FileFilter#getDescription()
+						 */
+						public String getDescription ()
+						{
+							return Bundle.getText("MainFrameFileOWProjectDescription") ;
+						}
+					}) ;
+					localFileChooser.showSaveDialog(MainFrame.this) ;
+
+					/*
+					 * Working on a selected file
+					 */
+					File localFile = null ;
+					if ( (localFile = localFileChooser.getSelectedFile()) != null)
+					{
+						// Adding extension if necessary
+						if (!localFile.getName().endsWith(".xml"))
+						{
+							localFile = new File(localFile.getAbsolutePath() + ".xml") ;
+						}
+
+						// Checking if the file already exists before saving
+						if (!localFile.exists()
+								|| JOptionPane.showConfirmDialog(MainFrame.this, Bundle.getText("MainFrameFileSaveConfirm"), "PSI", JOptionPane.YES_NO_OPTION,
+										JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+						{
+							try
+							{
+								ProjectControler.exportToOpenWorkbench(currentProject, localFile) ;
+								LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectExportedToOW"))) ;
+
+							}
+							catch (FileSaveException exc)
+							{
+								JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileExportError"), "PSI", JOptionPane.ERROR_MESSAGE) ;
+							}
+						}
+					}
+				}
+			}) ;
 		}
 		return exportOWFileMenuItem ;
 	}
@@ -1122,6 +1329,7 @@ public class MainFrame extends JFrame
 		}
 		return rightSplitPane ;
 	}
+
 
 	public void getDefaultPanel()
 	{
@@ -1175,17 +1383,17 @@ public class MainFrame extends JFrame
 		defaultPanel.setBackground(Color.WHITE);
 		MainTabbedPane.getInstance().addTab(Bundle.getText("MainFrameDefaultPanelTitle"), defaultPanel);
 	}
-	
+
 	/**
 	 * This method initializes treeScrollPane
-	 *
+	 * 
 	 * @return javax.swing.JScrollPane.
 	 */
 	public JScrollPane getTreeScrollPane ()
 	{
 		if (treeScrollPane == null)
 		{
-			treeScrollPane = new JScrollPane(getProjectTree()) ;			
+			treeScrollPane = new JScrollPane(getProjectTree()) ;
 		}
 		return treeScrollPane ;
 	}
@@ -1205,73 +1413,71 @@ public class MainFrame extends JFrame
 		return logContainer ;
 	}
 
-	
-
 	public Project getProject ()
 	{
 		return this.currentProject ;
 	}
 
 	/**
-	 * This method initializes mainContentPane	
-	 * 	
-	 * @return javax.swing.JPanel	
+	 * This method initializes mainContentPane
+	 * 
+	 * @return javax.swing.JPanel
 	 */
 	private JPanel getMainContentPane ()
 	{
 		if (mainContentPane == null)
 		{
 			mainContentPane = new JPanel() ;
-			mainContentPane.setLayout(new BorderLayout());
-			mainContentPane.add(getMainSplitPane(), java.awt.BorderLayout.CENTER);
-			mainContentPane.add(getStatusPanel(), java.awt.BorderLayout.SOUTH);
-			mainContentPane.add(getMainToolBar(), java.awt.BorderLayout.NORTH);
+			mainContentPane.setLayout(new BorderLayout()) ;
+			mainContentPane.add(getMainSplitPane(), java.awt.BorderLayout.CENTER) ;
+			mainContentPane.add(getStatusPanel(), java.awt.BorderLayout.SOUTH) ;
+			mainContentPane.add(getMainToolBar(), java.awt.BorderLayout.NORTH) ;
 		}
 		return mainContentPane ;
 	}
 
 	/**
-	 * This method initializes statusPanel	
-	 * 	
-	 * @return javax.swing.JPanel	
+	 * This method initializes statusPanel
+	 * 
+	 * @return javax.swing.JPanel
 	 */
 	private JPanel getStatusPanel ()
 	{
 		if (statusPanel == null)
 		{
-			statusLabel = new JLabel();
-			statusLabel.setText("JLabel");
+			statusLabel = new JLabel() ;
+			statusLabel.setText("JLabel") ;
 			statusPanel = new JPanel() ;
-			statusPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
-			statusPanel.add(statusLabel, null);
+			statusPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED)) ;
+			statusPanel.add(statusLabel, null) ;
 		}
 		return statusPanel ;
 	}
 
 	/**
-	 * This method initializes mainToolBar	
-	 * 	
-	 * @return javax.swing.JToolBar	
+	 * This method initializes mainToolBar
+	 * 
+	 * @return javax.swing.JToolBar
 	 */
 	private JToolBar getMainToolBar ()
 	{
 		if (mainToolBar == null)
 		{
 			mainToolBar = new JToolBar() ;
-			mainToolBar.add(getCreateButton());
-			mainToolBar.add(getOpenButton());
-			mainToolBar.add(getSaveButton());
-			mainToolBar.add(getSaveAsButton());
-			mainToolBar.addSeparator() ;			
-			mainToolBar.add(getIterationButton());			
+			mainToolBar.add(getCreateButton()) ;
+			mainToolBar.add(getOpenButton()) ;
+			mainToolBar.add(getSaveButton()) ;
+			mainToolBar.add(getSaveAsButton()) ;
+			mainToolBar.addSeparator() ;
+			mainToolBar.add(getIterationButton()) ;
 		}
 		return mainToolBar ;
 	}
 
 	/**
-	 * This method initializes createButton	
-	 * 	
-	 * @return javax.swing.JButton	
+	 * This method initializes createButton
+	 * 
+	 * @return javax.swing.JButton
 	 */
 	private JButton getCreateButton ()
 	{
@@ -1280,15 +1486,15 @@ public class MainFrame extends JFrame
 			createButton = new JButton() ;
 			createButton.setAction(actionCreate) ;
 			createButton.setToolTipText(Bundle.getText("MainFrameFileCreateProjectButton"));
-			createButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_create.gif")));			
+			createButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_create.gif")));	
 		}
 		return createButton ;
 	}
 
 	/**
-	 * This method initializes openButton	
-	 * 	
-	 * @return javax.swing.JButton	
+	 * This method initializes openButton
+	 * 
+	 * @return javax.swing.JButton
 	 */
 	private JButton getOpenButton ()
 	{
@@ -1303,9 +1509,9 @@ public class MainFrame extends JFrame
 	}
 
 	/**
-	 * This method initializes saveButton	
-	 * 	
-	 * @return javax.swing.JButton	
+	 * This method initializes saveButton
+	 * 
+	 * @return javax.swing.JButton
 	 */
 	private JButton getSaveButton ()
 	{
@@ -1320,15 +1526,29 @@ public class MainFrame extends JFrame
 	}
 
 	/**
-	 * This method initializes iterationButton	
-	 * 	
-	 * @return javax.swing.JButton	
+	 * This method initializes iterationButton
+	 * 
+	 * @return javax.swing.JButton
 	 */
 	private JButton getIterationButton ()
 	{
 		if (iterationButton == null)
 		{
 			iterationButton = new JButton() ;
+			iterationButton.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+					int localChoice = JOptionPane.showConfirmDialog(MainFrame.this, Bundle.getText("MainFrameConfirmIterationMessage"), "PSI",
+							JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) ;
+
+					if (localChoice == JOptionPane.YES_OPTION)
+					{
+						BreakdownElementsControler.addIterationIntoProject(getProject()) ;
+					}
+				}
+			}) ;
+
 			iterationButton.setToolTipText(Bundle.getText("MainFrameFileIterateProjectButton"));
 			iterationButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_iteration.gif")));
 		}
@@ -1336,9 +1556,9 @@ public class MainFrame extends JFrame
 	}
 
 	/**
-	 * This method initializes saveAsButton	
-	 * 	
-	 * @return javax.swing.JButton	
+	 * This method initializes saveAsButton
+	 * 
+	 * @return javax.swing.JButton
 	 */
 	private JButton getSaveAsButton ()
 	{

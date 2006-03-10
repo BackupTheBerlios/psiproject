@@ -1,27 +1,29 @@
 
 package ui.misc ;
 
-import javax.swing.Box ;
-import javax.swing.BoxLayout ;
-import javax.swing.JPanel ;
-import javax.swing.JScrollPane ;
-import javax.swing.JTable ;
-import javax.swing.JTextArea ;
-import javax.swing.JTextField ;
-import javax.swing.table.AbstractTableModel ;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Observable;
+import java.util.Observer;
 
-import ui.resource.Bundle ;
-import model.spem2.TaskDefinition ;
-import model.spem2.TaskDescriptor ;
-import model.spem2.WorkProductDescriptor ;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.table.AbstractTableModel;
 
-import java.util.ArrayList ;
-import java.util.Collection ;
-import java.util.Observable ;
-import java.util.Observer ;
-import java.awt.Dimension ;
-import java.awt.FlowLayout ;
-import javax.swing.JLabel ;
+import model.spem2.TaskDefinition;
+import model.spem2.TaskDescriptor;
+import model.spem2.WorkProductDescriptor;
+import process.GlobalController;
+import ui.resource.Bundle;
 
 /**
  * JPanelTaskDescriptor : TODO type description
@@ -539,6 +541,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 
 			this.task = _task ;
 			this.task.addObserver(this) ;
+			
 			this.data = task.getTasks() ;
 			this.head = new ArrayList <String>() ;
 			head.add(Bundle.getText("TaskDescriptorPanelTableTasksID")) ;
@@ -559,7 +562,19 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		 */
 		public int getRowCount ()
 		{
-			return data.size() ;
+			int localCount = 0 ;
+			
+			Iterator<TaskDefinition> localIt = data.iterator() ;
+			
+			while (localIt.hasNext())
+			{
+				if (GlobalController.currentIteration.getTasks().contains(localIt.next()))
+				{
+					localCount++ ;
+				}
+			}
+			
+			return localCount ;
 		}
 
 		/**
@@ -567,7 +582,20 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		 */
 		public Object getValueAt (int _row, int _col)
 		{
-			Object tempArray[] = data.toArray() ;
+			Collection<TaskDefinition> localCol = new ArrayList<TaskDefinition>() ;
+			Iterator<TaskDefinition> localIt = data.iterator() ;
+			TaskDefinition localTask ;
+			
+			while (localIt.hasNext())
+			{				
+				localTask = localIt.next() ;
+				if (GlobalController.currentIteration.getTasks().contains(localTask))
+				{
+					localCol.add(localTask) ;
+				}
+			}
+			
+			Object tempArray[] = localCol.toArray() ;
 			switch (_col)
 			{
 				case 0:

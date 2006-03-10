@@ -11,6 +11,8 @@ import javax.swing.JDialog ;
 import javax.swing.JProgressBar ;
 import javax.swing.Timer;
 
+import ui.window.MainFrame;
+
 /**
  * ProgressDialog : A progress bar simulation
  * 
@@ -22,6 +24,7 @@ public class ProgressDialog extends JDialog
 {
 	private static final long serialVersionUID = -8283875527881698361L ;
 	private JPanel mainPanel = null;
+	private MainFrame owner = null ;
 	private JProgressBar progressBar = null;
 	private Timer timer = null;
 	
@@ -29,9 +32,10 @@ public class ProgressDialog extends JDialog
 	/**
 	 * This is the default constructor
 	 */
-	public ProgressDialog (JFrame _owner)
+	public ProgressDialog (MainFrame _owner)
 	{
-		super(_owner) ;
+		super() ;
+		this.owner= _owner; 
 		//initialize() ;
 	}
 
@@ -46,9 +50,11 @@ public class ProgressDialog extends JDialog
         
 		this.setVisible(true) ;
 		this.setModal(true);
-		this.setPreferredSize(new java.awt.Dimension(250,50));
+		this.setLocationRelativeTo(owner) ;
 		this.pack(); 
-	//	this.setSize(new java.awt.Dimension(250,100));
+		this.setSize(new java.awt.Dimension(250,50));
+		
+		//this.setSize(new java.awt.Dimension(250,100));
 		this.timer = new Timer(1000,new ActionListener(){
 			public void actionPerformed (ActionEvent _e)
 			{

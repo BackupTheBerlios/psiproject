@@ -115,7 +115,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		this.setSize(533, 323) ;
 		this.setComponentOrientation(java.awt.ComponentOrientation.LEFT_TO_RIGHT) ;
 		this.add(getInfoPanel(), null) ;
-		this.add(Box.createRigidArea(new Dimension(0, 30))) ;
+		this.add(Box.createRigidArea(new Dimension(0, 5))) ;
 		this.add(getDataScrollPane(), null) ;
 	}
 

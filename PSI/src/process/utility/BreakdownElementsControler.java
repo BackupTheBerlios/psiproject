@@ -230,8 +230,9 @@ public class BreakdownElementsControler
 	 * @version 1.0
 	 * 
 	 * @param _task
+	 * @param _project
 	 */
-	public static void deleteTaskDefinition(TaskDefinition _task, Project _proj)
+	public static void deleteTaskDefinition(TaskDefinition _task, Project _project)
 	{
 		// Suppressing from tasks
 		Iterator <WorkProductDescriptor> localArtifactIterator = _task.getInputProducts().iterator() ;
@@ -254,12 +255,44 @@ public class BreakdownElementsControler
 		}
 		
 		// Suppressing from resources
+		Iterator <HumanResource> localResourceIterator = _project.getResources().iterator() ;
+		HumanResource localResource ;
+		while (localResourceIterator.hasNext())
+		{
+			localResource = localResourceIterator.next() ;
+			if (localResource.getPerformingTasks().contains(_task))
+			{
+				localResource.getPerformingTasks().remove(_task) ;
+				localResource.setChanged() ;
+				localResource.notifyObservers(_task) ;
+			}
+		}
 		
-		// Suppressing from product
-		_task.getTask().getTasks().remove(_task) ;
+		// Suppressing from activity if in current iteration only
+		boolean found = false ;
+		Iterator<Iteration> localIterationIterator = _project.getIterations().iterator() ;
+		Iteration localIt ;
+		
+		while (localIterationIterator.hasNext())
+		{
+			localIt = localIterationIterator.next() ;
+			if (!localIt.equals(GlobalController.currentIteration) && localIt.getTasks().contains(_task))
+			{
+				found = true ;
+				break ;
+			}
+		}
+		
+		
+		
 		_task.getTask().setChanged() ;
 		_task.getTask().notifyObservers(_task) ;
+		if (!found)
+		{System.out.println("aye") ;
+			_task.getTask().getTasks().remove(_task) ;			
+		}
 		
+		GlobalController.currentIteration.getTasks().remove(_task) ;
 		GlobalController.projectChanged = true ;
 	}
 	
@@ -316,6 +349,27 @@ public class BreakdownElementsControler
 		_artifact.setDescription(_description) ;
 		_artifact.setChanged() ;
 		_artifact.notifyObservers() ;
+		
+		GlobalController.projectChanged = true ;
+		
+	}
+	
+	/**
+	 * Updates task with new values
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _task
+	 * @param _name
+	 * @param _description
+	 */
+	public static void updateTaskDefinitionInfo(TaskDefinition _task, String _name, String _description)
+	{
+		_task.setName(_name) ;
+		_task.setDescription(_description) ;
+		_task.setChanged() ;
+		_task.notifyObservers() ;
 		
 		GlobalController.projectChanged = true ;
 		
@@ -464,7 +518,7 @@ public class BreakdownElementsControler
 	public static void setDateForTaskDefinition(TaskDefinition _task, Date _date, boolean _start, boolean _prevision)
 	{
 		if (_prevision)
-		{			
+		{	
 			if (_start)
 			{
 				_task.getPlanningData().setStartDate(_date) ;

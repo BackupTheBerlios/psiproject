@@ -666,7 +666,7 @@ public class MainFrame extends JFrame
 			// Adding extension if necessary
 			if (!localFile.getName().endsWith(".xml"))
 			{
-				// localFile.
+				localFile = new File(localFile.getAbsolutePath() + ".xml") ;
 			}
 
 			// Checking if the file already exists before saving

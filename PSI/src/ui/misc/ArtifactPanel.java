@@ -122,9 +122,9 @@ public class ArtifactPanel extends JPanel implements Observer
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)) ;
 		this.setSize(493, 259) ;
 		this.add(getInfoPanel(), null) ;
-		this.add(Box.createRigidArea(new Dimension(0, 30))) ;
+		this.add(Box.createRigidArea(new Dimension(0, 5))) ;
 		this.add(getButtonsPanel(), null);
-		this.add(Box.createRigidArea(new Dimension(0, 30))) ;
+		this.add(Box.createRigidArea(new Dimension(0, 5))) ;
 		this.add(getDataScrollPane(), null);
 		this.add(Box.createVerticalGlue()) ;
 	}
@@ -503,7 +503,7 @@ public class ArtifactPanel extends JPanel implements Observer
 			dataPanel = new JPanel() ;
 			dataPanel.setLayout(new BoxLayout(getDataPanel(), BoxLayout.Y_AXIS));
 			dataPanel.add(getInTasksPanel(), null);
-			dataPanel.add(Box.createRigidArea(new Dimension(0, 30))) ;
+			dataPanel.add(Box.createRigidArea(new Dimension(0, 5))) ;
 			dataPanel.add(getOutTasksPanel(), null);
 			dataPanel.add(Box.createVerticalGlue()) ;
 		}

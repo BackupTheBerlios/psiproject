@@ -137,11 +137,11 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.setSize(530, 312) ;
 		this.add(getInfoPanel(), null);
-		this.add(Box.createRigidArea(new Dimension(0, 30))) ;
+		this.add(Box.createRigidArea(new Dimension(0, 5))) ;
 		this.add(getButtonsPanel(), null);
-		this.add(Box.createRigidArea(new Dimension(0, 30))) ;
+		this.add(Box.createRigidArea(new Dimension(0, 5))) ;
 		this.add(getPlanificationPanel(), null);
-		this.add(Box.createRigidArea(new Dimension(0, 30))) ;
+		this.add(Box.createRigidArea(new Dimension(0, 5))) ;
 		this.add(getDataScrollPane(), null);
 	}
 
@@ -435,6 +435,13 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		if (saveButton == null)
 		{
 			saveButton = new JButton(Bundle.getText("Save")) ;
+			saveButton.addActionListener(new java.awt.event.ActionListener()
+					{
+						public void actionPerformed (java.awt.event.ActionEvent e)
+						{
+							BreakdownElementsControler.updateTaskDefinitionInfo(task, nameTextField.getText(), descriptionTextArea.getText()) ;
+						}
+					}) ;
 		}
 		return saveButton ;
 	}
@@ -840,9 +847,9 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 						case 0 :
 							return Bundle.getText("TaskDefinitionPanelPlanPrevision") ;
 						case 1 :
-							return task.getPlanningData().getStartDate() == null ? "lol" : task.getPlanningData().getStartDate() ;
+							return task.getPlanningData().getStartDate() ;
 						case 2 :
-							return task.getPlanningData().getFinishDate()  == null ? "lol" : task.getPlanningData().getFinishDate();
+							return task.getPlanningData().getFinishDate() ;
 						default :
 							return task.getPlanningData().getDuration() ;
 					}
@@ -852,9 +859,9 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 						case 0 :
 							return Bundle.getText("TaskDefinitionPanelPlanReal") ;
 						case 1 :
-							return task.getRealData().getStartDate() == null ? "lol" : task.getRealData().getStartDate() ;
+							return task.getRealData().getStartDate() ;
 						case 2 :
-							return task.getRealData().getFinishDate()  == null ? "lol" : task.getRealData().getFinishDate() ;
+							return task.getRealData().getFinishDate() ;
 						default :
 							return task.getRealData().getDuration() ;
 					}
@@ -881,7 +888,7 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 			{
 				BreakdownElementsControler.setDateForTaskDefinition(task, (Date) _object, localStart, localPrevision) ;
 			}					
-					
+				
 		}
 
 
@@ -948,7 +955,7 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 
 			DateFormatter localFormatter = new DateFormatter(Bundle.dateFormat) ;
 
-			// formattage du champ de texte
+			// Text field formatting
 			DefaultFormatterFactory localFormatterFactory = new DefaultFormatterFactory(localFormatter) ;
 			((JFormattedTextField) getComponent()).setFormatterFactory(localFormatterFactory) ;
 
@@ -972,8 +979,11 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		@ Override
 		public Component getTableCellEditorComponent (JTable _table, Object _value, boolean _arg2, int _row, int _col)
 		{
-			((JFormattedTextField) getComponent()).setValue(_value) ;
-			return ((JFormattedTextField) getComponent()) ;
+			JFormattedTextField ftf = (JFormattedTextField)super.getTableCellEditorComponent(_table, _value, _arg2, _row, _col) ;
+			/*((JFormattedTextField) getComponent()).setValue(_value) ;
+			return ((JFormattedTextField) getComponent()) ;*/
+			ftf.setValue(_value) ;
+			return ftf ;
 		}
 		
 		

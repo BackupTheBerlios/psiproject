@@ -181,7 +181,7 @@ public class ArtifactAdderDialog extends JDialog
 					{
 						try
 						{
-							BreakdownElementsControler.addArtefactIntoWorkProductDescriptor(product, nameTextField.getText(), descriptionTextArea.getText()) ;
+							BreakdownElementsControler.addArtifactIntoWorkProductDescriptor(product, nameTextField.getText(), descriptionTextArea.getText()) ;
 							ArtifactAdderDialog.this.dispose() ;
 						}
 						catch (DuplicateElementException exc)

@@ -21,6 +21,9 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Test for model") ;
 		//$JUnit-BEGIN$
+		/**
+		 * Model's test Cases
+		 */
 		suite.addTestSuite(ComponentTest.class) ;
 		suite.addTestSuite(GuideTest.class);
 		suite.addTestSuite(GuideTypeTest.class);
@@ -30,6 +33,10 @@ public class AllTests
 		suite.addTestSuite(PresentationTest.class);
 		suite.addTestSuite(ProjectTest.class);
 		suite.addTestSuite(StateTest.class);
+		/**
+		 * Model's sub package's test suites
+		 */
+		suite.addTest(model.spem2.AllTests.suite());
 		
 		
 		//$JUnit-END$

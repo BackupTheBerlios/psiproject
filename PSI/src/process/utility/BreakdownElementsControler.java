@@ -281,11 +281,14 @@ public class BreakdownElementsControler
 		Iteration localIteration = new Iteration(localID, _proj.getIterations().size() + 1) ;
 		
 		// Copying references to tasks
-		Iterator<TaskDefinition> localTaskIteration = GlobalController.currentIteration.getTasks().iterator() ;
-		
-		while (localTaskIteration.hasNext())
+		if (GlobalController.currentIteration != null)
 		{
-			localIteration.getTasks().add(localTaskIteration.next()) ;
+			Iterator<TaskDefinition> localTaskIteration = GlobalController.currentIteration.getTasks().iterator() ;
+			
+			while (localTaskIteration.hasNext())
+			{
+				localIteration.getTasks().add(localTaskIteration.next()) ;
+			}
 		}
 
 		_proj.getIterations().add(localIteration) ;

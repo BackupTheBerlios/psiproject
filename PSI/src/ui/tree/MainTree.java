@@ -238,6 +238,19 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 		// For artifacts
 		artifactPopupMenu = new JPopupMenu() ;
 		JMenuItem artifactCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
+		JMenuItem artifactDeleteMenuItem = new JMenuItem(Bundle.getText("Delete")) ;
+		artifactDeleteMenuItem.addActionListener(new java.awt.event.ActionListener()
+		{
+			public void actionPerformed (java.awt.event.ActionEvent e)
+			{
+				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
+
+				if (localNode instanceof ArtifactTreeNode)
+				{
+					BreakdownElementsControler.deleteArtifact(((ArtifactTreeNode)localNode).getArtifact()) ;
+				}
+			}
+		}) ;
 		JMenuItem artifactExpandMenuItem = new JMenuItem(Bundle.getText("MainTreePopupShow")) ;
 		artifactExpandMenuItem.addActionListener(new java.awt.event.ActionListener()
 		{
@@ -253,11 +266,25 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 			}
 		}) ;
 		artifactPopupMenu.add(artifactExpandMenuItem) ;
+		artifactPopupMenu.add(artifactDeleteMenuItem) ;
 		artifactPopupMenu.addSeparator() ;
 		artifactPopupMenu.add(artifactCloseMenuItem) ;
 
 		taskDefinitionPopupMenu = new JPopupMenu() ;
 		JMenuItem taskDefinitionCloseMenuItem = new JMenuItem(Bundle.getText("MainTreePopupClose")) ;
+		JMenuItem taskDefinitionDeleteMenuItem = new JMenuItem(Bundle.getText("Delete")) ;
+		taskDefinitionDeleteMenuItem.addActionListener(new java.awt.event.ActionListener()
+		{
+			public void actionPerformed (java.awt.event.ActionEvent e)
+			{
+				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
+
+				if (localNode instanceof TaskDefinitionTreeNode)
+				{
+					BreakdownElementsControler.deleteTaskDefinition(((TaskDefinitionTreeNode)localNode).getTask(), MainTree.this.getProject()) ;
+				}
+			}
+		}) ;
 		JMenuItem taskDefinitionExpandMenuItem = new JMenuItem(Bundle.getText("MainTreePopupShow")) ;
 		taskDefinitionExpandMenuItem.addActionListener(new java.awt.event.ActionListener()
 		{
@@ -274,6 +301,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 			}
 		}) ;
 		taskDefinitionPopupMenu.add(taskDefinitionExpandMenuItem) ;
+		taskDefinitionPopupMenu.add(taskDefinitionDeleteMenuItem) ;
 		taskDefinitionPopupMenu.addSeparator() ;
 		taskDefinitionPopupMenu.add(taskDefinitionCloseMenuItem) ;
 
@@ -840,6 +868,26 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 			return this ;
 		}
 
+	}
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the project.
+	 */
+	public Project getProject ()
+	{
+		return this.project ;
+	}
+
+	/**
+	 * Setter
+	 *
+	 * @param _project The project to set.
+	 */
+	public void setProject (Project _project)
+	{
+		this.project = _project ;
 	}
 
 }

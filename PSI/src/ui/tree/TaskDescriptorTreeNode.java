@@ -10,11 +10,12 @@ import javax.swing.tree.TreePath;
 
 import model.spem2.TaskDefinition;
 import model.spem2.TaskDescriptor;
+import process.GlobalController;
 
 /**
  * TaskDescriptorTreeNode : A tree representation of a task
  * 
- * @author Condé Mickaël K.
+ * @author Cond? Micka?l K.
  * @version 1.0
  * 
  */
@@ -46,9 +47,15 @@ public class TaskDescriptorTreeNode extends DefaultMutableTreeNode implements Ob
 		this.setUserObject(task.getName()) ;
 		
 		Iterator<TaskDefinition> localIterator = task.getTasks().iterator() ;
+		TaskDefinition localTask ;
+		
 		while (localIterator.hasNext())
 		{
-			this.add(new TaskDefinitionTreeNode(localIterator.next(), tree)) ;
+			localTask = localIterator.next() ;
+			if (GlobalController.currentIteration.getTasks().contains(localTask))
+			{
+				this.add(new TaskDefinitionTreeNode(localTask, tree)) ;
+			}
 		}
 	}
 	
@@ -87,6 +94,19 @@ public class TaskDescriptorTreeNode extends DefaultMutableTreeNode implements Ob
 				TaskDefinitionTreeNode localNode = new TaskDefinitionTreeNode((TaskDefinition)_object, tree) ;
 				tree.getModel().insertNodeInto(localNode, this, getChildCount()) ;
 				tree.scrollPathToVisible(new TreePath(localNode.getPath()));
+			}
+			
+			else
+			{
+				int localChildCount = getChildCount() ;
+				for(int i = 0 ; i < localChildCount ; i++)
+				{
+					if (((TaskDefinitionTreeNode)getChildAt(i)).getTask().getId().equals(((TaskDefinition)_object).getId()))
+					{
+						tree.getModel().removeNodeFromParent((TaskDefinitionTreeNode)getChildAt(i)) ;
+						break ;
+					}
+				}
 			}
 		}
 		

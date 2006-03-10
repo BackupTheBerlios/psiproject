@@ -899,7 +899,7 @@ public class ProjectControler
 				for (int i = 0 ; i < localChildMax ; i++)
 				{
 					if (localMemTaskElts.item(i).getNodeType() == Node.ELEMENT_NODE
-							&& localMemTaskElts.item(i).getNodeName().equalsIgnoreCase("membreTache"))
+							&& localMemTaskElts.item(i).getNodeName().equalsIgnoreCase("MembreTache"))
 					{
 						localChildList = localMemTaskElts.item(i).getChildNodes() ;
 						localPID = "";
@@ -1415,6 +1415,8 @@ public class ProjectControler
 			String taskDefsInfo = "" ;
 			String taskDefsIds = "" ;
 			
+			String taskMemInfo = "" ;
+			
 			String taskDefsItInfo = "" ;
 
 			// Initializing components
@@ -1912,10 +1914,10 @@ public class ProjectControler
 						{							
 							localTaskDefinition = taskDIterator.next() ;
 							taskDefsInfo += "<eltTache>\n" ;
-							taskDefsInfo += "<id>" + localTaskDefinition.getId() + "</id>" ;
-							taskDefsInfo += "<nom>" + localTaskDefinition.getName() + "</nom>" ;
-							taskDefsInfo += "<tempsPasse>" + (int)localTaskDefinition.getRealData().getDuration() + "</tempsPasse>" ;
-							taskDefsInfo += "<dateFinReelle>" + dateFormat.format(localTaskDefinition.getRealData().getFinishDate()) + "</dateFinReelle>" ;
+							taskDefsInfo += "<id>" + localTaskDefinition.getId() + "</id>\n" ;
+							taskDefsInfo += "<nom>" + localTaskDefinition.getName() + "</nom>\n" ;
+							taskDefsInfo += "<tempsPasse>" + (int)localTaskDefinition.getRealData().getDuration() + "</tempsPasse>\n" ;
+							taskDefsInfo += "<dateFinReelle>" + dateFormat.format(localTaskDefinition.getRealData().getFinishDate()) + "</dateFinReelle>\n" ;
 							taskDefsInfo += "</eltTache>\n" ;					
 							
 							
@@ -2259,6 +2261,22 @@ public class ProjectControler
 					localOSW.write("<id>" + localTempResource.getId() + "</id>\n") ;
 					localOSW.write("<nom>" + localTempResource.getFullName() + "</nom>\n") ;
 					localOSW.write("</eltMembre>\n") ;
+					
+					// Generating tasks
+					if (localTempResource.getPerformingTasks().size() > 0)
+					{
+						taskMemInfo += "<MembreTache>\n" ;
+						taskMemInfo += "<idMembre>"+localTempResource.getId()+"</idMembre>\n" ;
+						taskMemInfo += "<listeTache>\n" ;
+						taskDIterator = localTempResource.getPerformingTasks().iterator() ;
+						while (taskDIterator.hasNext())
+						{
+							taskMemInfo += "<id>"+taskDIterator.next().getId()+"</id>\n" ;
+						}
+						taskMemInfo += "</listeTache>\n" ;
+						taskMemInfo += "</MembreTache>\n" ;
+					}
+					
 				}
 				localOSW.write("</listeMembres>\n") ;
 
@@ -2372,7 +2390,14 @@ public class ProjectControler
 			localOSW.write("<listeMembreArtefact/>\n") ;
 
 			// Between members and tasks
-			localOSW.write("<listeMembreTache/>\n") ;
+			if (taskMemInfo.equals(""))
+			{
+				localOSW.write("<listeMembreTache/>\n") ;
+			}
+			else
+			{
+				localOSW.write("<listeMembreTache>"+taskMemInfo+"</listeMembreTache>\n") ;
+			}
 
 			// Between tasks and artifacts in
 			if (artifactsForTaskIn.equals(""))
@@ -2613,32 +2638,36 @@ public class ProjectControler
 				while (taskIterator.hasNext())
 				{
 					localTempTask = taskIterator.next();
-					localOSW.write("<Task ") ;
-					localOSW.write("start=\"" + dateFormat.format(localTempTask.getPlanningData().getStartDate()) + "\" ") ;
-					localOSW.write("proxy=\"false\" ") ;
-					localOSW.write("critical=\"false\" ") ;
-					localOSW.write("status=\"0\" ") ;
-					localOSW.write("outlineLevel=\"1\" ") ;
-					localOSW.write("finish=\"" + dateFormat.format(localTempTask.getPlanningData().getFinishDate()) + "\" ") ;
-					localOSW.write("summary=\"false\" ") ;
-					localOSW.write("milestone=\"false\" ") ;
-					localOSW.write("name=\"" + localTempTask.getName() + "\" ") ;
-					localOSW.write("taskID=\"" + localTempTask.getId() + "\" ") ;
-					localOSW.write("fixed=\"false\" ") ;
-					localOSW.write("locked=\"false\" ") ;
-					localOSW.write("key=\"false\" ") ;
-					localOSW.write("percComp=\"0.0\" ") ;
-					localOSW.write("unplanned=\"false\">\n") ;
 					
-					localOSW.write("<Assignments>\n") ;
-					localOSW.write("<Assignment status=\"0\" ") ;
-					localOSW.write("resourceID=\"" + localTempResource.getId() + "\" ") ;
-					localOSW.write("unplanned=\"false\" ") ;
-					localOSW.write("estPattern=\"3\" ") ;
-					localOSW.write("estMax=\"1.0\"/>\n") ;
-					localOSW.write("</Assignments>\n") ;
-					
-					localOSW.write("</Task>") ;
+					if (GlobalController.currentIteration.getTasks().contains(localTempTask))
+					{
+						localOSW.write("<Task ") ;
+						localOSW.write("start=\"" + dateFormat.format(localTempTask.getPlanningData().getStartDate()) + "\" ") ;
+						localOSW.write("proxy=\"false\" ") ;
+						localOSW.write("critical=\"false\" ") ;
+						localOSW.write("status=\"0\" ") ;
+						localOSW.write("outlineLevel=\"1\" ") ;
+						localOSW.write("finish=\"" + dateFormat.format(localTempTask.getPlanningData().getFinishDate()) + "\" ") ;
+						localOSW.write("summary=\"false\" ") ;
+						localOSW.write("milestone=\"false\" ") ;
+						localOSW.write("name=\"" + localTempTask.getName() + "\" ") ;
+						localOSW.write("taskID=\"" + localTempTask.getId() + "\" ") ;
+						localOSW.write("fixed=\"false\" ") ;
+						localOSW.write("locked=\"false\" ") ;
+						localOSW.write("key=\"false\" ") ;
+						localOSW.write("percComp=\"0.0\" ") ;
+						localOSW.write("unplanned=\"false\">\n") ;
+
+						localOSW.write("<Assignments>\n") ;
+						localOSW.write("<Assignment status=\"0\" ") ;
+						localOSW.write("resourceID=\"" + localTempResource.getId() + "\" ") ;
+						localOSW.write("unplanned=\"false\" ") ;
+						localOSW.write("estPattern=\"3\" ") ;
+						localOSW.write("estMax=\"1.0\"/>\n") ;
+						localOSW.write("</Assignments>\n") ;
+
+						localOSW.write("</Task>") ;
+					}
 				}
 			}
 			
@@ -2843,8 +2872,7 @@ public class ProjectControler
 		}
 		
 	}
-	
-	
+		
 	public static void exportTo2DB (Project _project, File _destination) throws FileSaveException
 	{
 		try
@@ -2980,37 +3008,41 @@ public class ProjectControler
 						while (taskDIterator.hasNext())
 						{							
 							localTaskDefinition = taskDIterator.next() ;
-							localOSW.write("<workbreakdownelement id =\"" + localTaskDefinition.getId() + "\">\n") ;
-							localOSW.write("<name>" + localTaskDefinition.getName() + "</name>\n") ;
-							localOSW.write("<prevstartdate>" + dateFormat.format(localTaskDefinition.getPlanningData().getStartDate()) + "</prevstartdate>\n") ;
-							localOSW.write("<prevenddate>" + dateFormat.format(localTaskDefinition.getPlanningData().getFinishDate()) + "</prevenddate>\n") ;
-							localOSW.write("<realstartdate>" + dateFormat.format(localTaskDefinition.getRealData().getStartDate()) + "</realstartdate>\n") ;
-							localOSW.write("<realenddate>" + dateFormat.format(localTaskDefinition.getRealData().getFinishDate()) + "</realenddate>\n") ;
-							localOSW.write("<prevamount>" + (int)localTaskDefinition.getPlanningData().getDuration() + "</prevamount>\n") ;
 							
-							
-							//Members
-							resourceIterator = _project.getResources().iterator() ;
-							while (resourceIterator.hasNext())
+							if (GlobalController.currentIteration.getTasks().contains(localTaskDefinition))
 							{
-								localTempResource = resourceIterator.next() ;
-								taskIterator = (localTempResource).getPerformingTasks().iterator();
-								while (taskIterator.hasNext())
+								localOSW.write("<workbreakdownelement id =\"" + localTaskDefinition.getId() + "\">\n") ;
+								localOSW.write("<name>" + localTaskDefinition.getName() + "</name>\n") ;
+								localOSW.write("<prevstartdate>" + dateFormat.format(localTaskDefinition.getPlanningData().getStartDate())
+										+ "</prevstartdate>\n") ;
+								localOSW.write("<prevenddate>" + dateFormat.format(localTaskDefinition.getPlanningData().getFinishDate()) + "</prevenddate>\n") ;
+								localOSW.write("<realstartdate>" + dateFormat.format(localTaskDefinition.getRealData().getStartDate()) + "</realstartdate>\n") ;
+								localOSW.write("<realenddate>" + dateFormat.format(localTaskDefinition.getRealData().getFinishDate()) + "</realenddate>\n") ;
+								localOSW.write("<prevamount>" + (int) localTaskDefinition.getPlanningData().getDuration() + "</prevamount>\n") ;
+
+								// Members
+								resourceIterator = _project.getResources().iterator() ;
+								while (resourceIterator.hasNext())
 								{
-									localTempTask = taskIterator.next();
-									
-									//we verify if this person is working on this task
-									if (localTempTask.getId().equals(localTaskDefinition.getId()))
+									localTempResource = resourceIterator.next() ;
+									taskIterator = (localTempResource).getPerformingTasks().iterator() ;
+									while (taskIterator.hasNext())
 									{
-										localOSW.write("<working id =\"" + localTaskDefinition.getId() + "\">\n") ;
-										localOSW.write("<amount>" + (int)localTaskDefinition.getRealData().getDuration() + "</amount>\n") ;
-										localOSW.write("<resource id=\"" + localTempResource.getId() + "\"/>\n ") ;
-										localOSW.write("</working>\n");
+										localTempTask = taskIterator.next() ;
+
+										// we verify if this person is working on this task
+										if (localTempTask.getId().equals(localTaskDefinition.getId()))
+										{
+											localOSW.write("<working id =\"" + localTaskDefinition.getId() + "\">\n") ;
+											localOSW.write("<amount>" + (int) localTaskDefinition.getRealData().getDuration() + "</amount>\n") ;
+											localOSW.write("<resource id=\"" + localTempResource.getId() + "\"/>\n ") ;
+											localOSW.write("</working>\n") ;
+										}
 									}
 								}
+								localOSW.write("<wbeset id=\"" + ((TaskDescriptor) localElement).getParentId() + "\"/>\n") ;
+								localOSW.write("</workbreakdownelement>\n") ;
 							}
-							localOSW.write("<wbeset id=\"" + ((TaskDescriptor)localElement).getParentId() + "\"/>\n") ;
-							localOSW.write("</workbreakdownelement>\n");		
 						}
 						
 					}

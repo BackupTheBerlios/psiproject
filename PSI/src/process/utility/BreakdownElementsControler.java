@@ -129,7 +129,7 @@ public class BreakdownElementsControler
 	 * @param _description
 	 * @throws DuplicateElementException
 	 */
-	public static void addArtefactIntoWorkProductDescriptor (WorkProductDescriptor _product, String _name, String _description)
+	public static void addArtifactIntoWorkProductDescriptor (WorkProductDescriptor _product, String _name, String _description)
 			throws DuplicateElementException
 	{
 		// Checking if this name exists
@@ -148,6 +148,44 @@ public class BreakdownElementsControler
 		_product.getArtifacts().add(localArtifact) ;
 		_product.setChanged() ;
 		_product.notifyObservers(localArtifact) ;
+		
+		GlobalController.projectChanged = true ;
+	}
+	
+	/**
+	 * Delete an artifact and cleaning all references
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _artifact
+	 */
+	public static void deleteArtifact(Artifact _artifact)
+	{
+		// Suppressing from tasks
+		Iterator <TaskDescriptor> localTaskIterator = _artifact.getUsingTasks().iterator() ;
+		TaskDefinition localTask ;
+		while (localTaskIterator.hasNext())
+		{
+			localTask = (TaskDefinition)localTaskIterator.next() ;
+			localTask.getInputProducts().remove(_artifact) ;
+			localTask.setChanged() ;
+			localTask.notifyObservers(_artifact) ;
+		}
+		
+		localTaskIterator = _artifact.getProducingTasks().iterator() ;
+		while (localTaskIterator.hasNext())
+		{
+			localTask = (TaskDefinition)localTaskIterator.next() ;
+			localTask.getOutputProducts().remove(_artifact) ;
+			localTask.setChanged() ;
+			localTask.notifyObservers(_artifact) ;
+		}
+		
+		// Suppressing from product
+		_artifact.getProduct().getArtifacts().remove(_artifact) ;
+		_artifact.getProduct().setChanged() ;
+		_artifact.getProduct().notifyObservers(_artifact) ;
 		
 		GlobalController.projectChanged = true ;
 	}
@@ -186,6 +224,46 @@ public class BreakdownElementsControler
 	}
 	
 	/**
+	 * Delete a task from curent iteration andcleaning all references
+	 *
+	 * @author Conde Mickael K.
+	 * @version 1.0
+	 * 
+	 * @param _task
+	 */
+	public static void deleteTaskDefinition(TaskDefinition _task, Project _proj)
+	{
+		// Suppressing from tasks
+		Iterator <WorkProductDescriptor> localArtifactIterator = _task.getInputProducts().iterator() ;
+		Artifact localArtifact ;
+		while (localArtifactIterator.hasNext())
+		{
+			localArtifact = (Artifact)localArtifactIterator.next() ;
+			localArtifact.getUsingTasks().remove(_task) ;
+			localArtifact.setChanged() ;
+			localArtifact.notifyObservers(_task) ;
+		}
+		
+		localArtifactIterator = _task.getOutputProducts().iterator() ;
+		while (localArtifactIterator.hasNext())
+		{
+			localArtifact = (Artifact)localArtifactIterator.next() ;
+			localArtifact.getProducingTasks().remove(_task) ;
+			localArtifact.setChanged() ;
+			localArtifact.notifyObservers(_task) ;
+		}
+		
+		// Suppressing from resources
+		
+		// Suppressing from product
+		_task.getTask().getTasks().remove(_task) ;
+		_task.getTask().setChanged() ;
+		_task.getTask().notifyObservers(_task) ;
+		
+		GlobalController.projectChanged = true ;
+	}
+	
+	/**
 	 * Adds a new iteration
 	 *
 	 * @author Conde Mickael K.
@@ -201,6 +279,15 @@ public class BreakdownElementsControler
 				+ "_iter" ;
 		
 		Iteration localIteration = new Iteration(localID, _proj.getIterations().size() + 1) ;
+		
+		// Copying references to tasks
+		Iterator<TaskDefinition> localTaskIteration = GlobalController.currentIteration.getTasks().iterator() ;
+		
+		while (localTaskIteration.hasNext())
+		{
+			localIteration.getTasks().add(localTaskIteration.next()) ;
+		}
+
 		_proj.getIterations().add(localIteration) ;
 		_proj.setChanged() ;
 		_proj.notifyObservers(localIteration) ;

@@ -85,6 +85,19 @@ public class WorkProductDescriptorTreeNode extends DefaultMutableTreeNode implem
 				tree.getModel().insertNodeInto(localNode, this, getChildCount()) ;
 				tree.scrollPathToVisible(new TreePath(localNode.getPath()));
 			}
+			
+			else
+			{
+				int localChildCount = getChildCount() ;
+				for(int i = 0 ; i < localChildCount ; i++)
+				{
+					if (((ArtifactTreeNode)getChildAt(i)).getArtifact().getId().equals(((Artifact)_object).getId()))
+					{
+						tree.getModel().removeNodeFromParent((ArtifactTreeNode)getChildAt(i)) ;
+						break ;
+					}
+				}
+			}
 		}
 	}
 

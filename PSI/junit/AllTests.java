@@ -15,7 +15,6 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Test for default package") ;
 		//$JUnit-BEGIN$
-		suite.addTest(model.spem2.AllTests.suite());
 		suite.addTest(model.AllTests.suite());
 		suite.addTest(process.AllTests.suite());
 		//$JUnit-END$

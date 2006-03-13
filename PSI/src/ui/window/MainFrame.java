@@ -8,7 +8,11 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -28,6 +32,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 
@@ -115,6 +121,10 @@ public class MainFrame extends JFrame
 	private Project currentProject = null ;
 
 	private boolean projectModified = false ;
+	
+	private Timer statusbarTimer = null;
+	
+	
 
 	/*
 	 * Here are defined actions which can be performed by the user. Abstract Actions are used to
@@ -255,7 +265,15 @@ public class MainFrame extends JFrame
 				Preferences.getInstance().setYPosition(e.getComponent().getY()) ;
 			}
 		}) ;
-
+		
+		statusbarTimer = new Timer(1000,new ActionListener(){
+			public void actionPerformed (ActionEvent _e)
+			{				
+				Date now = new Date();				
+				statusLabel.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(now));								
+			}});
+		this.statusbarTimer.start();
+		
 	}
 
 	/**
@@ -1445,11 +1463,16 @@ public class MainFrame extends JFrame
 	{
 		if (statusPanel == null)
 		{
-			statusLabel = new JLabel() ;
-			statusLabel.setText("JLabel") ;
-			statusPanel = new JPanel() ;
-			statusPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED)) ;
-			statusPanel.add(statusLabel, null) ;
+			statusLabel = new JLabel();						
+
+			Date now = new Date();
+			
+			statusLabel.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(now));
+			statusPanel = new JPanel();
+			statusPanel.setLayout(new BorderLayout());
+			
+			statusPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED)) ;			
+			statusPanel.add(statusLabel, java.awt.BorderLayout.EAST) ;
 		}
 		return statusPanel ;
 	}

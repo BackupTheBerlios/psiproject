@@ -18,7 +18,9 @@ import javax.swing.JTextField;
 import process.exception.DuplicateElementException;
 import process.utility.BreakdownElementsControler;
 
+import model.LogInformation;
 import model.spem2.TaskDescriptor;
+import ui.misc.LogPanel;
 import ui.resource.Bundle;
 import ui.window.MainFrame;
 
@@ -178,6 +180,7 @@ public class TaskDefinitionAdderDialog extends JDialog
 						try
 						{
 							BreakdownElementsControler.addTaskDefinitionIntoTaskDescriptor(task, nameTextField.getText(), descriptionTextArea.getText()) ;
+							LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageTaskCreated") + " : " + nameTextField.getText())) ;
 							TaskDefinitionAdderDialog.this.dispose() ;
 						}
 						catch (DuplicateElementException exc)

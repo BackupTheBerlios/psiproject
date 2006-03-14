@@ -2,6 +2,8 @@
 package ui.window ;
 
 
+
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -11,8 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -32,21 +34,23 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
 
 import model.LogInformation;
 import model.Project;
-import process.Preferences;
+import process.GlobalController;
 import process.exception.FileParseException;
 import process.exception.FileSaveException;
 import process.utility.BreakdownElementsControler;
 import process.utility.ProcessControler;
 import process.utility.ProjectControler;
 import ui.dialog.AboutDialog;
-import ui.dialog.PreferenceDialog;
+import ui.dialog.PreferencesDialog;
 import ui.dialog.ProgressDialog;
 import ui.misc.LogPanel;
 import ui.misc.MainTabbedPane;
@@ -114,17 +118,31 @@ public class MainFrame extends JFrame
 
 	private JScrollPane treeScrollPane = null ;
 
-	// private JTabbedPane mainContainer = null ;
-
 	private JTabbedPane logContainer = null ;
 
 	private Project currentProject = null ;
+	
+	private JPanel mainContentPane = null ;
 
-	private boolean projectModified = false ;
+	private JPanel statusPanel = null ;
+
+	private JLabel statusLabel = null ;
+
+	private JToolBar mainToolBar = null ;
+
+	private JButton createButton = null ;
+
+	private JButton openButton = null ;
+	
+	private JButton saveButton = null ;
+
+	private JButton iterationButton = null ;
+
+	private JButton saveAsButton = null;
+	
+	Preferences preferences = null ;
 	
 	private Timer statusbarTimer = null;
-	
-	
 
 	/*
 	 * Here are defined actions which can be performed by the user. Abstract Actions are used to
@@ -181,23 +199,7 @@ public class MainFrame extends JFrame
 		}
 	} ;
 
-	private JPanel mainContentPane = null ;
-
-	private JPanel statusPanel = null ;
-
-	private JLabel statusLabel = null ;
-
-	private JToolBar mainToolBar = null ;
-
-	private JButton createButton = null ;
-
-	private JButton openButton = null ;
-
-	private JButton saveButton = null ;
-
-	private JButton iterationButton = null ;
-
-	private JButton saveAsButton = null;
+	
 	
 	/**
 	 * @throws HeadlessException
@@ -205,9 +207,48 @@ public class MainFrame extends JFrame
 	public MainFrame () throws HeadlessException
 	{
 		super() ;
+		preferences = Preferences.userRoot() ;
+		
+		// Trying to apply laf;
+		LookAndFeelInfo localLAF =  new LookAndFeelInfo(preferences.get("laf", ""), preferences.get("lafclass", "")) ;
+		try
+		{
+			UIManager.setLookAndFeel(localLAF.getClassName()) ;
+			SwingUtilities.updateComponentTreeUI(MainFrame.this) ;
+		}
+		catch (Exception exc)
+		{
+		}
+		
 		new SplashScreen(this, 4);
 		initialize() ;
 		LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageAppStarted"))) ;
+		
+		// Trying to open the last project if necessary
+		if (preferences.getBoolean("load_last_project", true))
+		{
+			try
+			{
+				currentProject = ProjectControler.open(new File(preferences.get("last_project", ""))) ;
+				if (currentProject != null)
+				{
+					// Updating actions
+					actionImport.setEnabled(true) ;
+					actionSave.setEnabled(true) ;
+					actionSaveAs.setEnabled(true) ;
+					getIterationButton().setEnabled(true) ;
+					getExportFileMenu().setEnabled(true) ;
+
+					getProjectTree().loadProject(currentProject) ;
+					LogPanel.getInstance().addInformation(
+							new LogInformation(Bundle.getText("MainFrameLogMessageProjectOpened") + " : " + currentProject.getName())) ;
+				}
+			}
+			catch (FileParseException exc)
+			{
+				JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileOpenIncorrectFormat"), "PSI", JOptionPane.ERROR_MESSAGE) ;
+			}
+		}
 	}
 
 	/**
@@ -216,11 +257,10 @@ public class MainFrame extends JFrame
 	 */
 	private void initialize ()
 	{
-		Preferences localPrefs = Preferences.getInstance() ;
 		this.setName("mainFrame") ;
 		this.setJMenuBar(getMainMenuBar()) ;
 		this.setTitle("Project Supervising Indicators") ;
-		this.setBounds(localPrefs.getXPosition(), localPrefs.getYPosition(), localPrefs.getWidth(), localPrefs.getHeight()) ;
+		this.setBounds(preferences.getInt("window_xposition", 0), preferences.getInt("window_yposition", 0), preferences.getInt("window_width", 700), preferences.getInt("window_height", 600)) ;
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE) ;
 
 		this.setContentPane(getMainContentPane()) ;
@@ -252,8 +292,8 @@ public class MainFrame extends JFrame
 			 */
 			public void componentResized (java.awt.event.ComponentEvent e)
 			{
-				Preferences.getInstance().setWidth(e.getComponent().getWidth()) ;
-				Preferences.getInstance().setHeight(e.getComponent().getHeight()) ;
+				preferences.putInt("window_width", e.getComponent().getWidth()) ;
+				preferences.putInt("window_height", e.getComponent().getHeight()) ;
 			}
 
 			/**
@@ -261,8 +301,8 @@ public class MainFrame extends JFrame
 			 */
 			public void componentMoved (java.awt.event.ComponentEvent e)
 			{
-				Preferences.getInstance().setXPosition(e.getComponent().getX()) ;
-				Preferences.getInstance().setYPosition(e.getComponent().getY()) ;
+				preferences.putInt("window_xposition", e.getComponent().getX()) ;
+				preferences.putInt("window_yposition", e.getComponent().getY()) ;
 			}
 		}) ;
 		
@@ -285,9 +325,9 @@ public class MainFrame extends JFrame
 	 */
 	private void actionExit ()
 	{
-		Preferences.getInstance().save() ;
+		//Preferences.getInstance().save() ;
 
-		if (projectModified)
+		if (GlobalController.projectChanged)
 		{
 			int localChoice = JOptionPane.showConfirmDialog(this, Bundle.getText("MainFrameConfirmExitMessage"), "PSI", JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE) ;
@@ -331,7 +371,7 @@ public class MainFrame extends JFrame
 		localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileCreateProjectTitle")) ;
 		localFileChooser.setAcceptAllFileFilterUsed(false) ;
 		localFileChooser.setApproveButtonText(Bundle.getText("MainFrameFileCreateProjectButton")) ;
-		File localDirectory = new File(Preferences.getInstance().getWorkDirectory()) ;
+		File localDirectory = new File(preferences.get("work_directory", "")) ;
 		if (localDirectory != null)
 		{
 			localFileChooser.setCurrentDirectory(localDirectory) ;
@@ -369,9 +409,9 @@ public class MainFrame extends JFrame
 
 			actionImport.setEnabled(false) ;
 
-			if (Preferences.getInstance().getWorkDirectory().trim().equals(""))
+			if (preferences.get("work_directory", "").equals(""))
 			{
-				Preferences.getInstance().setWorkDirectory(localDirectory.getAbsolutePath()) ;
+				preferences.put("work_directory", localDirectory.getAbsolutePath()) ;
 			}
 
 			try
@@ -379,6 +419,8 @@ public class MainFrame extends JFrame
 				currentProject = ProjectControler.create(localFile) ;
 				if (currentProject != null)
 				{
+					// Resetting the currentProject
+					preferences.put("last_project", "") ;
 					getProjectTree().loadProject(currentProject) ;
 					actionImport.setEnabled(true) ;
 					LogPanel.getInstance().addInformation(
@@ -398,7 +440,7 @@ public class MainFrame extends JFrame
 	/**
 	 * Imports a process dpe description to a newly created project
 	 * 
-	 * @author Cond? Mickael K.
+	 * @author Conde Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param e
@@ -419,8 +461,9 @@ public class MainFrame extends JFrame
 		localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileImportProjectTitle")) ;
 		localFileChooser.setAcceptAllFileFilterUsed(false) ;
 		localFileChooser.setApproveButtonText(Bundle.getText("MainFrameFileImportProjectButton")) ;
-		File localDirectory = new File(Preferences.getInstance().getLastProject()).getParentFile() ;
-		if (localDirectory != null)
+		File localDirectory = new File(preferences.get("work_directory", "")) ;
+		
+		if (localDirectory.exists())
 		{
 			localFileChooser.setCurrentDirectory(localDirectory) ;
 		}
@@ -494,7 +537,7 @@ public class MainFrame extends JFrame
 	/**
 	 * Opens a project from file
 	 * 
-	 * @author Cond? Mickael K.
+	 * @author Conde Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param e
@@ -509,8 +552,8 @@ public class MainFrame extends JFrame
 		JFileChooser localFileChooser = new JFileChooser() ;
 		localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileOpenProjectTitle")) ;
 		localFileChooser.setAcceptAllFileFilterUsed(false) ;
-		File localDirectory = new File(Preferences.getInstance().getWorkDirectory()) ;
-		if (localDirectory != null)
+		File localDirectory = new File(preferences.get("work_directory", "")) ;
+		if (localDirectory.exists())
 		{
 			localFileChooser.setCurrentDirectory(localDirectory) ;
 		}
@@ -531,7 +574,7 @@ public class MainFrame extends JFrame
 			 */
 			public String getDescription ()
 			{
-				return Bundle.getText("MainFrameFilePSIFilesDescription") ;
+				return Bundle.getText("MainFrameFilePSIFileDescription") ;
 			}
 		}) ;
 		localFileChooser.showOpenDialog(MainFrame.this) ;
@@ -540,13 +583,11 @@ public class MainFrame extends JFrame
 		 * Working on a selected file
 		 */
 		File localFile ;
-		if ( (localFile = localFileChooser.getSelectedFile()) != null)
+		if ( (localFile = localFileChooser.getSelectedFile()) != null && localFile.exists())
 		{
-
-			if (Preferences.getInstance().getWorkDirectory().trim().equals(""))
+			if (preferences.get("work_directory", "").equals(""))
 			{
-				Preferences.getInstance().setWorkDirectory(localDirectory.getAbsolutePath()) ;
-				Preferences.getInstance().setLastProject(localFile.getAbsolutePath()) ;
+				preferences.put("work_directory", localDirectory.getAbsolutePath()) ;
 			}
 
 			try
@@ -554,6 +595,7 @@ public class MainFrame extends JFrame
 				currentProject = ProjectControler.open(localFile) ;
 				if (currentProject != null)
 				{
+					preferences.put("last_project", localFile.getAbsolutePath()) ;
 					// Updating actions
 					actionImport.setEnabled(true) ;
 					actionSave.setEnabled(true) ;
@@ -563,7 +605,7 @@ public class MainFrame extends JFrame
 
 					getProjectTree().loadProject(currentProject) ;
 					LogPanel.getInstance().addInformation(
-							new LogInformation(Bundle.getText("MainFrameLogMessageProjectCreated") + " : " + currentProject.getName())) ;
+							new LogInformation(Bundle.getText("MainFrameLogMessageProjectOpened") + " : " + currentProject.getName())) ;
 				}
 			}
 			catch (FileParseException exc)
@@ -595,7 +637,7 @@ public class MainFrame extends JFrame
 	 */
 	private void actionSave ()
 	{
-		File localFile = new File(Preferences.getInstance().getLastProject()) ;
+		File localFile = new File(preferences.get("last_project", "")) ;
 
 		if (!localFile.exists())
 		{
@@ -608,6 +650,7 @@ public class MainFrame extends JFrame
 			ProjectControler.save(currentProject, localFile) ;
 			actionSave.setEnabled(false) ;
 			LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved"))) ;
+			GlobalController.projectChanged = false ;
 
 		}
 		catch (FileSaveException exc)
@@ -619,7 +662,7 @@ public class MainFrame extends JFrame
 	/**
 	 * Saves the current project [under another name]
 	 * 
-	 * @author Cond? Mickael K.
+	 * @author Conde Mickael K.
 	 * @version 1.0
 	 * 
 	 * @param e
@@ -645,8 +688,8 @@ public class MainFrame extends JFrame
 		localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileSaveProjectTitle")) ;
 		localFileChooser.setAcceptAllFileFilterUsed(false) ;
 		localFileChooser.setApproveButtonText(Bundle.getText("MainFrameFileImportProjectButton")) ;
-		File localDirectory = new File(Preferences.getInstance().getWorkDirectory()) ;
-		if (localDirectory != null)
+		File localDirectory = new File(preferences.get("work_directory", "")) ;
+		if (localDirectory.exists())
 		{
 			localFileChooser.setCurrentDirectory(localDirectory) ;
 		}
@@ -696,8 +739,9 @@ public class MainFrame extends JFrame
 				{
 					ProjectControler.save(currentProject, localFile) ;
 					actionSave.setEnabled(false) ;
-					Preferences.getInstance().setLastProject(localFile.getAbsolutePath()) ;
-					LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved"))) ;
+					preferences.put("last_project", localFile.getAbsolutePath()) ;
+					LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved") + " (" + localFile.getName() + ")")) ;
+					GlobalController.projectChanged = false ;
 
 				}
 				catch (FileSaveException exc)
@@ -723,12 +767,12 @@ public class MainFrame extends JFrame
 			mainSplitPane.setOneTouchExpandable(true) ;
 			mainSplitPane.setLeftComponent(getTreeScrollPane()) ;
 			mainSplitPane.setRightComponent(getRightSplitPane()) ;
-			mainSplitPane.setDividerLocation(Preferences.getInstance().getTreeWidth()) ;
+			mainSplitPane.setDividerLocation(preferences.getInt("window_treewidth", 250)) ;
 			mainSplitPane.addPropertyChangeListener("lastDividerLocation", new java.beans.PropertyChangeListener()
 			{
 				public void propertyChange (java.beans.PropertyChangeEvent e)
 				{
-					Preferences.getInstance().setTreeWidth(mainSplitPane.getDividerLocation()) ;
+					preferences.putInt("window_treewidth", mainSplitPane.getDividerLocation()) ;
 				}
 			}) ;
 		}
@@ -968,7 +1012,7 @@ public class MainFrame extends JFrame
 							MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance();
 							if((mainTabbedPane.getTabCount()>0)&&(mainTabbedPane.getTitleAt(0).equals(Bundle.getText("MainFrameDefaultPanelTitle"))))
 								mainTabbedPane.remove(0);
-							HelpFrame helpFrame = new HelpFrame();
+							new HelpFrame();
 						}
 					}) ;
 		}
@@ -991,7 +1035,7 @@ public class MainFrame extends JFrame
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
 				{
-					AboutDialog aboutDialog = new AboutDialog() ;
+					new AboutDialog() ;
 					MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance();
 					if((mainTabbedPane.getTabCount()>0)&&(mainTabbedPane.getTitleAt(0).equals(Bundle.getText("MainFrameDefaultPanelTitle"))))
 						mainTabbedPane.remove(0);
@@ -1020,7 +1064,7 @@ public class MainFrame extends JFrame
 					MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance();
 					if((mainTabbedPane.getTabCount()>0)&&(mainTabbedPane.getTitleAt(0).equals(Bundle.getText("MainFrameDefaultPanelTitle"))))
 						mainTabbedPane.remove(0);
-					new PreferenceDialog(MainFrame.this) ;
+					new PreferencesDialog(MainFrame.this) ;
 					
 				}
 			}) ;
@@ -1085,7 +1129,7 @@ public class MainFrame extends JFrame
 					localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileExportProjectTitle")) ;
 					localFileChooser.setAcceptAllFileFilterUsed(false) ;
 					localFileChooser.setApproveButtonText(Bundle.getText("MainFrameFileExportProjectButton")) ;
-					File localDirectory = new File(Preferences.getInstance().getExportDirectory()) ;
+					File localDirectory = new File(preferences.get("export_directory", "")) ;
 					if (localDirectory != null)
 					{
 						localFileChooser.setCurrentDirectory(localDirectory) ;
@@ -1171,7 +1215,7 @@ public class MainFrame extends JFrame
 					localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileExportProjectTitle")) ;
 					localFileChooser.setAcceptAllFileFilterUsed(false) ;
 					localFileChooser.setApproveButtonText(Bundle.getText("MainFrameFileExportProjectButton")) ;
-					File localDirectory = new File(Preferences.getInstance().getExportDirectory()) ;
+					File localDirectory = new File(preferences.get("export_directory", "")) ;
 					if (localDirectory != null)
 					{
 						localFileChooser.setCurrentDirectory(localDirectory) ;
@@ -1256,7 +1300,7 @@ public class MainFrame extends JFrame
 					localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileExportProjectTitle")) ;
 					localFileChooser.setAcceptAllFileFilterUsed(false) ;
 					localFileChooser.setApproveButtonText(Bundle.getText("MainFrameFileExportProjectButton")) ;
-					File localDirectory = new File(Preferences.getInstance().getExportDirectory()) ;
+					File localDirectory = new File(preferences.get("export_directory", "")) ;
 					if (localDirectory != null)
 					{
 						localFileChooser.setCurrentDirectory(localDirectory) ;
@@ -1330,19 +1374,18 @@ public class MainFrame extends JFrame
 			rightSplitPane = new JSplitPane() ;
 			rightSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT) ;
 			rightSplitPane.setOneTouchExpandable(true) ;
-			rightSplitPane.setDividerLocation(Preferences.getInstance().getLogHeight()) ;
+			rightSplitPane.setDividerLocation(preferences.getInt("window_mainheight", 400)) ;
 			rightSplitPane.addPropertyChangeListener(new java.beans.PropertyChangeListener()
 			{
 				public void propertyChange (java.beans.PropertyChangeEvent e)
 				{
 					if ( (e.getPropertyName().equals("lastDividerLocation")))
 					{
-						Preferences.getInstance().setLogHeight(rightSplitPane.getDividerLocation()) ;
+						preferences.putInt("window_mainheight", rightSplitPane.getDividerLocation()) ;
 					}
 				}
 			}) ;
 			rightSplitPane.setTopComponent(MainTabbedPane.getInstance()) ;
-			getDefaultPanel();
 			rightSplitPane.setBottomComponent(getLogContainer()) ;
 		}
 		return rightSplitPane ;

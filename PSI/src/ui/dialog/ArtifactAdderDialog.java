@@ -15,9 +15,11 @@ import javax.swing.JScrollPane ;
 import javax.swing.JTextArea ;
 import javax.swing.JTextField ;
 
+import model.LogInformation;
 import model.spem2.WorkProductDescriptor ;
 import process.exception.DuplicateElementException ;
 import process.utility.BreakdownElementsControler ;
+import ui.misc.LogPanel;
 import ui.resource.Bundle ;
 import ui.window.MainFrame ;
 
@@ -181,7 +183,8 @@ public class ArtifactAdderDialog extends JDialog
 					{
 						try
 						{
-							BreakdownElementsControler.addArtifactIntoWorkProductDescriptor(product, nameTextField.getText(), descriptionTextArea.getText()) ;
+							BreakdownElementsControler.addArtifactIntoWorkProductDescriptor(product, nameTextField.getText(), descriptionTextArea.getText()) ;							
+							LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageArtifactCreated") + " : " + nameTextField.getText())) ;
 							ArtifactAdderDialog.this.dispose() ;
 						}
 						catch (DuplicateElementException exc)

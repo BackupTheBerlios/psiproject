@@ -35,20 +35,21 @@ public class BreakdownElementsControler
 	 * @param _role
 	 * @param _resource
 	 */
-	public static void linkRoleDescriptorAndHumanResource (RoleDescriptor _role, HumanResource _resource)
+	public static void linkRoleDescriptorAndHumanResource (RoleDescriptor _role, HumanResource _resource) throws DuplicateElementException
 	{
-		if (!_role.getPerformers().contains(_resource))
+		if (_role.getPerformers().contains(_resource))
 		{
-			_role.getPerformers().add(_resource) ;
-			_role.setChanged() ;
-			_role.notifyObservers(_resource) ;
-			// Back linking
-			_resource.getPerformingRoles().add(_role) ;
-			_resource.setChanged() ;
-			_resource.notifyObservers(_role) ;
-			
-			GlobalController.projectChanged = true ;
+			throw new DuplicateElementException() ;
 		}
+		_role.getPerformers().add(_resource) ;
+		_role.setChanged() ;
+		_role.notifyObservers(_resource) ;
+		// Back linking
+		_resource.getPerformingRoles().add(_role) ;
+		_resource.setChanged() ;
+		_resource.notifyObservers(_role) ;
+
+		GlobalController.projectChanged = true ;
 	}
 	
 	/**
@@ -85,16 +86,17 @@ public class BreakdownElementsControler
 	 * @param _task
 	 * @param _resource
 	 */
-	public static void linkTaskDefinitionAndHumanResource (TaskDefinition _task, HumanResource _resource)
+	public static void linkTaskDefinitionAndHumanResource (TaskDefinition _task, HumanResource _resource) throws DuplicateElementException
 	{
-		if (!_resource.getPerformingTasks().contains(_task))
+		if (_resource.getPerformingTasks().contains(_task))
 		{
-			_resource.getPerformingTasks().add(_task) ;
-			_resource.setChanged() ;
-			_resource.notifyObservers(_task) ;
-			
-			GlobalController.projectChanged = true ;
+			throw new DuplicateElementException() ;
 		}
+		_resource.getPerformingTasks().add(_task) ;
+		_resource.setChanged() ;
+		_resource.notifyObservers(_task) ;
+
+		GlobalController.projectChanged = true ;
 	}
 	
 	/**

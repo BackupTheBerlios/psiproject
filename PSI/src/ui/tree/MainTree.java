@@ -17,6 +17,7 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -35,15 +36,18 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import model.HumanResource;
+import model.LogInformation;
 import model.Project;
 import model.spem2.Artifact;
 import model.spem2.RoleDescriptor;
 import model.spem2.TaskDefinition;
+import process.exception.DuplicateElementException;
 import process.utility.BreakdownElementsControler;
 import ui.dialog.ArtifactAdderDialog;
 import ui.dialog.TaskDefinitionAdderDialog;
 import ui.misc.ArtifactPanel;
 import ui.misc.HumanResourcePanel;
+import ui.misc.LogPanel;
 import ui.misc.MainTabbedPane;
 import ui.misc.RoleDescriptorPanel;
 import ui.misc.TaskDefinitionPanel;
@@ -148,8 +152,11 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 
 				if (localNode instanceof RoleDescriptorTreeNode)
 				{
-					BreakdownElementsControler.unlinkRoleDescriptorAndHumanResource( ((RoleDescriptorTreeNode) localNode).getRole(),
-							((ResourceTreeNode) localNode.getParent()).getResource()) ;
+					RoleDescriptor tempRole = ((RoleDescriptorTreeNode) localNode).getRole() ;
+					HumanResource tempResource = ((ResourceTreeNode) localNode.getParent()).getResource() ;
+					BreakdownElementsControler.unlinkRoleDescriptorAndHumanResource( tempRole, tempResource) ;
+					LogPanel.getInstance().addInformation(
+							new LogInformation(Bundle.getText("MainFrameLogMessageOldMemberRole") + " : "  + tempRole.getName() + " - " + tempResource.getFullName())) ;
 				}
 			}
 		}) ;
@@ -248,6 +255,9 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				if (localNode instanceof ArtifactTreeNode)
 				{
 					BreakdownElementsControler.deleteArtifact(((ArtifactTreeNode)localNode).getArtifact()) ;
+					LogPanel.getInstance().addInformation(
+							new LogInformation(Bundle.getText("MainFrameLogMessageArtifactDeleted") + " : "  + ((ArtifactTreeNode)localNode).getArtifact().getName())) ;
+					
 				}
 			}
 		}) ;
@@ -282,6 +292,8 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				if (localNode instanceof TaskDefinitionTreeNode)
 				{
 					BreakdownElementsControler.deleteTaskDefinition(((TaskDefinitionTreeNode)localNode).getTask(), MainTree.this.getProject()) ;
+					LogPanel.getInstance().addInformation(
+							new LogInformation(Bundle.getText("MainFrameLogMessageTaskDeleted") + " : "  + ((TaskDefinitionTreeNode)localNode).getTask().getName())) ;
 				}
 			}
 		}) ;
@@ -476,19 +488,51 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 
 				// Now getting the target component
 				TreePath localPath = getPathForLocation(_evt.getLocation().x, _evt.getLocation().y) ;
-				DefaultMutableTreeNode localTargetNode = (DefaultMutableTreeNode) localPath.getLastPathComponent() ;
+				DefaultMutableTreeNode localTargetNode = null ;
+				
+				try
+				{
+					localTargetNode = (DefaultMutableTreeNode) localPath.getLastPathComponent() ;
+				}
+				catch (NullPointerException exc)
+				{
+					_evt.rejectDrop() ;
+					return ;
+				}
 
 				// If the node is a role, then linking
 				if (localTargetNode instanceof RoleDescriptorTreeNode)
 				{
-					BreakdownElementsControler.linkRoleDescriptorAndHumanResource( ((RoleDescriptorTreeNode) localTargetNode).getRole(), localResource) ;
-					_evt.getDropTargetContext().dropComplete(true) ;
+					try
+					{
+						BreakdownElementsControler.linkRoleDescriptorAndHumanResource( ((RoleDescriptorTreeNode) localTargetNode).getRole(), localResource) ;
+						_evt.getDropTargetContext().dropComplete(true) ;
+						LogPanel.getInstance().addInformation(
+								new LogInformation(Bundle.getText("MainFrameLogMessageNewMemberRole") + " : "  + ((RoleDescriptorTreeNode) localTargetNode).getRole().getName() + " - " + localResource.getFullName())) ;
+					}
+					catch (InvalidDnDOperationException exc)
+					{
+					}
+					catch (DuplicateElementException exc)
+					{
+					}
 				}
 
 				else if (localTargetNode instanceof TaskDefinitionTreeNode)
 				{
-					BreakdownElementsControler.linkTaskDefinitionAndHumanResource( ((TaskDefinitionTreeNode) localTargetNode).getTask(), localResource) ;
-					_evt.getDropTargetContext().dropComplete(true) ;
+					try
+					{
+						BreakdownElementsControler.linkTaskDefinitionAndHumanResource( ((TaskDefinitionTreeNode) localTargetNode).getTask(), localResource) ;
+						_evt.getDropTargetContext().dropComplete(true) ;
+						LogPanel.getInstance().addInformation(
+								new LogInformation(Bundle.getText("MainFrameLogMessageNewMemberTask") + " : " + ((TaskDefinitionTreeNode) localTargetNode).getTask().getName() + " - " + localResource.getFullName())) ;
+					}
+					catch (InvalidDnDOperationException exc)
+					{
+					}
+					catch (DuplicateElementException exc)
+					{
+					}
 				}
 
 				/*
@@ -514,13 +558,34 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				RoleDescriptor localRole = (RoleDescriptor) transferable.getTransferData(RoleDescriptor.ROLE_FLAVOR) ;
 
 				TreePath localPath = getPathForLocation(_evt.getLocation().x, _evt.getLocation().y) ;
-				DefaultMutableTreeNode localTargetNode = (DefaultMutableTreeNode) localPath.getLastPathComponent() ;
+				DefaultMutableTreeNode localTargetNode = null ;
+				
+				try
+				{
+					localTargetNode = (DefaultMutableTreeNode) localPath.getLastPathComponent() ;
+				}
+				catch (NullPointerException exc)
+				{
+					_evt.rejectDrop() ;
+					return ;
+				}
 
 				// If the node is a role, then linking
 				if (localTargetNode instanceof ResourceTreeNode)
 				{
-					BreakdownElementsControler.linkRoleDescriptorAndHumanResource(localRole, ((ResourceTreeNode) localTargetNode).getResource()) ;
-					_evt.getDropTargetContext().dropComplete(true) ;
+					try
+					{
+						BreakdownElementsControler.linkRoleDescriptorAndHumanResource(localRole, ((ResourceTreeNode) localTargetNode).getResource()) ;
+						_evt.getDropTargetContext().dropComplete(true) ;
+						LogPanel.getInstance().addInformation(
+								new LogInformation(Bundle.getText("MainFrameLogMessageNewMemberRole") + " : " + localRole.getName() + " - " + ((ResourceTreeNode) localTargetNode).getResource().getFullName())) ;
+					}
+					catch (InvalidDnDOperationException exc)
+					{
+					}
+					catch (DuplicateElementException exc)
+					{
+					}
 				}
 
 			}
@@ -531,7 +596,18 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				Artifact localArtifact = (Artifact) transferable.getTransferData(Artifact.ARTIFACT_FLAVOR) ;
 
 				TreePath localPath = getPathForLocation(_evt.getLocation().x, _evt.getLocation().y) ;
-				DefaultMutableTreeNode localTargetNode = (DefaultMutableTreeNode) localPath.getLastPathComponent() ;
+				
+				DefaultMutableTreeNode localTargetNode = null ;
+				
+				try
+				{
+					localTargetNode = (DefaultMutableTreeNode) localPath.getLastPathComponent() ;
+				}
+				catch (NullPointerException exc)
+				{
+					_evt.rejectDrop() ;
+					return ;
+				}
 
 				
 				// If the node is a task
@@ -558,7 +634,18 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 				TaskDefinition localTasks[] = { (TaskDefinition) transferable.getTransferData(TaskDefinition.TASK_FLAVOR) };
 
 				TreePath localPath = getPathForLocation(_evt.getLocation().x, _evt.getLocation().y) ;
-				DefaultMutableTreeNode localTargetNode = (DefaultMutableTreeNode) localPath.getLastPathComponent() ;			
+
+				DefaultMutableTreeNode localTargetNode = null ;
+				
+				try
+				{
+					localTargetNode = (DefaultMutableTreeNode) localPath.getLastPathComponent() ;
+				}
+				catch (NullPointerException exc)
+				{
+					_evt.rejectDrop() ;
+					return ;
+				}
 				
 				// If the node is a task
 				if (localTargetNode instanceof ArtifactTreeNode)
@@ -820,6 +907,12 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 			if (_object instanceof RoleDescriptorTreeNode)
 			{
 				setIcon(new ImageIcon(getClass().getResource("/ui/resource/icon_role.gif"))) ;
+			}
+			
+			// Resources
+			else if (_object instanceof ResourceTreeNode)
+			{
+				setIcon(new ImageIcon(getClass().getResource("/ui/resource/icon_resource.gif"))) ;
 			}
 
 			// Products and artifacts

@@ -1313,6 +1313,7 @@ public class ProjectControler
 									if (localNested.get(k) instanceof RoleDescriptor && localIDS.contains(((RoleDescriptor)localNested.get(k)).getId()))
 									{
 										localResources.get(j).getPerformingRoles().add((RoleDescriptor)localNested.get(k)) ;
+										((RoleDescriptor)localNested.get(k)).getPerformers().add(localResources.get(j)) ;
 									}
 								}
 								break ;

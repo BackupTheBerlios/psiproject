@@ -933,7 +933,98 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 		public void keyPressed (KeyEvent _e)
 		{
 			// Filtering events
-			// System.out.println(_e) ;
+			// Deleting artifacts, tasks and roles from members
+			if (_e.getKeyCode() == KeyEvent.VK_DELETE)
+			{
+				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
+
+				if (localNode instanceof TaskDefinitionTreeNode)
+				{
+					
+					BreakdownElementsControler.deleteTaskDefinition(((TaskDefinitionTreeNode)localNode).getTask(), MainTree.this.getProject()) ;
+					LogPanel.getInstance().addInformation(
+							new LogInformation(Bundle.getText("MainFrameLogMessageTaskDeleted") + " : "  + ((TaskDefinitionTreeNode)localNode).getTask().getName())) ;
+				}
+				
+				else if (localNode instanceof ArtifactTreeNode)
+				{
+					
+					BreakdownElementsControler.deleteArtifact(((ArtifactTreeNode)localNode).getArtifact()) ;
+					LogPanel.getInstance().addInformation(
+							new LogInformation(Bundle.getText("MainFrameLogMessageArtifactDeleted") + " : "  + ((ArtifactTreeNode)localNode).getArtifact().getName())) ;
+				}
+				
+				else if (localNode instanceof RoleDescriptorTreeNode)
+				{
+					RoleDescriptor tempRole = ((RoleDescriptorTreeNode) localNode).getRole() ;
+					HumanResource tempResource = ((ResourceTreeNode) localNode.getParent()).getResource() ;
+					BreakdownElementsControler.unlinkRoleDescriptorAndHumanResource( tempRole, tempResource) ;
+					LogPanel.getInstance().addInformation(
+							new LogInformation(Bundle.getText("MainFrameLogMessageOldMemberRole") + " : "  + tempRole.getName() + " - " + tempResource.getFullName())) ;
+				}
+			}
+			
+			else if (_e.getKeyCode() == KeyEvent.VK_ENTER)
+			{
+				DefaultMutableTreeNode localNode = (DefaultMutableTreeNode) getLastSelectedPathComponent() ;
+				
+				/*
+				 * Task descriptors => displaying estimations
+				 */
+				if (localNode instanceof TaskDescriptorTreeNode)
+				{
+					MainTabbedPane.getInstance().addTab( ((TaskDescriptorTreeNode) localNode).getTask().getName(), new ImageIcon(getClass().getResource("/ui/resource/icon_activity.gif")),
+							new TaskDescriptorPanel( ((TaskDescriptorTreeNode) localNode).getTask())) ;
+				}
+				
+								
+				/*
+				 * Role descriptors => displaying role infos
+				 */
+				else if (localNode instanceof RoleDescriptorTreeNode)
+				{
+					MainTabbedPane.getInstance().addTab( ((RoleDescriptorTreeNode) localNode).getRole().getName(), new ImageIcon(getClass().getResource("/ui/resource/icon_role.gif")),
+							new RoleDescriptorPanel( ((RoleDescriptorTreeNode) localNode).getRole())) ;
+				}
+
+				/*
+				 * Product descriptors
+				 */
+				else if (localNode instanceof WorkProductDescriptorTreeNode)
+				{
+					MainTabbedPane.getInstance().addTab( ((WorkProductDescriptorTreeNode) localNode).getProduct().getName(), new ImageIcon(getClass().getResource("/ui/resource/icon_product.gif")), 
+							new WorkProductDescriptorPanel( ((WorkProductDescriptorTreeNode) localNode).getProduct())) ;
+				}
+
+				/*
+				 * Artifacts
+				 */
+				else if (localNode instanceof ArtifactTreeNode)
+				{
+					MainTabbedPane.getInstance().addTab( ((ArtifactTreeNode) localNode).getArtifact().getName(),new ImageIcon(getClass().getResource("/ui/resource/icon_artifact.gif")), 
+							new ArtifactPanel(mainFrame, ((ArtifactTreeNode) localNode).getArtifact())) ;
+				}
+
+				/*
+				 * Task definitions
+				 */
+				else if (localNode instanceof TaskDefinitionTreeNode)
+				{
+					MainTabbedPane.getInstance().addTab( ((TaskDefinitionTreeNode) localNode).getTask().getName(), new ImageIcon(getClass().getResource("/ui/resource/icon_task.gif")),
+							new TaskDefinitionPanel(mainFrame, ((TaskDefinitionTreeNode) localNode).getTask())) ;
+				}
+				
+				/*
+				 * Resources definitions
+				 */
+				else if (localNode instanceof ResourceTreeNode)
+				{
+					MainTabbedPane.getInstance().add(new HumanResourcePanel( ((ResourceTreeNode) localNode).getResource()),
+							((ResourceTreeNode) localNode).getResource().getFullName()) ;
+				}
+				
+			}
+			
 		}
 
 	}

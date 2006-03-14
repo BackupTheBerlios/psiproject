@@ -129,7 +129,7 @@ public class BreakdownElementsControler
 			}
 			
 		}
-		System.out.println(_task.getTask().getPrimaryPerformers().size()) ;
+		
 		// If nothing found, then linking with the FIRST good role
 		if (!roleFound && _task.getTask().getPrimaryPerformers().size() > 0)
 		{
@@ -335,7 +335,7 @@ public class BreakdownElementsControler
 		_task.getTask().setChanged() ;
 		_task.getTask().notifyObservers(_task) ;
 		if (!found)
-		{System.out.println("aye") ;
+		{
 			_task.getTask().getTasks().remove(_task) ;			
 		}
 		

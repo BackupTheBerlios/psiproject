@@ -71,6 +71,21 @@ public class BreakdownElementsControler
 			// Back linking
 			_resource.getPerformingRoles().remove(_role) ;
 			_resource.setChanged() ;
+			
+			// Removing tasks
+			Iterator<TaskDescriptor> localTDI = _role.getPrimaryTasks().iterator() ;
+			Iterator<TaskDefinition> localTDeI ;
+			
+			while (localTDI.hasNext())
+			{
+				localTDeI = localTDI.next().getTasks().iterator() ;
+				while (localTDeI.hasNext())
+				{
+					unlinkTaskDefinitionAndHumanResource(localTDeI.next(), _resource) ;
+				}
+			}
+			
+			
 			_resource.notifyObservers(_role) ;
 			
 			GlobalController.projectChanged = true ;
@@ -92,8 +107,38 @@ public class BreakdownElementsControler
 		{
 			throw new DuplicateElementException() ;
 		}
+		
+		// Adding roles if necessary
+		boolean roleFound = false ;
+		
+		Iterator<RoleDescriptor> localIterator = _resource.getPerformingRoles().iterator() ;
+		RoleDescriptor localRole ;
+		Iterator<TaskDescriptor> localTIterator ;
+		while (localIterator.hasNext() && !roleFound)
+		{
+			localRole = localIterator.next() ;
+			localTIterator = localRole.getPrimaryTasks().iterator() ;
+			
+			while (localTIterator.hasNext())
+			{
+				if (localTIterator.next() == _task.getTask())
+				{
+					roleFound = true ;
+					break ;
+				}
+			}
+			
+		}
+		System.out.println(_task.getTask().getPrimaryPerformers().size()) ;
+		// If nothing found, then linking with the FIRST good role
+		if (!roleFound && _task.getTask().getPrimaryPerformers().size() > 0)
+		{
+			localRole = _task.getTask().getPrimaryPerformers().iterator().next() ;
+			BreakdownElementsControler.linkRoleDescriptorAndHumanResource(localRole, _resource) ;
+		}
+		
 		_resource.getPerformingTasks().add(_task) ;
-		_resource.setChanged() ;
+		_resource.setChanged() ;		
 		_resource.notifyObservers(_task) ;
 
 		GlobalController.projectChanged = true ;

@@ -143,6 +143,7 @@ public class MainFrame extends JFrame
 	Preferences preferences = null ;
 	
 	private Timer statusbarTimer = null;
+	private boolean statusbarflash = true; 
 
 	/*
 	 * Here are defined actions which can be performed by the user. Abstract Actions are used to
@@ -309,8 +310,20 @@ public class MainFrame extends JFrame
 		statusbarTimer = new Timer(1000,new ActionListener(){
 			public void actionPerformed (ActionEvent _e)
 			{				
-				Date now = new Date();				
-				statusLabel.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(now));								
+				Date now = new Date();	
+				String DateText = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(now);
+				if (statusbarflash == false)
+				{
+					String part[];
+					part = DateText.split(":");
+					DateText = part[0]+" "+part[1];
+					statusbarflash = true;												
+				}
+				else
+					statusbarflash = false;
+				
+				statusLabel.setText(DateText);
+					
 			}});
 		this.statusbarTimer.start();
 		

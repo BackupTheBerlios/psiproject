@@ -954,7 +954,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 							new LogInformation(Bundle.getText("MainFrameLogMessageArtifactDeleted") + " : "  + ((ArtifactTreeNode)localNode).getArtifact().getName())) ;
 				}
 				
-				else if (localNode instanceof RoleDescriptorTreeNode)
+				else if (localNode instanceof RoleDescriptorTreeNode && localNode.getParent() instanceof ResourceTreeNode)
 				{
 					RoleDescriptor tempRole = ((RoleDescriptorTreeNode) localNode).getRole() ;
 					HumanResource tempResource = ((ResourceTreeNode) localNode.getParent()).getResource() ;

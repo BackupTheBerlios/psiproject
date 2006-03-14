@@ -71,6 +71,7 @@ public class BreakdownElementsControler
 			// Back linking
 			_resource.getPerformingRoles().remove(_role) ;
 			_resource.setChanged() ;
+			_resource.notifyObservers(_role) ;
 			
 			// Removing tasks
 			Iterator<TaskDescriptor> localTDI = _role.getPrimaryTasks().iterator() ;
@@ -83,10 +84,7 @@ public class BreakdownElementsControler
 				{
 					unlinkTaskDefinitionAndHumanResource(localTDeI.next(), _resource) ;
 				}
-			}
-			
-			
-			_resource.notifyObservers(_role) ;
+			}			
 			
 			GlobalController.projectChanged = true ;
 		}

@@ -22,6 +22,7 @@ import model.spem2.Artifact ;
 import model.spem2.TaskDefinition ;
 import model.spem2.TaskDescriptor ;
 import model.spem2.WorkProductDescriptor ;
+import process.exception.DuplicateElementException;
 import process.utility.BreakdownElementsControler ;
 import ui.resource.Bundle ;
 import ui.window.MainFrame ;
@@ -442,7 +443,13 @@ public class TaskDefinitionManagerDialog extends JDialog
 					removeButton.setEnabled(true) ;
 
 					// Updating model
-					BreakdownElementsControler.linkTaskDefinitionToArtifacts(task, _localSelectedValues, inOutComboBox.getSelectedIndex() == 0) ;
+					try
+					{
+						BreakdownElementsControler.linkTaskDefinitionToArtifacts(task, _localSelectedValues, inOutComboBox.getSelectedIndex() == 0) ;
+					}
+					catch (DuplicateElementException exc)
+					{
+					}
 
 					// Updating lists
 					for (int i = 0; i < _localSelectedValues.length; i++ )

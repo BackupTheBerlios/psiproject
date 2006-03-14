@@ -432,17 +432,27 @@ public class BreakdownElementsControler
 	 * @param _tasks
 	 * @param _in
 	 */
-	public static void linkArtifactToTaskDefinitions(Artifact _artifact, Object[] _tasks, boolean _in)
+	public static void linkArtifactToTaskDefinitions(Artifact _artifact, Object[] _tasks, boolean _in) throws DuplicateElementException
 	{
 		for (int i = 0 ; i < _tasks.length ; i++)
 		{
 			if (_in)
 			{
+				if (((TaskDefinition)_tasks[i]).getInputProducts().contains(_artifact))
+				{
+					throw new DuplicateElementException() ;
+				}
+				
 				((TaskDefinition)_tasks[i]).getInputProducts().add(_artifact) ;
 				_artifact.getUsingTasks().add((TaskDefinition)_tasks[i]) ;
 			}
 			else
 			{
+				if (((TaskDefinition)_tasks[i]).getOutputProducts().contains(_artifact))
+				{
+					throw new DuplicateElementException() ;
+				}
+				
 				((TaskDefinition)_tasks[i]).getOutputProducts().add(_artifact) ;
 				_artifact.getProducingTasks().add((TaskDefinition)_tasks[i]) ;
 			}
@@ -498,17 +508,26 @@ public class BreakdownElementsControler
 	 * @param _artifacts
 	 * @param _in
 	 */
-	public static void linkTaskDefinitionToArtifacts(TaskDefinition _task, Object[] _artifacts, boolean _in)
+	public static void linkTaskDefinitionToArtifacts(TaskDefinition _task, Object[] _artifacts, boolean _in) throws DuplicateElementException
 	{
 		for (int i = 0 ; i < _artifacts.length ; i++)
 		{
 			if (_in)
 			{
+				if (((Artifact)_artifacts[i]).getUsingTasks().contains(_task))
+				{
+					throw new DuplicateElementException() ;
+				}
 				((Artifact)_artifacts[i]).getUsingTasks().add(_task) ;
 				_task.getInputProducts().add((Artifact)_artifacts[i]) ;
 			}
 			else
 			{
+				if (((Artifact)_artifacts[i]).getProducingTasks().contains(_task))
+				{
+					throw new DuplicateElementException() ;
+				}
+				
 				((Artifact)_artifacts[i]).getProducingTasks().add(_task) ;
 				_task.getOutputProducts().add((Artifact)_artifacts[i]) ;
 			}

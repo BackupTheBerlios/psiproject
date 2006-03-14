@@ -529,27 +529,13 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 					}
 					catch (InvalidDnDOperationException exc)
 					{
+						_evt.rejectDrop() ;
 					}
 					catch (DuplicateElementException exc)
 					{
+						_evt.rejectDrop() ;
 					}
 				}
-
-				/*
-				 * else if (localTargetNode instanceof TaskDescriptorTreeNode) { Collection
-				 * <RoleDescriptor> localRoles = ((TaskDescriptorTreeNode)
-				 * localTargetNode).getTask().getPrimaryPerformers() ; Iterator <RoleDescriptor>
-				 * localIterator = localRoles.iterator() ;
-				 * 
-				 * while (localIterator.hasNext()) { if
-				 * (localResource.getPerformingRoles().contains(localIterator.next())) { if
-				 * (!localResource.getPerformingTasks().contains( ((TaskDescriptorTreeNode)
-				 * localTargetNode).getTask())) { localResource.getPerformingTasks().add(
-				 * ((TaskDescriptorTreeNode) localTargetNode).getTask()) ;
-				 * _evt.getDropTargetContext().dropComplete(true) ; }
-				 * 
-				 * break ; } } }
-				 */
 			}
 
 			// A role
@@ -582,9 +568,11 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 					}
 					catch (InvalidDnDOperationException exc)
 					{
+						_evt.rejectDrop() ;
 					}
 					catch (DuplicateElementException exc)
 					{
+						_evt.rejectDrop() ;
 					}
 				}
 
@@ -617,12 +605,40 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 					
 					if (localTasks[0].getTask().getInputProducts().contains(localArtifact.getProduct()))
 					{
-						BreakdownElementsControler.linkArtifactToTaskDefinitions(localArtifact,localTasks, true) ;
+						try
+						{
+							BreakdownElementsControler.linkArtifactToTaskDefinitions(localArtifact,localTasks, true) ;
+							_evt.getDropTargetContext().dropComplete(true) ;
+							LogPanel.getInstance().addInformation(
+									new LogInformation(Bundle.getText("MainFrameLogMessageNewTaskArtifact") + " : " + localTasks[0].getName() + " - " + localArtifact.getName())) ;
+						}
+						catch (InvalidDnDOperationException exc)
+						{
+							_evt.rejectDrop() ;
+						}
+						catch (DuplicateElementException exc)
+						{
+							_evt.rejectDrop() ;
+						}
 					}					
 					
 					else if (localTasks[0].getTask().getOutputProducts().contains(localArtifact.getProduct()))
 					{
-						BreakdownElementsControler.linkArtifactToTaskDefinitions(localArtifact,localTasks, false) ;
+						try
+						{
+							BreakdownElementsControler.linkArtifactToTaskDefinitions(localArtifact,localTasks, false) ;
+							_evt.getDropTargetContext().dropComplete(true) ;
+							LogPanel.getInstance().addInformation(
+									new LogInformation(Bundle.getText("MainFrameLogMessageNewTaskArtifact") + " : " + localTasks[0].getName() + " - " + localArtifact.getName())) ;
+						}
+						catch (InvalidDnDOperationException exc)
+						{
+							_evt.rejectDrop() ;
+						}
+						catch (DuplicateElementException exc)
+						{
+							_evt.rejectDrop() ;
+						}
 					}
 				}				
 
@@ -654,12 +670,57 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 					
 					if (localTasks[0].getTask().getInputProducts().contains(localArtifact.getProduct()))
 					{
-						BreakdownElementsControler.linkArtifactToTaskDefinitions(localArtifact,localTasks, true) ;
+						try
+						{
+							BreakdownElementsControler.linkArtifactToTaskDefinitions(localArtifact,localTasks, true) ;
+							_evt.getDropTargetContext().dropComplete(true) ;
+							LogPanel.getInstance().addInformation(
+									new LogInformation(Bundle.getText("MainFrameLogMessageNewTaskArtifact") + " : " + localTasks[0].getName() + " - " + localArtifact.getName())) ;
+						}
+						catch (InvalidDnDOperationException exc)
+						{
+							_evt.rejectDrop() ;
+						}
+						catch (DuplicateElementException exc)
+						{
+							_evt.rejectDrop() ;
+						}
 					}					
 					
 					else if (localTasks[0].getTask().getOutputProducts().contains(localArtifact.getProduct()))
 					{
-						BreakdownElementsControler.linkArtifactToTaskDefinitions(localArtifact,localTasks, false) ;
+						try
+						{
+							BreakdownElementsControler.linkArtifactToTaskDefinitions(localArtifact,localTasks, false) ;
+							_evt.getDropTargetContext().dropComplete(true) ;
+							LogPanel.getInstance().addInformation(
+									new LogInformation(Bundle.getText("MainFrameLogMessageNewTaskArtifact") + " : " + localTasks[0].getName() + " - " + localArtifact.getName())) ;
+						}
+						catch (InvalidDnDOperationException exc)
+						{
+							_evt.rejectDrop() ;
+						}
+						catch (DuplicateElementException exc)
+						{
+							_evt.rejectDrop() ;
+						}
+					}
+				}
+				
+				else if (localTargetNode instanceof ResourceTreeNode)
+				{			
+					HumanResource localResource = ((ResourceTreeNode)localTargetNode).getResource() ;
+					
+					try
+					{
+						BreakdownElementsControler.linkTaskDefinitionAndHumanResource(localTasks[0], localResource) ;
+						_evt.getDropTargetContext().dropComplete(true) ;
+						LogPanel.getInstance().addInformation(
+								new LogInformation(Bundle.getText("MainFrameLogMessageNewMemberTask") + " : " + localTasks[0].getName() + " - " + localResource.getFullName())) ;
+					}
+					catch (DuplicateElementException exc)
+					{
+						_evt.rejectDrop() ;
 					}
 				}
 			}

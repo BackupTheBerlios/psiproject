@@ -625,11 +625,19 @@ public class BreakdownElementsControler
 			if (_start)
 			{
 				_task.getPlanningData().setStartDate(_date) ;
+				if (_date.after(_task.getPlanningData().getFinishDate()))
+				{
+					_task.getPlanningData().setFinishDate(_date) ;
+				}
 			}
 			
 			else
 			{
 				_task.getPlanningData().setFinishDate(_date) ;
+				if (_date.before(_task.getPlanningData().getStartDate()))
+				{
+					_task.getPlanningData().setStartDate(_date) ;
+				}
 			}
 		}
 		
@@ -638,11 +646,19 @@ public class BreakdownElementsControler
 			if (_start)
 			{
 				_task.getRealData().setStartDate(_date) ;
+				if (_date.after(_task.getRealData().getFinishDate()))
+				{
+					_task.getRealData().setFinishDate(_date) ;
+				}
 			}
 			
 			else
 			{
 				_task.getRealData().setFinishDate(_date) ;
+				if (_date.before(_task.getRealData().getStartDate()))
+				{
+					_task.getRealData().setStartDate(_date) ;
+				}
 			}
 		}
 		

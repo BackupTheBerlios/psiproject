@@ -576,6 +576,7 @@ public class ProjectControler
 						localChildList = localTasksNode.getChildNodes() ;
 						localID = "" ;
 						localName = "" ;
+						localDescription = "" ;
 						localDuration = 0 ;
 						localRDuration = 0 ;
 						localStartDate = new Date() ;
@@ -606,6 +607,18 @@ public class ProjectControler
 								catch (NullPointerException exc)
 								{
 									localName = "" ;
+								}
+							}
+							
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("description"))
+							{
+								try
+								{
+									localDescription = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localDescription = "" ;
 								}
 							}
 
@@ -682,7 +695,7 @@ public class ProjectControler
 							}
 						}
 
-						localTaskDefinition = new TaskDefinition(localID, localName, "", "") ;
+						localTaskDefinition = new TaskDefinition(localID, localName, localDescription, "") ;
 
 						localTaskDefinition.setPlanningData(new PlanningData(localStartDate, localFinishDate, 0, (float) localDuration)) ;
 						localTaskDefinition.setRealData(new PlanningData(localRStartDate, localRFinishDate, 0, (float) localRDuration)) ;
@@ -708,6 +721,7 @@ public class ProjectControler
 						localChildList = localArtifactsNode.getChildNodes() ;
 						localID = "" ;
 						localName = "" ;
+						localDescription = "" ;
 
 						for (int j = 0; j < localChildList.getLength(); j++ )
 						{
@@ -732,9 +746,21 @@ public class ProjectControler
 								{
 								}
 							}
+							
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("description"))
+							{
+								try
+								{
+									localDescription = localChildList.item(j).getFirstChild().getNodeValue() ;
+								}
+								catch (NullPointerException exc)
+								{
+									localDescription = "" ;
+								}
+							}
 						}
 
-						localArtifacts.add(new Artifact(localID, localName, "", "")) ;
+						localArtifacts.add(new Artifact(localID, localName, localDescription, "")) ;
 					}
 				}
 
@@ -1334,8 +1360,9 @@ public class ProjectControler
 	 * 
 	 * @param _project
 	 * @param _destination
+	 * @param _hapi
 	 */
-	public static void save (Project _project, File _destination) throws FileSaveException
+	public static void save (Project _project, File _destination, boolean _hapi) throws FileSaveException
 	{
 		try
 		{
@@ -1736,6 +1763,7 @@ public class ProjectControler
 							artifactsInfo += "<eltArtefact>\n" ;
 							artifactsInfo += "<id>" + localArtifact.getId() + "</id>" ;
 							artifactsInfo += "<nom>" + localArtifact.getName() + "</nom>" ;
+							if (!_hapi) { artifactsInfo += "<description>" + localArtifact.getDescription() + "</description>\n" ; }
 							artifactsInfo += "</eltArtefact>\n" ;
 
 							artifactsIds += "<id>" + localArtifact.getId() + "</id>" ;
@@ -1898,8 +1926,14 @@ public class ProjectControler
 							taskDefsInfo += "<eltTache>\n" ;
 							taskDefsInfo += "<id>" + localTaskDefinition.getId() + "</id>\n" ;
 							taskDefsInfo += "<nom>" + localTaskDefinition.getName() + "</nom>\n" ;
+							if (!_hapi) { taskDefsInfo += "<description>" + localTaskDefinition.getDescription() + "</description>\n" ; }
+							
+							if (!_hapi) { taskDefsInfo += "<tempsPrevu>" + (int) localTaskDefinition.getPlanningData().getDuration() + "</tempsPrevu>\n" ; }
 							taskDefsInfo += "<tempsPasse>" + (int) localTaskDefinition.getRealData().getDuration() + "</tempsPasse>\n" ;
-							taskDefsInfo += "<dateFinReelle>" + dateFormat.format(localTaskDefinition.getRealData().getFinishDate()) + "</dateFinReelle>\n" ;
+							if (!_hapi) { taskDefsInfo += "<dateDebutPrevisionnelle>" + dateFormat.format(localTaskDefinition.getPlanningData().getStartDate()) + "</dateDebutPrevisionnelle>\n" ; }
+							if (!_hapi) { taskDefsInfo += "<dateFinPrevisionnelle>" + dateFormat.format(localTaskDefinition.getPlanningData().getFinishDate()) + "</dateFinPrevisionnelle>\n" ; }
+							if (!_hapi) { taskDefsInfo += "<dateDebutReelle>" + dateFormat.format(localTaskDefinition.getRealData().getStartDate()) + "</dateDebutReelle>\n" ; }
+							taskDefsInfo += "<dateFinReelle>" + dateFormat.format(localTaskDefinition.getRealData().getFinishDate()) + "</dateFinReelle>\n" ;							
 							taskDefsInfo += "</eltTache>\n" ;
 
 							taskDefsIds += "<id>" + localTaskDefinition.getId() + "</id>\n" ;
@@ -2240,6 +2274,9 @@ public class ProjectControler
 					localOSW.write("<eltMembre>\n") ;
 					localOSW.write("<id>" + localTempResource.getId() + "</id>\n") ;
 					localOSW.write("<nom>" + localTempResource.getFullName() + "</nom>\n") ;
+					
+					if (!_hapi) { localOSW.write("<mail>" + localTempResource.getEmail() + "</mail>\n") ; }
+					
 					localOSW.write("</eltMembre>\n") ;
 
 					// Generating tasks

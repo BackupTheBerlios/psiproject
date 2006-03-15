@@ -28,9 +28,10 @@ import model.spem2.TaskDefinition ;
 import model.spem2.TaskDescriptor ;
 
 /**
- * HumanResourcePanel : TODO type description
+ * HumanResourcePanel : Panel describing resources
  * 
  * @author Florence MATTLER
+ * @author Conde Mickael K.
  * @version 1.0
  * 
  */

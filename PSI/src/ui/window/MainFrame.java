@@ -678,7 +678,7 @@ public class MainFrame extends JFrame
 
 		try
 		{
-			ProjectControler.save(currentProject, localFile) ;
+			ProjectControler.save(currentProject, localFile, false) ;
 			LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved"))) ;
 			GlobalController.projectChanged = false ;
 
@@ -767,7 +767,7 @@ public class MainFrame extends JFrame
 			{
 				try
 				{
-					ProjectControler.save(currentProject, localFile) ;
+					ProjectControler.save(currentProject, localFile, false) ;
 					preferences.put("last_project", localFile.getAbsolutePath()) ;
 					LogPanel.getInstance().addInformation(
 							new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved") + " (" + localFile.getName() + ")")) ;
@@ -1311,7 +1311,7 @@ public class MainFrame extends JFrame
 						{
 							try
 							{
-								ProjectControler.save(currentProject, localFile) ;
+								ProjectControler.save(currentProject, localFile, true) ;
 								actionSave.setEnabled(false) ;
 								LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageProjectExportedToDomino"))) ;
 

@@ -1,14 +1,13 @@
 
 package ui.dialog ;
 
-import java.awt.BorderLayout ;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JFrame ;
-import javax.swing.JPanel ;
-import javax.swing.JDialog ;
-import javax.swing.JProgressBar ;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.Timer;
 
 import ui.window.MainFrame;
@@ -50,10 +49,8 @@ public class ProgressDialog extends JDialog
         
 		this.setVisible(true) ;
 		this.setModal(true);
-		this.setLocationRelativeTo(owner) ;
 		this.pack(); 
-		this.setSize(new java.awt.Dimension(250,50));
-		
+		this.setBounds(owner.getX() + owner.getWidth() / 2 - 125, owner.getY() + owner.getHeight() / 2 - 25, 250, 50) ;
 		//this.setSize(new java.awt.Dimension(250,100));
 		this.timer = new Timer(1000,new ActionListener(){
 			public void actionPerformed (ActionEvent _e)

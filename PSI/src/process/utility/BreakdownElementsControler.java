@@ -8,6 +8,7 @@ import java.util.Iterator ;
 import model.HumanResource ;
 import model.Project;
 import model.spem2.Artifact ;
+import model.spem2.BreakdownElement;
 import model.spem2.Iteration;
 import model.spem2.RoleDescriptor ;
 import model.spem2.TaskDefinition;
@@ -259,13 +260,15 @@ public class BreakdownElementsControler
 		String localID = "_" + localCalendar.get(Calendar.MILLISECOND) + localCalendar.get(Calendar.DAY_OF_MONTH) + localCalendar.get(Calendar.MONTH)
 				+ localCalendar.get(Calendar.YEAR) + localCalendar.get(Calendar.HOUR) + localCalendar.get(Calendar.MINUTE) + localCalendar.get(Calendar.SECOND)
 				+ "_tskd" ;
+		
 		TaskDefinition localTask = new TaskDefinition(localID, _name, _description, _task.getId(), _task) ;
+		GlobalController.currentIteration.getTasks().add(localTask) ;
 		_task.getTasks().add(localTask) ;
 		_task.setChanged() ;
 		_task.notifyObservers(localTask) ;
 		
 		GlobalController.projectChanged = true ;
-		GlobalController.currentIteration.getTasks().add(localTask) ;
+		
 	}
 	
 	/**
@@ -349,7 +352,7 @@ public class BreakdownElementsControler
 	 * 
 	 * @param _proj
 	 */
-	public static void addIterationIntoProject(Project _proj)
+	public static void addIterationIntoProject(Project _proj, boolean _keepTasks)
 	{
 		Calendar localCalendar = Calendar.getInstance() ;
 		String localID = "_" + localCalendar.get(Calendar.MILLISECOND) + localCalendar.get(Calendar.DAY_OF_MONTH) + localCalendar.get(Calendar.MONTH)
@@ -359,22 +362,58 @@ public class BreakdownElementsControler
 		Iteration localIteration = new Iteration(localID, _proj.getIterations().size() + 1) ;
 		
 		// Copying references to tasks
-		if (GlobalController.currentIteration != null)
+		if (GlobalController.currentIteration != null && _keepTasks)
 		{
-			Iterator<TaskDefinition> localTaskIteration = GlobalController.currentIteration.getTasks().iterator() ;
+			Iterator<TaskDefinition> localTaskIterator = GlobalController.currentIteration.getTasks().iterator() ;
 			
-			while (localTaskIteration.hasNext())
+			while (localTaskIterator.hasNext())
 			{
-				localIteration.getTasks().add(localTaskIteration.next()) ;
+				localIteration.getTasks().add(localTaskIterator.next()) ;
 			}
-		}
+		}		
 
 		_proj.getIterations().add(localIteration) ;
 		_proj.setChanged() ;
 		_proj.notifyObservers(localIteration) ;
 		
 		GlobalController.projectChanged = true ;
+		Iteration lastIteration = GlobalController.currentIteration ;
 		GlobalController.currentIteration = localIteration ;
+		
+		
+		if (lastIteration != null && !_keepTasks)
+		{
+			Iterator<BreakdownElement> localBDI = _proj.getProcess().getNestedElements().iterator() ;
+			Iterator<TaskDefinition> localTaskIterator ;
+			BreakdownElement localBD ;
+			
+			while (localBDI.hasNext())
+			{
+				localBD = localBDI.next() ;
+				if (localBD instanceof TaskDescriptor)
+				{
+					localTaskIterator = lastIteration.getTasks().iterator() ;
+					
+					while (localTaskIterator.hasNext())
+					{
+						((TaskDescriptor)localBD).setChanged() ;
+						((TaskDescriptor)localBD).notifyObservers(localTaskIterator.next()) ;
+					}
+				}
+			}
+			
+			// Informing resources
+			Iterator<HumanResource> localHR = _proj.getResources().iterator() ;
+			HumanResource localR ;
+			
+			while (localHR.hasNext())
+			{
+				localR = localHR.next() ;
+				localR.setChanged() ;
+				localR.notifyObservers() ;
+				
+			}
+		}
 		
 	}
 

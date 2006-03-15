@@ -357,6 +357,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 	public void closeProject ()
 	{
 		project = null ;
+		treeModel.setRoot(new DefaultMutableTreeNode(Bundle.getText("MainTreeDefault"))) ;
 	}
 
 	/**

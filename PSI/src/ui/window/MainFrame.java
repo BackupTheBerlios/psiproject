@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent ;
 import java.awt.event.ActionListener ;
 import java.io.File ;
 import java.text.DateFormat ;
+import java.util.ArrayList ;
 import java.util.Date ;
 import java.util.prefs.Preferences ;
 
@@ -51,6 +52,7 @@ import ui.dialog.PreferencesDialog ;
 import ui.dialog.ProgressDialog ;
 import ui.misc.LogPanel ;
 import ui.misc.MainTabbedPane ;
+import ui.misc.TaskDefinitionPanel;
 import ui.resource.Bundle ;
 import ui.tree.MainTree ;
 
@@ -223,6 +225,12 @@ public class MainFrame extends JFrame
 		initialize() ;
 		LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageAppStarted"))) ;
 
+		// Opening help
+		if (preferences.getBoolean("load_help", true))
+		{
+			new HelpFrame() ;
+		}
+		
 		// Trying to open the last project if necessary
 		if (preferences.getBoolean("load_last_project", true))
 		{
@@ -760,7 +768,6 @@ public class MainFrame extends JFrame
 				try
 				{
 					ProjectControler.save(currentProject, localFile) ;
-					actionSave.setEnabled(false) ;
 					preferences.put("last_project", localFile.getAbsolutePath()) ;
 					LogPanel.getInstance().addInformation(
 							new LogInformation(Bundle.getText("MainFrameLogMessageProjectSaved") + " (" + localFile.getName() + ")")) ;
@@ -1075,6 +1082,24 @@ public class MainFrame extends JFrame
 			closeFileMenuItem.setText(Bundle.getText("MainFrameFileMenuClose")) ;
 			closeFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuCloseMn").charAt(0)) ;
 			closeFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.CTRL_MASK)) ;
+			closeFileMenuItem.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed (java.awt.event.ActionEvent e)
+				{
+					currentProject = null ;
+					projectTree.closeProject() ;
+					MainTabbedPane.getInstance().removeAll() ;
+					getDefaultPanel() ;
+					
+					// Actions deactivation
+					actionImport.setEnabled(false) ;
+					actionSave.setEnabled(false) ;
+					actionSaveAs.setEnabled(false) ;
+					getIterationButton().setEnabled(false) ;
+					getExportFileMenu().setEnabled(false) ;
+					getImportTasksFileMenuItem().setEnabled(false) ;
+				}
+			}) ;
 		}
 		return closeFileMenuItem ;
 	}
@@ -1733,7 +1758,31 @@ public class MainFrame extends JFrame
 
 					if (localChoice == JOptionPane.YES_OPTION)
 					{
-						BreakdownElementsControler.addIterationIntoProject(getProject()) ;
+						boolean keep = JOptionPane.showConfirmDialog(MainFrame.this, Bundle.getText("MainFrameConfirmKeepTasks"), "PSI",
+								JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION ;
+						
+						BreakdownElementsControler.addIterationIntoProject(getProject(), keep) ;
+						
+						// Removing all tasks panel if necessary
+						if (!keep)
+						{
+							int localTabCount = MainTabbedPane.getInstance().getTabCount() ;
+							
+							ArrayList <TaskDefinitionPanel> localTD = new ArrayList <TaskDefinitionPanel>() ;
+							
+							for (int i = 0 ; i < localTabCount; i++ )
+							{
+								if (MainTabbedPane.getInstance().getComponentAt(i) instanceof TaskDefinitionPanel)
+								{
+									localTD.add((TaskDefinitionPanel)MainTabbedPane.getInstance().getComponentAt(i)) ;
+								}
+							}
+							
+							for (int i = 0 ; i < localTD.size(); i++ )
+							{
+								MainTabbedPane.getInstance().remove(localTD.get(i)) ;
+							}
+						}
 					}
 				}
 			}) ;

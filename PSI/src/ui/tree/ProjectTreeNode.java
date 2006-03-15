@@ -99,7 +99,8 @@ public class ProjectTreeNode extends DefaultMutableTreeNode implements Observer
 	public void update (Observable _observable, Object _object)
 	{
 		Iteration localIt = (Iteration)_object ;
-		this.setUserObject(project.getName() + " (" + Bundle.getText("MainTreeNodeIterations") + localIt.getDescriptor().getName() + ")") ;		
+		this.setUserObject(project.getName() + " (" + Bundle.getText("MainTreeNodeIterations") + localIt.getDescriptor().getName() + ")") ;
+		tree.getModel().reload(this) ;
 	}
 
 }

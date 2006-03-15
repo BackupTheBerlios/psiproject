@@ -1,77 +1,81 @@
-package ui.misc;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Observable;
-import java.util.Observer;
+package ui.misc ;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.table.AbstractTableModel;
+import java.awt.Dimension ;
+import java.awt.FlowLayout ;
+import java.util.ArrayList ;
+import java.util.Collection ;
+import java.util.Iterator ;
+import java.util.Observable ;
+import java.util.Observer ;
 
-import ui.resource.Bundle;
+import javax.swing.Box ;
+import javax.swing.BoxLayout ;
+import javax.swing.JLabel ;
+import javax.swing.JPanel ;
+import javax.swing.JScrollPane ;
+import javax.swing.JTable ;
+import javax.swing.JTextField ;
+import javax.swing.table.AbstractTableModel ;
 
-import model.HumanResource; 
-import model.spem2.RoleDescriptor;
-import model.spem2.TaskDefinition;
-import model.spem2.TaskDescriptor;
+import process.GlobalController ;
+
+import ui.resource.Bundle ;
+
+import model.HumanResource ;
+import model.spem2.RoleDescriptor ;
+import model.spem2.TaskDefinition ;
+import model.spem2.TaskDescriptor ;
 
 /**
  * HumanResourcePanel : TODO type description
- *
+ * 
  * @author Florence MATTLER
  * @version 1.0
- *
+ * 
  */
 public class HumanResourcePanel extends JPanel implements Observer
 {
 	private static final long serialVersionUID = 7889691041843745114L ;
-	
-	private HumanResource humanResource;
-	
-	private JPanel infoPanel = null;
-	
-	private JPanel idPanel;
-	
-	private JLabel idLabel;
-	
-	private JTextField idTextField = null;
-	
-	private JPanel namePanel;
-	
-	private JLabel nameLabel;
-	
-	private JTextField nameTextField = null;
-	
-	private JPanel mailPanel;
-	
-	private JLabel mailLabel = null;
-	
-	private JTextField mailTextField = null;
-	
+
+	private HumanResource humanResource ;
+
+	private JPanel infoPanel = null ;
+
+	private JPanel idPanel ;
+
+	private JLabel idLabel ;
+
+	private JTextField idTextField = null ;
+
+	private JPanel namePanel ;
+
+	private JLabel nameLabel ;
+
+	private JTextField nameTextField = null ;
+
+	private JPanel mailPanel ;
+
+	private JLabel mailLabel = null ;
+
+	private JTextField mailTextField = null ;
+
 	private JLabel rolesEmptyLabel = null ;
-	
+
 	private JLabel tasksDescriptorEmptyLabel = null ;
-	
-	private JPanel rolesPanel = null;
-	
-	private JScrollPane rolesScrollPane = null;
-	
-	private JTable rolesTable = null;
-	
-	private JPanel tasksDescriptorPanel = null;
-	
-	private JScrollPane tasksDescriptorScrollPane = null;
-	
-	private JTable tasksDescriptorTable = null;
-	
+
+	private JPanel rolesPanel = null ;
+
+	private JScrollPane rolesScrollPane = null ;
+
+	private JTable rolesTable = null ;
+
+	private JPanel tasksDescriptorPanel = null ;
+
+	private JScrollPane tasksDescriptorScrollPane = null ;
+
+	private JTable tasksDescriptorTable = null ;
+
 	/**
 	 * Constructor
 	 * 
@@ -85,7 +89,7 @@ public class HumanResourcePanel extends JPanel implements Observer
 		initialize() ;
 
 	}
-	
+
 	/**
 	 * Panel initialisation
 	 * 
@@ -104,10 +108,10 @@ public class HumanResourcePanel extends JPanel implements Observer
 		this.add(Box.createRigidArea(new Dimension(0, 30))) ;
 		this.add(getRolesPanel(), null) ;
 		this.add(Box.createRigidArea(new Dimension(0, 30))) ;
-		this.add(getTasksDescriptorPanel(), null);
+		this.add(getTasksDescriptorPanel(), null) ;
 		this.add(Box.createVerticalGlue()) ;
 	}
-	
+
 	/**
 	 * Getter
 	 * 
@@ -118,7 +122,6 @@ public class HumanResourcePanel extends JPanel implements Observer
 		return this.humanResource ;
 	}
 
-	
 	/**
 	 * Setter
 	 * 
@@ -127,9 +130,9 @@ public class HumanResourcePanel extends JPanel implements Observer
 	 */
 	public void setHumanResourceDescriptor (HumanResource _humanResource)
 	{
-		this.humanResource  = _humanResource ;
+		this.humanResource = _humanResource ;
 	}
-	
+
 	/**
 	 * Needed for "cool" behaviour of the main tab
 	 * 
@@ -140,14 +143,14 @@ public class HumanResourcePanel extends JPanel implements Observer
 	{
 		return (_object instanceof HumanResourcePanel && ((HumanResourcePanel) _object).humanResource.getId().equals(humanResource.getId())) ;
 	}
-	
-	
+
 	/**
 	 * This method initializes infoPanel
 	 * 
 	 * @return javax.swing.JPanel
 	 */
-	private JPanel getInfoPanel(){
+	private JPanel getInfoPanel ()
+	{
 		if (infoPanel == null)
 		{
 			infoPanel = new JPanel() ;
@@ -162,13 +165,14 @@ public class HumanResourcePanel extends JPanel implements Observer
 		}
 		return infoPanel ;
 	}
-	
+
 	/**
 	 * This method initializes idPanel
 	 * 
 	 * @return javax.swing.JPanel
-	 */	
-	private JPanel getIdPanel(){
+	 */
+	private JPanel getIdPanel ()
+	{
 		if (idPanel == null)
 		{
 			idLabel = new JLabel() ;
@@ -177,30 +181,30 @@ public class HumanResourcePanel extends JPanel implements Observer
 			idPanel = new JPanel() ;
 			idPanel.setLayout(new BoxLayout(getIdPanel(), BoxLayout.X_AXIS)) ;
 			idPanel.add(idLabel, null) ;
-			idPanel.add(getIdTextField(), null);
+			idPanel.add(getIdTextField(), null) ;
 			idPanel.add(Box.createHorizontalGlue()) ;
 		}
-		return idPanel;
+		return idPanel ;
 	}
-	
+
 	/**
-	 * This method initializes idTextField	
-	 * 	
-	 * @return javax.swing.JTextField	
+	 * This method initializes idTextField
+	 * 
+	 * @return javax.swing.JTextField
 	 */
 	private JTextField getIdTextField ()
 	{
 		if (idTextField == null)
 		{
 			idTextField = new JTextField(30) ;
-			idTextField.setEditable(false);
-			idTextField.setBackground(java.awt.Color.white);
+			idTextField.setEditable(false) ;
+			idTextField.setBackground(java.awt.Color.white) ;
 			idTextField.setMaximumSize(new java.awt.Dimension(400, 20)) ;
 			idTextField.setText(humanResource.getId()) ;
 		}
 		return idTextField ;
-	}	
-	
+	}
+
 	/**
 	 * This method initializes namePanel
 	 * 
@@ -233,7 +237,7 @@ public class HumanResourcePanel extends JPanel implements Observer
 		{
 			nameTextField = new JTextField(30) ;
 			nameTextField.setEditable(false) ;
-			nameTextField.setBackground(java.awt.Color.white);
+			nameTextField.setBackground(java.awt.Color.white) ;
 			nameTextField.setMaximumSize(new java.awt.Dimension(400, 20)) ;
 			nameTextField.setText(humanResource.getFullName()) ;
 		}
@@ -272,30 +276,32 @@ public class HumanResourcePanel extends JPanel implements Observer
 		{
 			mailTextField = new JTextField(30) ;
 			mailTextField.setEditable(false) ;
-			mailTextField.setBackground(java.awt.Color.white);
+			mailTextField.setBackground(java.awt.Color.white) ;
 			mailTextField.setMaximumSize(new java.awt.Dimension(400, 20)) ;
 			mailTextField.setText(humanResource.getEmail()) ;
 		}
 		return mailTextField ;
 	}
-	
-	private JScrollPane getRolesScrollPane(){
+
+	private JScrollPane getRolesScrollPane ()
+	{
 		if (rolesScrollPane == null)
 		{
 			rolesScrollPane = new JScrollPane() ;
 			rolesScrollPane.setViewportView(getRolesTable()) ;
 			rolesScrollPane.setWheelScrollingEnabled(true) ;
 		}
-		return rolesScrollPane;
+		return rolesScrollPane ;
 	}
-	
-	private JPanel getRolesPanel(){
+
+	private JPanel getRolesPanel ()
+	{
 		if (rolesPanel == null)
 		{
-			FlowLayout flowLayout = new FlowLayout();
-			flowLayout.setAlignment(java.awt.FlowLayout.LEFT);
+			FlowLayout flowLayout = new FlowLayout() ;
+			flowLayout.setAlignment(java.awt.FlowLayout.LEFT) ;
 			rolesPanel = new JPanel() ;
-			rolesPanel.setLayout(flowLayout);
+			rolesPanel.setLayout(flowLayout) ;
 			rolesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, Bundle.getText("HumanResourceDescriptorPanelTableHead"),
 					javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, null, null)) ;
 			rolesPanel.setMinimumSize(new Dimension(200, 80)) ;
@@ -308,10 +314,11 @@ public class HumanResourcePanel extends JPanel implements Observer
 				rolesPanel.add(getRolesScrollPane(), null) ;
 			}
 		}
-		return rolesPanel;
+		return rolesPanel ;
 	}
-	
-	private JTable getRolesTable(){
+
+	private JTable getRolesTable ()
+	{
 		if (rolesTable == null)
 		{
 			rolesTable = new JTable(new RolesTableModel(humanResource)) ;
@@ -319,43 +326,61 @@ public class HumanResourcePanel extends JPanel implements Observer
 			rolesTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			rolesTable.getTableHeader().setReorderingAllowed(false) ;
 		}
-		
-		return rolesTable;
+
+		return rolesTable ;
 	}
-	
-	private JScrollPane getTasksDescriptorScrollPane(){
+
+	private JScrollPane getTasksDescriptorScrollPane ()
+	{
 		if (tasksDescriptorScrollPane == null)
 		{
 			tasksDescriptorScrollPane = new JScrollPane() ;
 			tasksDescriptorScrollPane.setViewportView(getTasksDescriptorTable()) ;
 			tasksDescriptorScrollPane.setWheelScrollingEnabled(true) ;
 		}
-		return tasksDescriptorScrollPane;
+		return tasksDescriptorScrollPane ;
 	}
-		
-	private JPanel getTasksDescriptorPanel (){
+
+	private JPanel getTasksDescriptorPanel ()
+	{
 		if (tasksDescriptorPanel == null)
 		{
-			FlowLayout flowLayout1 = new FlowLayout();
-			flowLayout1.setAlignment(java.awt.FlowLayout.LEFT);
+			FlowLayout flowLayout1 = new FlowLayout() ;
+			flowLayout1.setAlignment(java.awt.FlowLayout.LEFT) ;
 			tasksDescriptorPanel = new JPanel() ;
-			tasksDescriptorPanel.setLayout(flowLayout1);
-			tasksDescriptorPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, Bundle.getText("HumanResourceDescriptorPanelTableTasksHead"), javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, null, null));
-			tasksDescriptorPanel.setMinimumSize(new Dimension(200, 80)) ;		
-			
-			if (humanResource.getPerformingTasks().size() == 0)
+			tasksDescriptorPanel.setLayout(flowLayout1) ;
+			tasksDescriptorPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, Bundle.getText("HumanResourceDescriptorPanelTableTasksHead"),
+					javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, null, null)) ;
+			tasksDescriptorPanel.setMinimumSize(new Dimension(200, 80)) ;
+
+			boolean tasksFound = false ;
+			Iterator <TaskDefinition> localIt = humanResource.getPerformingTasks().iterator() ;
+			TaskDefinition localTask ;
+
+			while (localIt.hasNext())
 			{
-				tasksDescriptorPanel.add(tasksDescriptorEmptyLabel, null);
+				localTask = localIt.next() ;
+				if (GlobalController.currentIteration.getTasks().contains(localTask))
+				{
+					tasksFound = true ;
+					break ;
+				}
+			}
+
+			if (!tasksFound)
+			{
+				tasksDescriptorPanel.add(tasksDescriptorEmptyLabel, null) ;
 			}
 			else
 			{
-				tasksDescriptorPanel.add(getTasksDescriptorScrollPane(), null);
+				tasksDescriptorPanel.add(getTasksDescriptorScrollPane(), null) ;
 			}
 		}
-		return tasksDescriptorPanel;
+		return tasksDescriptorPanel ;
 	}
-	
-	private JTable getTasksDescriptorTable(){
+
+	private JTable getTasksDescriptorTable ()
+	{
 		if (tasksDescriptorTable == null)
 		{
 			tasksDescriptorTable = new JTable(new TaskDescriptorsTableModel(humanResource)) ;
@@ -363,17 +388,15 @@ public class HumanResourcePanel extends JPanel implements Observer
 			tasksDescriptorTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			tasksDescriptorTable.getTableHeader().setReorderingAllowed(false) ;
 		}
-		
-		return tasksDescriptorTable;
+
+		return tasksDescriptorTable ;
 	}
-	
-	
+
 	/**
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
 	public void update (Observable _observable, Object _object)
 	{
-		// TODO Auto-generated method stub
 		if ( ((HumanResource) _observable).getPerformingRoles().size() == 0)
 		{
 			rolesPanel.removeAll() ;
@@ -387,48 +410,60 @@ public class HumanResourcePanel extends JPanel implements Observer
 			rolesPanel.add(getRolesScrollPane(), null) ;
 			rolesPanel.revalidate() ;
 		}
-		if ( ((HumanResource) _observable).getPerformingTasks().size() == 0)
+
+		boolean tasksFound = false ;
+		Iterator <TaskDefinition> localIt = ((HumanResource) _observable).getPerformingTasks().iterator() ;
+		TaskDefinition localTask ;
+
+		while (localIt.hasNext())
 		{
-			tasksDescriptorPanel.removeAll();
-			tasksDescriptorPanel.add(tasksDescriptorEmptyLabel,null);
-			tasksDescriptorPanel.revalidate();
+			localTask = localIt.next() ;
+			if (GlobalController.currentIteration.getTasks().contains(localTask))
+			{
+				tasksFound = true ;
+				break ;
+			}
 		}
-		
+		if (!tasksFound)
+		{
+			tasksDescriptorPanel.removeAll() ;
+			tasksDescriptorPanel.add(tasksDescriptorEmptyLabel, null) ;
+			tasksDescriptorPanel.revalidate() ;
+		}
+
 		else
 		{
-			tasksDescriptorPanel.removeAll();
-			tasksDescriptorPanel.add(getTasksDescriptorScrollPane(),null);
-			tasksDescriptorPanel.revalidate();
+			tasksDescriptorPanel.removeAll() ;
+			tasksDescriptorPanel.add(getTasksDescriptorScrollPane(), null) ;
+			tasksDescriptorPanel.revalidate() ;
 		}
 	}
-	
-	
+
 	/**
 	 * TaskDescriptorsTableModel : table model designed to display task desc.
-	 *
+	 * 
 	 * @author Conde Mickael K.
 	 * @version 1.0
-	 *
+	 * 
 	 */
 	private class TaskDescriptorsTableModel extends AbstractTableModel
 	{
 		private static final long serialVersionUID = -405519902328407279L ;
-		
+
 		private Collection <TaskDefinition> data ;
 
 		private ArrayList <String> head ;
 
 		private HumanResource human ;
-		
+
 		/**
 		 * The number of columns to show (id, name and description)
 		 */
 		private final short COLUMN_NUMBER = 3 ;
 
-
 		/**
 		 * Constructor
-		 *
+		 * 
 		 * @param _task
 		 */
 		public TaskDescriptorsTableModel (HumanResource _human)
@@ -436,7 +471,7 @@ public class HumanResourcePanel extends JPanel implements Observer
 			super() ;
 
 			this.human = _human ;
-			data = this.human.getPerformingTasks();
+			data = this.human.getPerformingTasks() ;
 			head = new ArrayList <String>() ;
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableTasksID")) ;
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableTasksName")) ;
@@ -474,7 +509,19 @@ public class HumanResourcePanel extends JPanel implements Observer
 		 */
 		public int getRowCount ()
 		{
-			return data.size() ;
+			int localCount = 0 ;
+
+			Iterator <TaskDefinition> localIt = data.iterator() ;
+
+			while (localIt.hasNext())
+			{
+				if (GlobalController.currentIteration.getTasks().contains(localIt.next()))
+				{
+					localCount++ ;
+				}
+			}
+
+			return localCount ;
 		}
 
 		/**
@@ -482,21 +529,33 @@ public class HumanResourcePanel extends JPanel implements Observer
 		 */
 		public Object getValueAt (int _row, int _col)
 		{
-			Object tempArray[] = data.toArray() ;
+			Collection <TaskDefinition> localCol = new ArrayList <TaskDefinition>() ;
+			Iterator <TaskDefinition> localIt = data.iterator() ;
+			TaskDefinition localTask ;
+
+			while (localIt.hasNext())
+			{
+				localTask = localIt.next() ;
+				if (GlobalController.currentIteration.getTasks().contains(localTask))
+				{
+					localCol.add(localTask) ;
+				}
+			}
+
+			Object tempArray[] = localCol.toArray() ;
 			switch (_col)
 			{
 				case 0:
-					return ((TaskDescriptor)tempArray[_row]).getId() ;
+					return ((TaskDescriptor) tempArray[_row]).getId() ;
 				case 1:
-					return ((TaskDescriptor)tempArray[_row]).getName() ;
+					return ((TaskDescriptor) tempArray[_row]).getName() ;
 				default:
-					return ((TaskDescriptor)tempArray[_row]).getDescription() ;
+					return ((TaskDescriptor) tempArray[_row]).getDescription() ;
 			}
 		}
-		
+
 	}
-	
-	
+
 	/**
 	 * ResourcesTableModel : table model designed to display roles
 	 * 
@@ -530,7 +589,7 @@ public class HumanResourcePanel extends JPanel implements Observer
 
 			this.human = _human ;
 			this.human.addObserver(this) ;
-			this.data = humanResource.getPerformingRoles();
+			this.data = humanResource.getPerformingRoles() ;
 			this.head = new ArrayList <String>() ;
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableID")) ;
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableName")) ;
@@ -562,11 +621,11 @@ public class HumanResourcePanel extends JPanel implements Observer
 			switch (_col)
 			{
 				case 0:
-					return ((RoleDescriptor)tempArray[_row]).getId() ;
+					return ((RoleDescriptor) tempArray[_row]).getId() ;
 				case 1:
-					return ((RoleDescriptor)tempArray[_row]).getName() ;
+					return ((RoleDescriptor) tempArray[_row]).getName() ;
 				default:
-					return ((RoleDescriptor)tempArray[_row]).getDescription() ;
+					return ((RoleDescriptor) tempArray[_row]).getDescription() ;
 			}
 		}
 
@@ -598,5 +657,5 @@ public class HumanResourcePanel extends JPanel implements Observer
 		}
 
 	}
-	
+
 }

@@ -124,7 +124,21 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 	 */
 	public void update (Observable _observable, Object _object)
 	{
-		if ( ((TaskDescriptor) _observable).getTasks().size() == 0)
+		boolean tasksFound = false ;
+		Iterator<TaskDefinition> localIt = ((TaskDescriptor) _observable).getTasks().iterator() ;
+		TaskDefinition localTask ;
+
+		while (localIt.hasNext())
+		{				
+			localTask = localIt.next() ;
+			if (GlobalController.currentIteration.getTasks().contains(localTask))
+			{
+				tasksFound = true ;
+				break ;
+			}
+		}
+		
+		if (!tasksFound)
 		{
 			tasksPanel.removeAll() ;
 			tasksPanel.add(tasksEmptyLabel, null) ;
@@ -187,7 +201,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		{
 			dataPanel = new JPanel() ;
 			dataPanel.setLayout(new BoxLayout(getDataPanel(), BoxLayout.Y_AXIS)) ;
-			dataPanel.add(getArtifactsPanel(), null) ;
+			dataPanel.add(getTasksPanel(), null) ;
 			dataPanel.add(getInProductsPanel(), null) ;
 			dataPanel.add(getOutProductsPanel(), null) ;
 			dataPanel.add(Box.createVerticalGlue()) ;
@@ -377,7 +391,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 	 * 
 	 * @return javax.swing.JPanel
 	 */
-	private JPanel getArtifactsPanel ()
+	private JPanel getTasksPanel ()
 	{
 		if (tasksPanel == null)
 		{
@@ -388,7 +402,21 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 			tasksPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, Bundle.getText("TaskDescriptorPanelTaskHead"),
 					javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, null, null)) ;
 
-			if (task.getTasks().size() == 0)
+			boolean tasksFound = false ;
+			Iterator<TaskDefinition> localIt = task.getTasks().iterator() ;
+			TaskDefinition localTask ;
+
+			while (localIt.hasNext())
+			{				
+				localTask = localIt.next() ;
+				if (GlobalController.currentIteration.getTasks().contains(localTask))
+				{
+					tasksFound = true ;
+					break ;
+				}
+			}			
+			
+			if (!tasksFound)
 			{
 				tasksPanel.add(tasksEmptyLabel, null) ;
 			}

@@ -89,7 +89,7 @@ public class TaskDescriptorTreeNode extends DefaultMutableTreeNode implements Ob
 		if (_object instanceof TaskDefinition)
 		{
 			// Adding to the node
-			if (task.getTasks().contains(_object) && !GlobalController.currentIteration.getTasks().contains(_object))
+			if (task.getTasks().contains(_object) && GlobalController.currentIteration.getTasks().contains(_object))
 			{
 				TaskDefinitionTreeNode localNode = new TaskDefinitionTreeNode((TaskDefinition)_object, tree) ;
 				tree.getModel().insertNodeInto(localNode, this, getChildCount()) ;

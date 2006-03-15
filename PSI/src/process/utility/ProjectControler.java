@@ -253,7 +253,7 @@ public class ProjectControler
 				}
 
 				localProject.setResources(localRessources) ;
-				BreakdownElementsControler.addIterationIntoProject(localProject) ;
+				BreakdownElementsControler.addIterationIntoProject(localProject, false) ;
 				return localProject ;
 
 			}
@@ -2836,6 +2836,8 @@ public class ProjectControler
 
 					localChildCount++ ;
 				}
+				
+				GlobalController.projectChanged = true ;
 
 			}
 			catch (ParserConfigurationException eDBF)

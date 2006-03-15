@@ -1,57 +1,57 @@
 
 package process.utility ;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
+import java.io.BufferedInputStream ;
+import java.io.BufferedOutputStream ;
+import java.io.File ;
+import java.io.FileInputStream ;
+import java.io.FileNotFoundException ;
+import java.io.FileOutputStream ;
+import java.io.IOException ;
+import java.io.OutputStreamWriter ;
+import java.io.UnsupportedEncodingException ;
+import java.text.DateFormat ;
+import java.text.ParseException ;
+import java.text.SimpleDateFormat ;
+import java.util.ArrayList ;
+import java.util.Collection ;
+import java.util.Date ;
+import java.util.Iterator ;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.DocumentBuilder ;
+import javax.xml.parsers.DocumentBuilderFactory ;
+import javax.xml.parsers.ParserConfigurationException ;
 
-import model.Component;
-import model.Guide;
-import model.GuideType;
-import model.HumanResource;
-import model.Interface;
-import model.Presentation;
-import model.Project;
-import model.spem2.Activity;
+import model.Component ;
+import model.Guide ;
+import model.GuideType ;
+import model.HumanResource ;
+import model.Interface ;
+import model.Presentation ;
+import model.Project ;
+import model.spem2.Activity ;
 
-import model.spem2.Artifact;
-import model.spem2.BreakdownElement;
-import model.spem2.DeliveryProcess;
-import model.spem2.Iteration;
-import model.spem2.PlanningData;
-import model.spem2.ProductType;
-import model.spem2.RoleDescriptor;
-import model.spem2.TaskDefinition;
-import model.spem2.TaskDescriptor;
-import model.spem2.WorkProductDescriptor;
+import model.spem2.Artifact ;
+import model.spem2.BreakdownElement ;
+import model.spem2.DeliveryProcess ;
+import model.spem2.Iteration ;
+import model.spem2.PlanningData ;
+import model.spem2.ProductType ;
+import model.spem2.RoleDescriptor ;
+import model.spem2.TaskDefinition ;
+import model.spem2.TaskDescriptor ;
+import model.spem2.WorkProductDescriptor ;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
+import org.w3c.dom.Document ;
+import org.w3c.dom.NamedNodeMap ;
+import org.w3c.dom.Node ;
+import org.w3c.dom.NodeList ;
+import org.xml.sax.SAXException ;
+import org.xml.sax.SAXParseException ;
 
-import process.GlobalController;
-import process.exception.FileParseException;
-import process.exception.FileSaveException;
+import process.GlobalController ;
+import process.exception.FileParseException ;
+import process.exception.FileSaveException ;
 
 /**
  * ProjectControler : Loads, saves project information
@@ -252,7 +252,7 @@ public class ProjectControler
 					}
 				}
 
-				localProject.setResources(localRessources) ;				
+				localProject.setResources(localRessources) ;
 				BreakdownElementsControler.addIterationIntoProject(localProject) ;
 				return localProject ;
 
@@ -329,7 +329,7 @@ public class ProjectControler
 
 					}
 				}) ;
-				
+
 				Project localProject ;
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd'/'MM'/'yyyy") ;
 
@@ -338,40 +338,37 @@ public class ProjectControler
 				 */
 				Document localDocument = localDB.parse(localBIS) ;
 				if (!localDocument.getDocumentElement().getTagName().equalsIgnoreCase("exportProjet")) { throw new FileParseException() ; }
-				
+
 				// Getting process
 				DeliveryProcess localProcess = ProcessControler.load(_source) ;
 				ArrayList <BreakdownElement> localNested = new ArrayList <BreakdownElement>(localProcess.getNestedElements()) ;
-				
+
 				// Variables for loops
 				String localPID = "" ;
 				String localID = "" ;
 				String localName = "" ;
 				String localDescription = "" ;
-				
+
 				Date localStartDate = null ;
 				Date localFinishDate = null ;
 				Date localRStartDate = null ;
 				Date localRFinishDate = null ;
-				
+
 				int localChildMax ;
-				
+
 				ArrayList <String> localIDS = new ArrayList <String>() ;
-				
+
 				NodeList localChildList ;
-				
+
 				// Getting project info
 				NodeList localProjectNodeList = localDocument.getElementsByTagName("projet") ;
-				if (localProjectNodeList.getLength() != 1 || !localProjectNodeList.item(0).getParentNode().getNodeName().equalsIgnoreCase("elementProjet"))
-				{
-					throw new FileParseException() ;
-				}
+				if (localProjectNodeList.getLength() != 1 || !localProjectNodeList.item(0).getParentNode().getNodeName().equalsIgnoreCase("elementProjet")) { throw new FileParseException() ; }
 
 				Node localProjectNode = localProjectNodeList.item(0) ;
 				NodeList localProjectElements = localProjectNode.getChildNodes() ;
 				localChildMax = localProjectElements.getLength() ;
-				
-				for (int i = 0 ; i < localChildMax ; i++)
+
+				for (int i = 0; i < localChildMax; i++ )
 				{
 					if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE && localProjectElements.item(i).getNodeName().equalsIgnoreCase("id"))
 					{
@@ -384,8 +381,9 @@ public class ProjectControler
 							localID = "" ;
 						}
 					}
-					
-					else if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE && localProjectElements.item(i).getNodeName().equalsIgnoreCase("nom"))
+
+					else if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localProjectElements.item(i).getNodeName().equalsIgnoreCase("nom"))
 					{
 						try
 						{
@@ -396,8 +394,9 @@ public class ProjectControler
 							localName = "" ;
 						}
 					}
-					
-					else if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE && localProjectElements.item(i).getNodeName().equalsIgnoreCase("description"))
+
+					else if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localProjectElements.item(i).getNodeName().equalsIgnoreCase("description"))
 					{
 						try
 						{
@@ -408,8 +407,9 @@ public class ProjectControler
 							localDescription = "" ;
 						}
 					}
-					
-					else if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE && localProjectElements.item(i).getNodeName().equalsIgnoreCase("dateDebut"))
+
+					else if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localProjectElements.item(i).getNodeName().equalsIgnoreCase("dateDebut"))
 					{
 						try
 						{
@@ -418,10 +418,11 @@ public class ProjectControler
 						catch (Exception exc)
 						{
 							localStartDate = new Date() ;
-						}						
+						}
 					}
-					
-					else if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE && localProjectElements.item(i).getNodeName().equalsIgnoreCase("dateFin"))
+
+					else if (localProjectElements.item(i).getNodeType() == Node.ELEMENT_NODE
+							&& localProjectElements.item(i).getNodeName().equalsIgnoreCase("dateFin"))
 					{
 						try
 						{
@@ -430,14 +431,14 @@ public class ProjectControler
 						catch (Exception exc)
 						{
 							localFinishDate = new Date() ;
-						}						
+						}
 					}
 				}
 				localProject = new Project(localID, localName, localDescription, localStartDate, localFinishDate) ;
 				localProject.setProcess(localProcess) ;
-				
+
 				// Getting resources
-				ArrayList<HumanResource> localResources = new ArrayList <HumanResource>() ;
+				ArrayList <HumanResource> localResources = new ArrayList <HumanResource>() ;
 				NodeList localResourcesNodeListRoot = localDocument.getElementsByTagName("listeMembres") ;
 				if (localResourcesNodeListRoot.getLength() != 1) { throw new FileParseException() ; }
 				NodeList localResourcesNodeList = localResourcesNodeListRoot.item(0).getChildNodes() ;
@@ -445,7 +446,7 @@ public class ProjectControler
 				Node localResourcesNode ;
 				String localMail = "" ;
 
-				for (int i = 0 ; i < localChildMax ; i++)
+				for (int i = 0; i < localChildMax; i++ )
 				{
 					if (localResourcesNodeList.item(i).getNodeType() == Node.ELEMENT_NODE
 							&& localResourcesNodeList.item(i).getNodeName().equalsIgnoreCase("eltMembre"))
@@ -455,11 +456,10 @@ public class ProjectControler
 						localID = "" ;
 						localName = "" ;
 						localMail = "" ;
-						
-						for (int j = 0 ; j < localChildList.getLength() ; j++)
+
+						for (int j = 0; j < localChildList.getLength(); j++ )
 						{
-							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
 							{
 								try
 								{
@@ -470,9 +470,8 @@ public class ProjectControler
 									localID = "" ;
 								}
 							}
-							
-							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
+
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
 							{
 								try
 								{
@@ -483,9 +482,8 @@ public class ProjectControler
 									localName = "" ;
 								}
 							}
-							
-							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("mail"))
+
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("mail"))
 							{
 								try
 								{
@@ -501,20 +499,19 @@ public class ProjectControler
 						localResources.add(new HumanResource(localID, localName, localMail)) ;
 					}
 				}
-				
+
 				localProject.setResources(localResources) ;
 
-				
 				// Getting iterations
-				ArrayList<Iteration> localIterations = new ArrayList <Iteration>() ;
+				ArrayList <Iteration> localIterations = new ArrayList <Iteration>() ;
 				NodeList localIterationsNodeListRoot = localDocument.getElementsByTagName("listeIterations") ;
 				if (localIterationsNodeListRoot.getLength() != 1) { throw new FileParseException() ; }
 				NodeList localIterationsNodeList = localIterationsNodeListRoot.item(0).getChildNodes() ;
 				localChildMax = localIterationsNodeList.getLength() ;
 				Node localIterationsNode ;
-				
+
 				int localItNumber ;
-				for (int i = 0 ; i < localChildMax ; i++)
+				for (int i = 0; i < localChildMax; i++ )
 				{
 					if (localIterationsNodeList.item(i).getNodeType() == Node.ELEMENT_NODE
 							&& localIterationsNodeList.item(i).getNodeName().equalsIgnoreCase("eltIteration"))
@@ -523,11 +520,10 @@ public class ProjectControler
 						localChildList = localIterationsNode.getChildNodes() ;
 						localID = "" ;
 						localItNumber = 1 ;
-						
-						for (int j = 0 ; j < localChildList.getLength() ; j++)
+
+						for (int j = 0; j < localChildList.getLength(); j++ )
 						{
-							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
 							{
 								try
 								{
@@ -538,7 +534,7 @@ public class ProjectControler
 									localID = "" ;
 								}
 							}
-							
+
 							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
 									&& localChildList.item(j).getNodeName().equalsIgnoreCase("numero"))
 							{
@@ -552,30 +548,29 @@ public class ProjectControler
 								}
 							}
 						}
-						
+
 						localIterations.add(new Iteration(localID, localItNumber)) ;
 					}
 				}
-				
+
 				localProject.setIterations(localIterations) ;
 				GlobalController.currentIteration = localIterations.get(localIterations.size() - 1) ;
 
 				// Getting tasks
-				ArrayList<TaskDefinition> localTasks = new ArrayList <TaskDefinition>() ;
+				ArrayList <TaskDefinition> localTasks = new ArrayList <TaskDefinition>() ;
 				NodeList localTasksNodeListRoot = localDocument.getElementsByTagName("listeTaches") ;
 				if (localTasksNodeListRoot.getLength() != 1) { throw new FileParseException() ; }
 				NodeList localTasksNodeList = localTasksNodeListRoot.item(0).getChildNodes() ;
 				localChildMax = localTasksNodeList.getLength() ;
 				Node localTasksNode ;
-				
+
 				int localDuration = 0 ;
 				int localRDuration = 0 ;
 				TaskDefinition localTaskDefinition ;
 
-				for (int i = 0 ; i < localChildMax ; i++)
+				for (int i = 0; i < localChildMax; i++ )
 				{
-					if (localTasksNodeList.item(i).getNodeType() == Node.ELEMENT_NODE
-							&& localTasksNodeList.item(i).getNodeName().equalsIgnoreCase("eltTache"))
+					if (localTasksNodeList.item(i).getNodeType() == Node.ELEMENT_NODE && localTasksNodeList.item(i).getNodeName().equalsIgnoreCase("eltTache"))
 					{
 						localTasksNode = localTasksNodeList.item(i) ;
 						localChildList = localTasksNode.getChildNodes() ;
@@ -587,11 +582,10 @@ public class ProjectControler
 						localFinishDate = new Date() ;
 						localRStartDate = new Date() ;
 						localRFinishDate = new Date() ;
-						
-						for (int j = 0 ; j < localChildList.getLength() ; j++)
+
+						for (int j = 0; j < localChildList.getLength(); j++ )
 						{
-							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
 							{
 								try
 								{
@@ -602,9 +596,8 @@ public class ProjectControler
 									localID = "" ;
 								}
 							}
-							
-							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
+
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
 							{
 								try
 								{
@@ -615,7 +608,7 @@ public class ProjectControler
 									localName = "" ;
 								}
 							}
-							
+
 							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
 									&& localChildList.item(j).getNodeName().equalsIgnoreCase("tempsPasse"))
 							{
@@ -627,7 +620,7 @@ public class ProjectControler
 								{
 								}
 							}
-							
+
 							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
 									&& localChildList.item(j).getNodeName().equalsIgnoreCase("tempsPrevu"))
 							{
@@ -639,7 +632,7 @@ public class ProjectControler
 								{
 								}
 							}
-							
+
 							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
 									&& localChildList.item(j).getNodeName().equalsIgnoreCase("dateDebutReelle"))
 							{
@@ -651,7 +644,7 @@ public class ProjectControler
 								{
 								}
 							}
-							
+
 							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
 									&& localChildList.item(j).getNodeName().equalsIgnoreCase("dateDebutPrevisionnelle"))
 							{
@@ -663,7 +656,7 @@ public class ProjectControler
 								{
 								}
 							}
-							
+
 							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
 									&& localChildList.item(j).getNodeName().equalsIgnoreCase("dateFinReelle"))
 							{
@@ -675,7 +668,7 @@ public class ProjectControler
 								{
 								}
 							}
-							
+
 							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
 									&& localChildList.item(j).getNodeName().equalsIgnoreCase("dateFinPrevisionnelle"))
 							{
@@ -690,23 +683,23 @@ public class ProjectControler
 						}
 
 						localTaskDefinition = new TaskDefinition(localID, localName, "", "") ;
-						
-						localTaskDefinition.setPlanningData(new PlanningData(localStartDate, localFinishDate, 0, (float)localDuration)) ;
-						localTaskDefinition.setRealData(new PlanningData(localRStartDate, localRFinishDate, 0, (float)localRDuration)) ;
-						
+
+						localTaskDefinition.setPlanningData(new PlanningData(localStartDate, localFinishDate, 0, (float) localDuration)) ;
+						localTaskDefinition.setRealData(new PlanningData(localRStartDate, localRFinishDate, 0, (float) localRDuration)) ;
+
 						localTasks.add(localTaskDefinition) ;
 					}
 				}
 
 				// Getting artifacts
-				ArrayList<Artifact> localArtifacts = new ArrayList <Artifact>() ;
+				ArrayList <Artifact> localArtifacts = new ArrayList <Artifact>() ;
 				NodeList localArtifactsNodeListRoot = localDocument.getElementsByTagName("listeArtefacts") ;
 				if (localArtifactsNodeListRoot.getLength() != 1) { throw new FileParseException() ; }
 				NodeList localArtifactsNodeList = localArtifactsNodeListRoot.item(0).getChildNodes() ;
 				localChildMax = localArtifactsNodeList.getLength() ;
 				Node localArtifactsNode ;
 
-				for (int i = 0 ; i < localChildMax ; i++)
+				for (int i = 0; i < localChildMax; i++ )
 				{
 					if (localArtifactsNodeList.item(i).getNodeType() == Node.ELEMENT_NODE
 							&& localArtifactsNodeList.item(i).getNodeName().equalsIgnoreCase("eltArtefact"))
@@ -715,11 +708,10 @@ public class ProjectControler
 						localChildList = localArtifactsNode.getChildNodes() ;
 						localID = "" ;
 						localName = "" ;
-						
-						for (int j = 0 ; j < localChildList.getLength() ; j++)
+
+						for (int j = 0; j < localChildList.getLength(); j++ )
 						{
-							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
 							{
 								try
 								{
@@ -729,9 +721,8 @@ public class ProjectControler
 								{
 								}
 							}
-							
-							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
+
+							else if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("nom"))
 							{
 								try
 								{
@@ -742,28 +733,27 @@ public class ProjectControler
 								}
 							}
 						}
-						
+
 						localArtifacts.add(new Artifact(localID, localName, "", "")) ;
 					}
 				}
-				
+
 				// Linking project with process
 				// Iteration and tasks
 				NodeList localITTaskRoot = localDocument.getElementsByTagName("listeIterationTache") ;
 				NodeList localITTaskElts = localITTaskRoot.item(0).getChildNodes() ;
 				NodeList localInnerIdentifiers ;
-				localChildMax = localITTaskElts.getLength() ;	
+				localChildMax = localITTaskElts.getLength() ;
 
-				for (int i = 0 ; i < localChildMax ; i++)
+				for (int i = 0; i < localChildMax; i++ )
 				{
-					if (localITTaskElts.item(i).getNodeType() == Node.ELEMENT_NODE
-							&& localITTaskElts.item(i).getNodeName().equalsIgnoreCase("iterationTache"))
+					if (localITTaskElts.item(i).getNodeType() == Node.ELEMENT_NODE && localITTaskElts.item(i).getNodeName().equalsIgnoreCase("iterationTache"))
 					{
 						localChildList = localITTaskElts.item(i).getChildNodes() ;
-						localPID = "";
+						localPID = "" ;
 						localIDS.clear() ;
-						
-						for (int j = 0 ; j < localChildList.getLength() ; j++)
+
+						for (int j = 0; j < localChildList.getLength(); j++ )
 						{
 							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
 									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idIteration"))
@@ -776,7 +766,7 @@ public class ProjectControler
 								{
 								}
 							}
-							
+
 							/*
 							 * The tasks
 							 */
@@ -801,13 +791,13 @@ public class ProjectControler
 								}
 							}
 						}
-						
+
 						// Linking
-						for (int j = 0 ; j < localIterations.size() ; j++)
+						for (int j = 0; j < localIterations.size(); j++ )
 						{
 							if (localIterations.get(j).getDescriptor().getId().equals(localPID))
 							{
-								for (int k = 0 ; k < localTasks.size() ; k++)
+								for (int k = 0; k < localTasks.size(); k++ )
 								{
 									if (localIDS.contains(localTasks.get(k).getId()))
 									{
@@ -819,22 +809,22 @@ public class ProjectControler
 						}
 					}
 				}
-				
+
 				// Members and artifacts
 				NodeList localMemArtifactRoot = localDocument.getElementsByTagName("listeMembreArtefact") ;
 				NodeList localMemArtifactElts = localMemArtifactRoot.item(0).getChildNodes() ;
-				localChildMax = localMemArtifactElts.getLength() ;	
+				localChildMax = localMemArtifactElts.getLength() ;
 
-				for (int i = 0 ; i < localChildMax ; i++)
+				for (int i = 0; i < localChildMax; i++ )
 				{
 					if (localMemArtifactElts.item(i).getNodeType() == Node.ELEMENT_NODE
 							&& localMemArtifactElts.item(i).getNodeName().equalsIgnoreCase("membreArtefact"))
 					{
 						localChildList = localMemArtifactElts.item(i).getChildNodes() ;
-						localPID = "";
+						localPID = "" ;
 						localIDS.clear() ;
-						
-						for (int j = 0 ; j < localChildList.getLength() ; j++)
+
+						for (int j = 0; j < localChildList.getLength(); j++ )
 						{
 							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
 									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idArtefact"))
@@ -847,7 +837,7 @@ public class ProjectControler
 								{
 								}
 							}
-							
+
 							/*
 							 * The tasks
 							 */
@@ -872,13 +862,13 @@ public class ProjectControler
 								}
 							}
 						}
-						
+
 						// Linking
-						for (int j = 0 ; j < localResources.size() ; j++)
+						for (int j = 0; j < localResources.size(); j++ )
 						{
 							if (localResources.get(j).getId().equals(localPID))
 							{
-								for (int k = 0 ; k < localArtifacts.size() ; k++)
+								for (int k = 0; k < localArtifacts.size(); k++ )
 								{
 									if (localIDS.contains(localArtifacts.get(k).getId()))
 									{
@@ -890,25 +880,23 @@ public class ProjectControler
 						}
 					}
 				}
-				
+
 				// Members and tasks
 				NodeList localMemTaskRoot = localDocument.getElementsByTagName("listeMembreTache") ;
 				NodeList localMemTaskElts = localMemTaskRoot.item(0).getChildNodes() ;
-				localChildMax = localMemTaskElts.getLength() ;	
+				localChildMax = localMemTaskElts.getLength() ;
 
-				for (int i = 0 ; i < localChildMax ; i++)
+				for (int i = 0; i < localChildMax; i++ )
 				{
-					if (localMemTaskElts.item(i).getNodeType() == Node.ELEMENT_NODE
-							&& localMemTaskElts.item(i).getNodeName().equalsIgnoreCase("MembreTache"))
+					if (localMemTaskElts.item(i).getNodeType() == Node.ELEMENT_NODE && localMemTaskElts.item(i).getNodeName().equalsIgnoreCase("MembreTache"))
 					{
 						localChildList = localMemTaskElts.item(i).getChildNodes() ;
-						localPID = "";
+						localPID = "" ;
 						localIDS.clear() ;
-						
-						for (int j = 0 ; j < localChildList.getLength() ; j++)
+
+						for (int j = 0; j < localChildList.getLength(); j++ )
 						{
-							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idMembre"))
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("idMembre"))
 							{
 								try
 								{
@@ -918,7 +906,7 @@ public class ProjectControler
 								{
 								}
 							}
-							
+
 							/*
 							 * The tasks
 							 */
@@ -943,13 +931,13 @@ public class ProjectControler
 								}
 							}
 						}
-						
+
 						// Linking
-						for (int j = 0 ; j < localResources.size() ; j++)
+						for (int j = 0; j < localResources.size(); j++ )
 						{
 							if (localResources.get(j).getId().equals(localPID))
 							{
-								for (int k = 0 ; k < localTasks.size() ; k++)
+								for (int k = 0; k < localTasks.size(); k++ )
 								{
 									if (localIDS.contains(localTasks.get(k).getId()))
 									{
@@ -961,25 +949,24 @@ public class ProjectControler
 						}
 					}
 				}
-				
+
 				// Artifacts/tasks in
 				NodeList localArtifactTaskInRoot = localDocument.getElementsByTagName("listeTacheArtefact_Entree") ;
 				NodeList localArtifactTaskInElts = localArtifactTaskInRoot.item(0).getChildNodes() ;
-				localChildMax = localArtifactTaskInElts.getLength() ;	
+				localChildMax = localArtifactTaskInElts.getLength() ;
 
-				for (int i = 0 ; i < localChildMax ; i++)
+				for (int i = 0; i < localChildMax; i++ )
 				{
 					if (localArtifactTaskInElts.item(i).getNodeType() == Node.ELEMENT_NODE
 							&& localArtifactTaskInElts.item(i).getNodeName().equalsIgnoreCase("TacheArtefact_Entree"))
 					{
 						localChildList = localArtifactTaskInElts.item(i).getChildNodes() ;
-						localPID = "";
+						localPID = "" ;
 						localIDS.clear() ;
-						
-						for (int j = 0 ; j < localChildList.getLength() ; j++)
+
+						for (int j = 0; j < localChildList.getLength(); j++ )
 						{
-							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idTache"))
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("idTache"))
 							{
 								try
 								{
@@ -989,7 +976,7 @@ public class ProjectControler
 								{
 								}
 							}
-							
+
 							/*
 							 * The tasks
 							 */
@@ -1014,13 +1001,13 @@ public class ProjectControler
 								}
 							}
 						}
-						
+
 						// Linking
-						for (int j = 0 ; j < localTasks.size() ; j++)
+						for (int j = 0; j < localTasks.size(); j++ )
 						{
 							if (localTasks.get(j).getId().equals(localPID))
 							{
-								for (int k = 0 ; k < localArtifacts.size() ; k++)
+								for (int k = 0; k < localArtifacts.size(); k++ )
 								{
 									if (localIDS.contains(localArtifacts.get(k).getId()))
 									{
@@ -1033,25 +1020,24 @@ public class ProjectControler
 						}
 					}
 				}
-				
+
 				// Artifacts/tasks out
 				NodeList localArtifactTaskOutRoot = localDocument.getElementsByTagName("listeTacheArtefact_Sortie") ;
 				NodeList localArtifactTaskOutElts = localArtifactTaskOutRoot.item(0).getChildNodes() ;
-				localChildMax = localArtifactTaskOutElts.getLength() ;	
+				localChildMax = localArtifactTaskOutElts.getLength() ;
 
-				for (int i = 0 ; i < localChildMax ; i++)
+				for (int i = 0; i < localChildMax; i++ )
 				{
 					if (localArtifactTaskOutElts.item(i).getNodeType() == Node.ELEMENT_NODE
 							&& localArtifactTaskOutElts.item(i).getNodeName().equalsIgnoreCase("TacheArtefact_Sortie"))
 					{
 						localChildList = localArtifactTaskOutElts.item(i).getChildNodes() ;
-						localPID = "";
+						localPID = "" ;
 						localIDS.clear() ;
-						
-						for (int j = 0 ; j < localChildList.getLength() ; j++)
+
+						for (int j = 0; j < localChildList.getLength(); j++ )
 						{
-							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idTache"))
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("idTache"))
 							{
 								try
 								{
@@ -1061,7 +1047,7 @@ public class ProjectControler
 								{
 								}
 							}
-							
+
 							/*
 							 * The artifacts
 							 */
@@ -1086,13 +1072,13 @@ public class ProjectControler
 								}
 							}
 						}
-						
+
 						// Linking
-						for (int j = 0 ; j < localTasks.size() ; j++)
+						for (int j = 0; j < localTasks.size(); j++ )
 						{
 							if (localTasks.get(j).getId().equals(localPID))
 							{
-								for (int k = 0 ; k < localArtifacts.size() ; k++)
+								for (int k = 0; k < localArtifacts.size(); k++ )
 								{
 									if (localIDS.contains(localArtifacts.get(k).getId()))
 									{
@@ -1105,25 +1091,24 @@ public class ProjectControler
 						}
 					}
 				}
-				
+
 				// Products / artifacts
 				NodeList localProductArtifactRoot = localDocument.getElementsByTagName("listeProduitArtefact") ;
 				NodeList localProductArtifactElts = localProductArtifactRoot.item(0).getChildNodes() ;
-				localChildMax = localProductArtifactElts.getLength() ;	
+				localChildMax = localProductArtifactElts.getLength() ;
 
-				for (int i = 0 ; i < localChildMax ; i++)
+				for (int i = 0; i < localChildMax; i++ )
 				{
 					if (localProductArtifactElts.item(i).getNodeType() == Node.ELEMENT_NODE
 							&& localProductArtifactElts.item(i).getNodeName().equalsIgnoreCase("ProduitArtefact"))
 					{
 						localChildList = localProductArtifactElts.item(i).getChildNodes() ;
-						localPID = "";
+						localPID = "" ;
 						localIDS.clear() ;
-						
-						for (int j = 0 ; j < localChildList.getLength() ; j++)
+
+						for (int j = 0; j < localChildList.getLength(); j++ )
 						{
-							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idProduit"))
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("idProduit"))
 							{
 								try
 								{
@@ -1133,7 +1118,7 @@ public class ProjectControler
 								{
 								}
 							}
-							
+
 							/*
 							 * The artifacts
 							 */
@@ -1158,18 +1143,18 @@ public class ProjectControler
 								}
 							}
 						}
-						
+
 						// Linking
-						for (int j = 0 ; j < localNested.size() ; j++)
+						for (int j = 0; j < localNested.size(); j++ )
 						{
-							if (localNested.get(j) instanceof WorkProductDescriptor && ((WorkProductDescriptor)localNested.get(j)).getId().equals(localPID))
+							if (localNested.get(j) instanceof WorkProductDescriptor && ((WorkProductDescriptor) localNested.get(j)).getId().equals(localPID))
 							{
-								for (int k = 0 ; k < localArtifacts.size() ; k++)
+								for (int k = 0; k < localArtifacts.size(); k++ )
 								{
 									if (localIDS.contains(localArtifacts.get(k).getId()))
 									{
-										((WorkProductDescriptor)localNested.get(j)).getArtifacts().add(localArtifacts.get(k)) ;
-										localArtifacts.get(k).setProduct((WorkProductDescriptor)localNested.get(j)) ;
+										((WorkProductDescriptor) localNested.get(j)).getArtifacts().add(localArtifacts.get(k)) ;
+										localArtifacts.get(k).setProduct((WorkProductDescriptor) localNested.get(j)) ;
 									}
 								}
 								break ;
@@ -1177,22 +1162,22 @@ public class ProjectControler
 						}
 					}
 				}
-				
+
 				// Task descriptors / task definitions
 				NodeList localActivityTaskRoot = localDocument.getElementsByTagName("listeActiviteTache") ;
 				NodeList localActivityTaskElts = localActivityTaskRoot.item(0).getChildNodes() ;
-				localChildMax = localActivityTaskElts.getLength() ;	
+				localChildMax = localActivityTaskElts.getLength() ;
 
-				for (int i = 0 ; i < localChildMax ; i++)
+				for (int i = 0; i < localChildMax; i++ )
 				{
 					if (localActivityTaskElts.item(i).getNodeType() == Node.ELEMENT_NODE
 							&& localActivityTaskElts.item(i).getNodeName().equalsIgnoreCase("ActiviteTache"))
 					{
 						localChildList = localActivityTaskElts.item(i).getChildNodes() ;
-						localPID = "";
+						localPID = "" ;
 						localIDS.clear() ;
-						
-						for (int j = 0 ; j < localChildList.getLength() ; j++)
+
+						for (int j = 0; j < localChildList.getLength(); j++ )
 						{
 							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
 									&& localChildList.item(j).getNodeName().equalsIgnoreCase("idActivite"))
@@ -1205,7 +1190,7 @@ public class ProjectControler
 								{
 								}
 							}
-							
+
 							/*
 							 * The tasks
 							 */
@@ -1230,18 +1215,18 @@ public class ProjectControler
 								}
 							}
 						}
-						
+
 						// Linking
-						for (int j = 0 ; j < localNested.size() ; j++)
+						for (int j = 0; j < localNested.size(); j++ )
 						{
-							if (localNested.get(j) instanceof TaskDescriptor && ((TaskDescriptor)localNested.get(j)).getId().equals(localPID))
+							if (localNested.get(j) instanceof TaskDescriptor && ((TaskDescriptor) localNested.get(j)).getId().equals(localPID))
 							{
-								for (int k = 0 ; k < localTasks.size() ; k++)
+								for (int k = 0; k < localTasks.size(); k++ )
 								{
 									if (localIDS.contains(localTasks.get(k).getId()))
 									{
-										((TaskDescriptor)localNested.get(j)).getTasks().add(localTasks.get(k)) ;
-										localTasks.get(k).setTask((TaskDescriptor)localNested.get(j)) ;
+										((TaskDescriptor) localNested.get(j)).getTasks().add(localTasks.get(k)) ;
+										localTasks.get(k).setTask((TaskDescriptor) localNested.get(j)) ;
 									}
 								}
 								break ;
@@ -1249,25 +1234,23 @@ public class ProjectControler
 						}
 					}
 				}
-				
+
 				// Members / roles
 				NodeList localMemberRoleRoot = localDocument.getElementsByTagName("listeMembre") ;
 				NodeList localMemberRoleElts = localMemberRoleRoot.item(0).getChildNodes() ;
-				localChildMax = localMemberRoleElts.getLength() ;	
+				localChildMax = localMemberRoleElts.getLength() ;
 
-				for (int i = 0 ; i < localChildMax ; i++)
+				for (int i = 0; i < localChildMax; i++ )
 				{
-					if (localMemberRoleElts.item(i).getNodeType() == Node.ELEMENT_NODE
-							&& localMemberRoleElts.item(i).getNodeName().equalsIgnoreCase("Membre"))
+					if (localMemberRoleElts.item(i).getNodeType() == Node.ELEMENT_NODE && localMemberRoleElts.item(i).getNodeName().equalsIgnoreCase("Membre"))
 					{
 						localChildList = localMemberRoleElts.item(i).getChildNodes() ;
-						localPID = "";
+						localPID = "" ;
 						localIDS.clear() ;
-						
-						for (int j = 0 ; j < localChildList.getLength() ; j++)
+
+						for (int j = 0; j < localChildList.getLength(); j++ )
 						{
-							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("id"))
 							{
 								try
 								{
@@ -1277,12 +1260,11 @@ public class ProjectControler
 								{
 								}
 							}
-							
+
 							/*
 							 * The tasks
 							 */
-							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE
-									&& localChildList.item(j).getNodeName().equalsIgnoreCase("listeRole"))
+							if (localChildList.item(j).getNodeType() == Node.ELEMENT_NODE && localChildList.item(j).getNodeName().equalsIgnoreCase("listeRole"))
 							{
 								try
 								{
@@ -1302,18 +1284,18 @@ public class ProjectControler
 								}
 							}
 						}
-						
+
 						// Linking
-						for (int j = 0 ; j < localResources.size() ; j++)
+						for (int j = 0; j < localResources.size(); j++ )
 						{
 							if (localResources.get(j).getId().equals(localPID))
 							{
-								for (int k = 0 ; k < localNested.size() ; k++)
+								for (int k = 0; k < localNested.size(); k++ )
 								{
-									if (localNested.get(k) instanceof RoleDescriptor && localIDS.contains(((RoleDescriptor)localNested.get(k)).getId()))
+									if (localNested.get(k) instanceof RoleDescriptor && localIDS.contains( ((RoleDescriptor) localNested.get(k)).getId()))
 									{
-										localResources.get(j).getPerformingRoles().add((RoleDescriptor)localNested.get(k)) ;
-										((RoleDescriptor)localNested.get(k)).getPerformers().add(localResources.get(j)) ;
+										localResources.get(j).getPerformingRoles().add((RoleDescriptor) localNested.get(k)) ;
+										((RoleDescriptor) localNested.get(k)).getPerformers().add(localResources.get(j)) ;
 									}
 								}
 								break ;
@@ -1321,9 +1303,9 @@ public class ProjectControler
 						}
 					}
 				}
-				
+
 				return localProject ;
-		
+
 			}
 			catch (ParserConfigurationException eDBF)
 			{
@@ -1376,7 +1358,7 @@ public class ProjectControler
 			ArrayList <Component> localComponents = new ArrayList <Component>() ;
 			HumanResource localTempResource ;
 			Iteration localIteration ;
-			
+
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy") ;
 
 			// The following variables represents buffers for various elements (for optimisation in
@@ -1407,17 +1389,17 @@ public class ProjectControler
 			String presentationsInfo = "" ;
 			String guidesInfo = "" ;
 			String guideTypesInfo = "" ;
-			
+
 			String artifactsInfo = "" ;
 			String artifactsIds = "" ;
 			String artifactsForTaskIn = "" ;
 			String artifactsForTaskOut = "" ;
-			
+
 			String taskDefsInfo = "" ;
 			String taskDefsIds = "" ;
-			
+
 			String taskMemInfo = "" ;
-			
+
 			String taskDefsItInfo = "" ;
 
 			// Initializing components
@@ -1515,7 +1497,7 @@ public class ProjectControler
 						} // End of product
 
 						// For activities
-						else if (localTempElement instanceof Activity && !(localTempElement instanceof Component))
+						else if (localTempElement instanceof Activity && ! (localTempElement instanceof Component))
 						{
 							activitiesIds = activitiesIds + "<definitionTravailId>" + ((Activity) localTempElement).getDescriptor().getId()
 									+ "</definitionTravailId>\n" ;
@@ -1738,16 +1720,16 @@ public class ProjectControler
 					}
 
 					productsInfo = productsInfo + "</produit>\n" ;
-					
+
 					// Artifacts list for product
 					// Info + ID
-					if (((WorkProductDescriptor)localElement).getArtifacts().size() > 0)
+					if ( ((WorkProductDescriptor) localElement).getArtifacts().size() > 0)
 					{
 						artifactsIds += "<ProduitArtefact>\n" ;
-						artifactsIds += "<idProduit>"+ ((WorkProductDescriptor)localElement).getId() + "</idProduit>\n" ;
+						artifactsIds += "<idProduit>" + ((WorkProductDescriptor) localElement).getId() + "</idProduit>\n" ;
 						artifactsIds += "<listeIdArtefact>\n" ;
-						
-						artifactIterator = ((WorkProductDescriptor)localElement).getArtifacts().iterator() ;
+
+						artifactIterator = ((WorkProductDescriptor) localElement).getArtifacts().iterator() ;
 						while (artifactIterator.hasNext())
 						{
 							localArtifact = artifactIterator.next() ;
@@ -1755,20 +1737,19 @@ public class ProjectControler
 							artifactsInfo += "<id>" + localArtifact.getId() + "</id>" ;
 							artifactsInfo += "<nom>" + localArtifact.getName() + "</nom>" ;
 							artifactsInfo += "</eltArtefact>\n" ;
-							
+
 							artifactsIds += "<id>" + localArtifact.getId() + "</id>" ;
-						} 
-						
+						}
+
 						artifactsIds += "</listeIdArtefact>\n" ;
 						artifactsIds += "</ProduitArtefact>\n" ;
 					}
 					// Association
-					
-					
+
 				} // End of product
 
 				// For activities
-				else if (localElement instanceof Activity && !(localElement instanceof Component))
+				else if (localElement instanceof Activity && ! (localElement instanceof Component))
 				{
 					activitiesInfo = activitiesInfo + "<definitionTravail>\n" ;
 					activitiesInfo = activitiesInfo + "<id>" + ((Activity) localElement).getDescriptor().getId() + "</id>\n" ;
@@ -1791,7 +1772,7 @@ public class ProjectControler
 						activitiesInfo = activitiesInfo + "<cheminDiagrammeFlots>" + ((Activity) localElement).getFlowDiagramPath()
 								+ "</cheminDiagrammeFlots>\n" ;
 					}
-					
+
 					activitiesInfo = activitiesInfo + "<agregatComposant>" + ((Activity) localElement).getDescriptor().getParentId() + "</agregatComposant>\n" ;
 
 					// Tasks
@@ -1902,33 +1883,31 @@ public class ProjectControler
 					}
 
 					taskDescsInfo = taskDescsInfo + "</activite>\n" ;
-					
+
 					// Task Definitions for this descriptor
-					if (((TaskDescriptor)localElement).getTasks().size() > 0)
+					if ( ((TaskDescriptor) localElement).getTasks().size() > 0)
 					{
 						taskDefsIds += "<ActiviteTache>\n" ;
-						taskDefsIds += "<idActivite>"+ ((TaskDescriptor)localElement).getId() + "</idActivite>\n" ;
+						taskDefsIds += "<idActivite>" + ((TaskDescriptor) localElement).getId() + "</idActivite>\n" ;
 						taskDefsIds += "<listeIdTache>\n" ;
-						
-						taskDIterator = ((TaskDescriptor)localElement).getTasks().iterator() ;
+
+						taskDIterator = ((TaskDescriptor) localElement).getTasks().iterator() ;
 						while (taskDIterator.hasNext())
-						{							
+						{
 							localTaskDefinition = taskDIterator.next() ;
 							taskDefsInfo += "<eltTache>\n" ;
 							taskDefsInfo += "<id>" + localTaskDefinition.getId() + "</id>\n" ;
 							taskDefsInfo += "<nom>" + localTaskDefinition.getName() + "</nom>\n" ;
-							taskDefsInfo += "<tempsPasse>" + (int)localTaskDefinition.getRealData().getDuration() + "</tempsPasse>\n" ;
+							taskDefsInfo += "<tempsPasse>" + (int) localTaskDefinition.getRealData().getDuration() + "</tempsPasse>\n" ;
 							taskDefsInfo += "<dateFinReelle>" + dateFormat.format(localTaskDefinition.getRealData().getFinishDate()) + "</dateFinReelle>\n" ;
-							taskDefsInfo += "</eltTache>\n" ;					
-							
-							
-							
+							taskDefsInfo += "</eltTache>\n" ;
+
 							taskDefsIds += "<id>" + localTaskDefinition.getId() + "</id>\n" ;
-							
+
 							// Artifacts for tasks
-							if ( localTaskDefinition.getInputProducts().size() > 0)
+							if (localTaskDefinition.getInputProducts().size() > 0)
 							{
-								
+
 								artifactsForTaskIn += "<tacheArtefact_Entree>\n" ;
 								artifactsForTaskIn += "<idTache>" + localTaskDefinition.getId() + "</idTache>\n" ;
 								fakeArtifactIterator = localTaskDefinition.getInputProducts().iterator() ;
@@ -1940,9 +1919,9 @@ public class ProjectControler
 								artifactsForTaskIn += "</listeArtefact>\n" ;
 								artifactsForTaskIn += "</tacheArtefact_Entree>\n" ;
 							}
-							if ( localTaskDefinition.getOutputProducts().size() > 0)
+							if (localTaskDefinition.getOutputProducts().size() > 0)
 							{
-								
+
 								artifactsForTaskOut += "<tacheArtefact_Sortie>\n" ;
 								artifactsForTaskOut += "<idTache>" + localTaskDefinition.getId() + "</idTache>\n" ;
 								fakeArtifactIterator = localTaskDefinition.getOutputProducts().iterator() ;
@@ -1955,11 +1934,11 @@ public class ProjectControler
 								artifactsForTaskOut += "</tacheArtefact_Sortie>\n" ;
 							}
 						}
-						
+
 						taskDefsIds += "</listeIdTache>\n" ;
 						taskDefsIds += "</ActiviteTache>\n" ;
 					}
-					
+
 				} // End taskDescs
 
 				// For interfaces
@@ -2123,7 +2102,7 @@ public class ProjectControler
 					guideTypesInfo = guideTypesInfo + "<id>" + ((GuideType) localElement).getId() + "</id>\n" ;
 					guideTypesInfo = guideTypesInfo + "<nom>" + ((GuideType) localElement).getName() + "</nom>\n" ;
 					guideTypesInfo = guideTypesInfo + "</typeGuide>\n" ;
-					
+
 				} // End guideTypes
 			}
 
@@ -2262,22 +2241,22 @@ public class ProjectControler
 					localOSW.write("<id>" + localTempResource.getId() + "</id>\n") ;
 					localOSW.write("<nom>" + localTempResource.getFullName() + "</nom>\n") ;
 					localOSW.write("</eltMembre>\n") ;
-					
+
 					// Generating tasks
 					if (localTempResource.getPerformingTasks().size() > 0)
 					{
 						taskMemInfo += "<MembreTache>\n" ;
-						taskMemInfo += "<idMembre>"+localTempResource.getId()+"</idMembre>\n" ;
+						taskMemInfo += "<idMembre>" + localTempResource.getId() + "</idMembre>\n" ;
 						taskMemInfo += "<listeTache>\n" ;
 						taskDIterator = localTempResource.getPerformingTasks().iterator() ;
 						while (taskDIterator.hasNext())
 						{
-							taskMemInfo += "<id>"+taskDIterator.next().getId()+"</id>\n" ;
+							taskMemInfo += "<id>" + taskDIterator.next().getId() + "</id>\n" ;
 						}
 						taskMemInfo += "</listeTache>\n" ;
 						taskMemInfo += "</MembreTache>\n" ;
 					}
-					
+
 				}
 				localOSW.write("</listeMembres>\n") ;
 
@@ -2292,16 +2271,16 @@ public class ProjectControler
 			{
 				iterationIterator = _project.getIterations().iterator() ;
 				localOSW.write("<listeIterations>\n") ;
-				
+
 				Date localITStartDate = null ;
 				Date localITFinishDate = null ;
-				
+
 				TaskDefinition localItTaskDefinition ;
-				
+
 				while (iterationIterator.hasNext())
 				{
 					localIteration = iterationIterator.next() ;
-					
+
 					// Generating tasks for the current iteration
 					if (localIteration.getTasks().size() == 0)
 					{
@@ -2311,35 +2290,35 @@ public class ProjectControler
 					else
 					{
 						taskDIterator = localIteration.getTasks().iterator() ;
-						
+
 						taskDefsItInfo += "<iterationTache>\n" ;
-						taskDefsItInfo += "<idIteration>"+localIteration.getDescriptor().getId()+"</idIteration>\n" ;
+						taskDefsItInfo += "<idIteration>" + localIteration.getDescriptor().getId() + "</idIteration>\n" ;
 						taskDefsItInfo += "<listeIdTache>\n" ;
-						
+
 						while (taskDIterator.hasNext())
 						{
 							localItTaskDefinition = taskDIterator.next() ;
-							
+
 							// Generating strings
-							taskDefsItInfo += "<id>"+localItTaskDefinition.getId()+"</id>\n" ;
-							
+							taskDefsItInfo += "<id>" + localItTaskDefinition.getId() + "</id>\n" ;
+
 							// Updating iteration date
 							if (localITStartDate == null || localITStartDate.before(localItTaskDefinition.getRealData().getStartDate()))
 							{
 								localITStartDate = localItTaskDefinition.getRealData().getStartDate() ;
 							}
-							
+
 							if (localITFinishDate == null || localITFinishDate.after(localItTaskDefinition.getRealData().getFinishDate()))
 							{
 								localITFinishDate = localItTaskDefinition.getRealData().getFinishDate() ;
 							}
-							
+
 						}
 						taskDefsItInfo += "</listeIdTache>\n" ;
 						taskDefsItInfo += "</iterationTache>\n" ;
-						
+
 					}
-					
+
 					localOSW.write("<eltIteration>\n") ;
 					localOSW.write("<id>" + localIteration.getDescriptor().getId() + "</id>\n") ;
 					localOSW.write("<numero>" + localIteration.getDescriptor().getName() + "</numero>\n") ;
@@ -2384,7 +2363,7 @@ public class ProjectControler
 			}
 			else
 			{
-				localOSW.write("<listeIterationTache>\n" + taskDefsItInfo + "</listeIterationTache>\n") ;				
+				localOSW.write("<listeIterationTache>\n" + taskDefsItInfo + "</listeIterationTache>\n") ;
 			}
 
 			// Between members and artifacts
@@ -2397,7 +2376,7 @@ public class ProjectControler
 			}
 			else
 			{
-				localOSW.write("<listeMembreTache>"+taskMemInfo+"</listeMembreTache>\n") ;
+				localOSW.write("<listeMembreTache>" + taskMemInfo + "</listeMembreTache>\n") ;
 			}
 
 			// Between tasks and artifacts in
@@ -2520,29 +2499,27 @@ public class ProjectControler
 
 			OutputStreamWriter localOSW = new OutputStreamWriter(localBOS, "ISO-8859-1") ;
 
-			
-			
-			//date format for open workbench 
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh':'mm':'ss");
+			// date format for open workbench
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh':'mm':'ss") ;
 
 			/*
 			 * Initialisation
 			 */
 			BreakdownElement localElement = null ;
-			
+
 			Iterator <BreakdownElement> localIterator ;
-			
+
 			ArrayList <Component> localComponents = new ArrayList <Component>() ;
 			HumanResource localTempResource ;
-			TaskDefinition localTempTask;
+			TaskDefinition localTempTask ;
 
 			// The following variables represents buffers for various elements (for optimisation in
 			// loops)
-			
+
 			Iterator <TaskDefinition> taskIterator ;
-			
+
 			Iterator <HumanResource> resourceIterator ;
-			
+
 			// Initializing components
 			localIterator = _project.getProcess().getNestedElements().iterator() ;
 			while (localIterator.hasNext())
@@ -2558,12 +2535,12 @@ public class ProjectControler
 			 * Writing the file
 			 */
 			localOSW.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n") ;
-			localOSW.write("<WORKBENCH_PROJECT>\n");
-			localOSW.write("<BaseCalendars>\n");
-			localOSW.write("<Calendar name=\"Standard\"/>\n");
-			localOSW.write("</BaseCalendars>\n");
-			
-			//Members
+			localOSW.write("<WORKBENCH_PROJECT>\n") ;
+			localOSW.write("<BaseCalendars>\n") ;
+			localOSW.write("<Calendar name=\"Standard\"/>\n") ;
+			localOSW.write("</BaseCalendars>\n") ;
+
+			// Members
 			if (_project.getResources().size() == 0)
 			{
 				localOSW.write("<PoolRessources/>\n") ;
@@ -2588,7 +2565,7 @@ public class ProjectControler
 				}
 				localOSW.write("</PoolResources>\n") ;
 			}
-			
+
 			localOSW.write("<Projects>\n") ;
 			localOSW.write("<Project UID=\"" + _project.getId() + " \" ") ;
 			localOSW.write("closed=\"false\" ") ;
@@ -2609,9 +2586,9 @@ public class ProjectControler
 			localOSW.write("projectID=\"" + _project.getId() + " \" ") ;
 			localOSW.write("startImposed=\"false\" ") ;
 			localOSW.write("programme=\"false\">\n") ;
-			
+
 			localOSW.write("<Resources>\n") ;
-			//Link between Menbers and the project
+			// Link between Menbers and the project
 			resourceIterator = _project.getResources().iterator() ;
 			while (resourceIterator.hasNext())
 			{
@@ -2620,26 +2597,25 @@ public class ProjectControler
 				localOSW.write("resourceID=\"" + localTempResource.getId() + "\" ") ;
 				localOSW.write("openForTimeEntry=\"true\" ") ;
 				localOSW.write("bookingStatus=\"5\">\n") ;
-				//Curve name for open workbench
+				// Curve name for open workbench
 				localOSW.write("<Curve name=\"allocation\" type=\"1\" default=\"1.0\" />\n") ;
 				localOSW.write("<Curve name=\"rate\" type=\"1\" default=\"2.777777777777778E-4\" />\n") ;
 				localOSW.write("</Resource>\n") ;
 			}
-			
-			
+
 			localOSW.write("</Resources>\n") ;
-			
-			//Link between Tasks and the project
-			//Tasks : in and out
+
+			// Link between Tasks and the project
+			// Tasks : in and out
 			resourceIterator = _project.getResources().iterator() ;
 			while (resourceIterator.hasNext())
 			{
 				localTempResource = resourceIterator.next() ;
-				taskIterator = (localTempResource).getPerformingTasks().iterator();
+				taskIterator = (localTempResource).getPerformingTasks().iterator() ;
 				while (taskIterator.hasNext())
 				{
-					localTempTask = taskIterator.next();
-					
+					localTempTask = taskIterator.next() ;
+
 					if (GlobalController.currentIteration.getTasks().contains(localTempTask))
 					{
 						localOSW.write("<Task ") ;
@@ -2671,14 +2647,14 @@ public class ProjectControler
 					}
 				}
 			}
-			
+
 			localOSW.write("</Project>\n") ;
 			localOSW.write("</Projects>\n") ;
-			localOSW.write("</WORKBENCH_PROJECT>\n");
-			
+			localOSW.write("</WORKBENCH_PROJECT>\n") ;
+
 			localOSW.flush() ;
 			localOSW.close() ;
-			
+
 		}
 		catch (FileNotFoundException exc)
 		{
@@ -2696,14 +2672,14 @@ public class ProjectControler
 		}
 
 	}
-	
-	public static void importFromOpenWorkbench(File _source, Project _currentProject) throws FileParseException
+
+	public static void importFromOpenWorkbench (File _source, Project _currentProject) throws FileParseException
 	{
 		BreakdownElement localElement ;
 		TaskDefinition localTaskDefinition ;
 		Iterator <BreakdownElement> internIterator ;
 		Iterator <TaskDefinition> taskDefIterator ;
-		
+
 		try
 		{
 			FileInputStream localFIS = new FileInputStream(_source) ;
@@ -2744,7 +2720,7 @@ public class ProjectControler
 
 					}
 				}) ;
-				
+
 				/*
 				 * Parsing the data and checking the file format
 				 */
@@ -2757,19 +2733,19 @@ public class ProjectControler
 				NodeList localTasksNodeList = localTasksRootNode.getChildNodes() ;
 				int localChildCount = 0 ;
 				int localChildMax = localTasksNodeList.getLength() ;
-				
+
 				SimpleDateFormat localSDF = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss") ;
-				int localAttrTarget; // For optimising the loop
+				int localAttrTarget ; // For optimising the loop
 
 				Node localAttrNode ;
-				int localAttrCount;
-				NamedNodeMap localAttributes;
-				
-				String localID = null;
-				String localName = null;
-				Date localDateStart = null;
-				Date localDateFinish = null;
-								
+				int localAttrCount ;
+				NamedNodeMap localAttributes ;
+
+				String localID = null ;
+				String localName = null ;
+				Date localDateStart = null ;
+				Date localDateFinish = null ;
+
 				/*
 				 * Parsing
 				 */
@@ -2781,7 +2757,7 @@ public class ProjectControler
 						localTaskNode = localTasksNodeList.item(localChildCount) ;
 						if (localTaskNode == null) { throw new FileParseException() ; }
 						localAttrTarget = 4 ;
-						localAttributes = localTaskNode.getAttributes(); 
+						localAttributes = localTaskNode.getAttributes() ;
 						localAttrCount = localAttributes.getLength() ;
 						for (int i = 0; i < localAttrCount; i++ )
 						{
@@ -2789,15 +2765,15 @@ public class ProjectControler
 							if (localAttrNode.getNodeName().equalsIgnoreCase("taskID"))
 							{
 								localAttrTarget-- ;
-								localID = localAttrNode.getNodeValue();
+								localID = localAttrNode.getNodeValue() ;
 							}
 							else if (localAttrNode.getNodeName().equalsIgnoreCase("start"))
 							{
 								localAttrTarget-- ;
 								try
 								{
-									localDateStart = localSDF.parse(localAttrNode.getNodeValue());
-									
+									localDateStart = localSDF.parse(localAttrNode.getNodeValue()) ;
+
 								}
 								catch (ParseException pe)
 								{
@@ -2806,20 +2782,20 @@ public class ProjectControler
 							else if (localAttrNode.getNodeName().equalsIgnoreCase("name"))
 							{
 								localAttrTarget-- ;
-								localName = localAttrNode.getNodeValue();
-								
+								localName = localAttrNode.getNodeValue() ;
+
 							}
 							else if (localAttrNode.getNodeName().equalsIgnoreCase("finish"))
 							{
 								localAttrTarget-- ;
 								try
 								{
-									localDateFinish = localSDF.parse(localAttrNode.getNodeValue());
+									localDateFinish = localSDF.parse(localAttrNode.getNodeValue()) ;
 								}
 								catch (ParseException pe)
 								{
 								}
-																
+
 							}
 
 							if (localAttrTarget == 0)
@@ -2828,31 +2804,39 @@ public class ProjectControler
 							}
 						}
 					}
-					
+
 					/*
 					 * Initialising of the local project.
 					 */
-					internIterator = _currentProject.getProcess().getNestedElements().iterator();
-					while(internIterator.hasNext()){
-						localElement = internIterator.next();
-						if (localElement instanceof TaskDescriptor){
-							if (((TaskDescriptor)localElement).getTasks().size() > 0){
-								taskDefIterator = ((TaskDescriptor)localElement).getTasks().iterator() ;
-								while (taskDefIterator.hasNext()){
-									localTaskDefinition = taskDefIterator.next();
-									if(localTaskDefinition.getId().equals(localID)){
-										localTaskDefinition.setName(localName);
-										localTaskDefinition.getRealData().setStartDate(localDateStart);
-										localTaskDefinition.getRealData().setFinishDate(localDateFinish);
+					internIterator = _currentProject.getProcess().getNestedElements().iterator() ;
+					while (internIterator.hasNext())
+					{
+						localElement = internIterator.next() ;
+						if (localElement instanceof TaskDescriptor)
+						{
+							if ( ((TaskDescriptor) localElement).getTasks().size() > 0)
+							{
+								taskDefIterator = ((TaskDescriptor) localElement).getTasks().iterator() ;
+								while (taskDefIterator.hasNext())
+								{
+									localTaskDefinition = taskDefIterator.next() ;
+									if (localTaskDefinition.getId().equals(localID))
+									{
+										localTaskDefinition.setName(localName) ;
+										localTaskDefinition.getRealData().setStartDate(localDateStart) ;
+										localTaskDefinition.getRealData().setFinishDate(localDateFinish) ;
+										
+										localTaskDefinition.setChanged() ;
+										localTaskDefinition.notifyObservers() ;
 									}
 								}
 							}
 						}
 					}
-					
+
 					localChildCount++ ;
 				}
-								
+
 			}
 			catch (ParserConfigurationException eDBF)
 			{
@@ -2871,9 +2855,9 @@ public class ProjectControler
 		{
 			throw new FileParseException() ;
 		}
-		
+
 	}
-		
+
 	public static void exportTo2DB (Project _project, File _destination) throws FileSaveException
 	{
 		try
@@ -2883,30 +2867,26 @@ public class ProjectControler
 
 			OutputStreamWriter localOSW = new OutputStreamWriter(localBOS, "ISO-8859-1") ;
 
-			
-			
-			//date format for open workbench 
-			DateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy");
-			
-			
+			// date format for open workbench
+			DateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy") ;
 
 			/*
 			 * Initialisation
 			 */
 			BreakdownElement localElement = null ;
-			
+
 			Iterator <BreakdownElement> localIterator ;
 			Iterator <TaskDefinition> taskIterator ;
 			Iterator <TaskDefinition> taskDIterator ;
 			Iterator <HumanResource> resourceIterator ;
-			
+
 			ArrayList <Component> localComponents = new ArrayList <Component>() ;
 			HumanResource localTempResource ;
-			TaskDefinition localTempTask;
+			TaskDefinition localTempTask ;
 			TaskDefinition localTaskDefinition ;
-			int prevbudget = 0;
-			int realbudget = 0;
-			
+			int prevbudget = 0 ;
+			int realbudget = 0 ;
+
 			// Initializing components
 			localIterator = _project.getProcess().getNestedElements().iterator() ;
 			while (localIterator.hasNext())
@@ -2922,40 +2902,39 @@ public class ProjectControler
 			 * Writing the file
 			 */
 			localOSW.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n") ;
-			localOSW.write("<PSI-2DB>\n");
-			
-			//information about the project
-			localOSW.write("<project id=\""+ _project.getId() + "\">\n");
+			localOSW.write("<PSI-2DB>\n") ;
+
+			// information about the project
+			localOSW.write("<project id=\"" + _project.getId() + "\">\n") ;
 			localOSW.write("<name>" + _project.getName() + "</name>\n") ;
-			
-			//total time pass on the project
+
+			// total time pass on the project
 			localIterator = _project.getProcess().getNestedElements().iterator() ;
 			while (localIterator.hasNext())
 			{
 				localElement = localIterator.next() ;
-				//For task descriptors
+				// For task descriptors
 				if (localElement instanceof TaskDescriptor)
 				{
 					// Task Definitions for this descriptor
-					if (((TaskDescriptor)localElement).getTasks().size() > 0)
+					if ( ((TaskDescriptor) localElement).getTasks().size() > 0)
 					{
-						
-						taskDIterator = ((TaskDescriptor)localElement).getTasks().iterator() ;
+
+						taskDIterator = ((TaskDescriptor) localElement).getTasks().iterator() ;
 						while (taskDIterator.hasNext())
-						{							
+						{
 							localTaskDefinition = taskDIterator.next() ;
-							prevbudget = prevbudget + (int)localTaskDefinition.getPlanningData().getDuration() ;
-							realbudget = realbudget + (int)localTaskDefinition.getRealData().getDuration() ;
+							prevbudget = prevbudget + (int) localTaskDefinition.getPlanningData().getDuration() ;
+							realbudget = realbudget + (int) localTaskDefinition.getRealData().getDuration() ;
 						}
 					}
 				}
 			}
-							
+
 			localOSW.write("<prevbudget>" + prevbudget + "</prevbudget>\n") ;
 			localOSW.write("<realbudget>" + realbudget + "</realbudget>\n") ;
-			
-			
-			//Members
+
+			// Members
 			if (_project.getResources().size() == 0)
 			{
 				localOSW.write("<resource/>\n") ;
@@ -2963,53 +2942,52 @@ public class ProjectControler
 			else
 			{
 				resourceIterator = _project.getResources().iterator() ;
-				
+
 				while (resourceIterator.hasNext())
 				{
 					localTempResource = resourceIterator.next() ;
 					localOSW.write("<resource id=\"" + localTempResource.getId() + "\">\n") ;
-					localOSW.write("<name>" + localTempResource.getFullName() + "</name>\n") ;				
+					localOSW.write("<name>" + localTempResource.getFullName() + "</name>\n") ;
 					localOSW.write("</resource>\n") ;
 				}
 			}
-			
+
 			localIterator = _project.getProcess().getNestedElements().iterator() ;
 			while (localIterator.hasNext())
 			{
 				localElement = localIterator.next() ;
-				//For Activity
-				if ((localElement instanceof Activity) && (! (localElement instanceof Component)))
+				// For Activity
+				if ( (localElement instanceof Activity) && (! (localElement instanceof Component)))
 
 				{
-						
-						localOSW.write("<wbeset id=\"" + ((Activity) localElement).getDescriptor().getId()+ "\">\n") ;
-						localOSW.write("<name>" + ((Activity) localElement).getDescriptor().getName() + "</name>\n");
-						localOSW.write("</wbeset>\n");
-					
+
+					localOSW.write("<wbeset id=\"" + ((Activity) localElement).getDescriptor().getId() + "\">\n") ;
+					localOSW.write("<name>" + ((Activity) localElement).getDescriptor().getName() + "</name>\n") ;
+					localOSW.write("</wbeset>\n") ;
+
 				}
 			}
-			
-			
-			//Generating general data
+
+			// Generating general data
 			localIterator = _project.getProcess().getNestedElements().iterator() ;
 			while (localIterator.hasNext())
 			{
 				localElement = localIterator.next() ;
-				//For task descriptors
+				// For task descriptors
 				if (localElement instanceof TaskDescriptor)
 				{
 					localOSW.write("<activity id=\"" + ((TaskDescriptor) localElement).getId() + "\">\n") ;
 					localOSW.write("<name>" + ((TaskDescriptor) localElement).getName() + "</name>\n") ;
-					
+
 					// Task Definitions for this descriptor
-					if (((TaskDescriptor)localElement).getTasks().size() > 0)
+					if ( ((TaskDescriptor) localElement).getTasks().size() > 0)
 					{
-						
-						taskDIterator = ((TaskDescriptor)localElement).getTasks().iterator() ;
+
+						taskDIterator = ((TaskDescriptor) localElement).getTasks().iterator() ;
 						while (taskDIterator.hasNext())
-						{							
+						{
 							localTaskDefinition = taskDIterator.next() ;
-							
+
 							if (GlobalController.currentIteration.getTasks().contains(localTaskDefinition))
 							{
 								localOSW.write("<workbreakdownelement id =\"" + localTaskDefinition.getId() + "\">\n") ;
@@ -3045,21 +3023,21 @@ public class ProjectControler
 								localOSW.write("</workbreakdownelement>\n") ;
 							}
 						}
-						
+
 					}
-					
-					localOSW.write("</activity>\n");
-					
+
+					localOSW.write("</activity>\n") ;
+
 				} // End taskDescs
-	
+
 			}
-			
-			localOSW.write("</project>\n");
-			localOSW.write("</PSI-2DB>\n");
-			
+
+			localOSW.write("</project>\n") ;
+			localOSW.write("</PSI-2DB>\n") ;
+
 			localOSW.flush() ;
 			localOSW.close() ;
-			
+
 		}
 		catch (FileNotFoundException exc)
 		{
@@ -3077,5 +3055,5 @@ public class ProjectControler
 		}
 
 	}
-		
+
 }

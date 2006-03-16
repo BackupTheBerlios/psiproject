@@ -345,7 +345,7 @@ public class MainFrame extends JFrame
 			public void actionPerformed (ActionEvent _e)
 			{
 				Date now = new Date() ;
-				statusLabel.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(now)) ;
+				statusLabel.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT,Bundle.getCurrentLocale()).format(now)) ;
 			}
 		}) ;
 		this.statusbarTimer.start() ;
@@ -356,7 +356,7 @@ public class MainFrame extends JFrame
 
 			{
 				Date now = new Date() ;
-				String DateText = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(now) ;
+				String DateText = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT,Bundle.getCurrentLocale()).format(now) ;
 				if (statusbarflash == false)
 				{
 					String part[] ;
@@ -424,7 +424,7 @@ public class MainFrame extends JFrame
 		jButtonHelp.setToolTipText(Bundle.getText("MainFrameDefaultPanelHelpButton")) ;
 		if (defaultPanel != null) MainTabbedPane.getInstance().setTitleAt(0, Bundle.getText("MainFrameDefaultPanelTitle")) ;
 		logContainer.setTitleAt(0, Bundle.getText("MainFrameLogTab")) ;
-		statusLabel.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(new Date())) ;
+		statusLabel.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT,Bundle.getCurrentLocale()).format(new Date())) ;
 	}
 
 	/**
@@ -1710,7 +1710,7 @@ public class MainFrame extends JFrame
 		{
 			statusLabel = new JLabel() ;
 
-			statusLabel.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(new Date())) ;
+			statusLabel.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT,Bundle.getCurrentLocale()).format(new Date())) ;
 			statusPanel = new JPanel() ;
 			statusPanel.setLayout(new BorderLayout()) ;
 

@@ -133,7 +133,10 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		((TitledBorder) infoPanel.getBorder()).setTitle(Bundle.getText("TaskDescriptorPanelInfoTitle")) ;
 		idLabel.setText(Bundle.getText("TaskDescriptorPanelIDLabel")) ;
 		nameLabel.setText(Bundle.getText("TaskDescriptorPanelNameLabel")) ;
-		descriptionLabel.setText(Bundle.getText("TaskDescriptorPanelDescriptionLabel")) ;
+		if (!task.getDescription().trim().equals(""))
+		{
+			descriptionLabel.setText(Bundle.getText("TaskDescriptorPanelDescriptionLabel")) ;
+		}
 		((TitledBorder) inProductsPanel.getBorder()).setTitle(Bundle.getText("TaskDescriptorPanelInHead")) ;
 		((TitledBorder) outProductsPanel.getBorder()).setTitle(Bundle.getText("TaskDescriptorPanelOutHead")) ;
 		((TitledBorder) tasksPanel.getBorder()).setTitle(Bundle.getText("TaskDescriptorPanelTaskHead")) ;

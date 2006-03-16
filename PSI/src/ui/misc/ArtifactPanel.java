@@ -1,31 +1,34 @@
 
 package ui.misc ;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Observable;
-import java.util.Observer;
+import java.awt.Dimension ;
+import java.awt.FlowLayout ;
+import java.util.ArrayList ;
+import java.util.Collection ;
+import java.util.Observable ;
+import java.util.Observer ;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.Box ;
+import javax.swing.BoxLayout ;
+import javax.swing.JButton ;
+import javax.swing.JLabel ;
+import javax.swing.JPanel ;
+import javax.swing.JScrollPane ;
+import javax.swing.JTable ;
+import javax.swing.JTextArea ;
+import javax.swing.JTextField ;
+import javax.swing.border.TitledBorder ;
+import javax.swing.table.AbstractTableModel ;
 
-import model.spem2.Artifact;
-import model.spem2.TaskDefinition;
-import model.spem2.TaskDescriptor;
-import process.utility.BreakdownElementsControler;
-import ui.dialog.ArtifactManagerDialog;
-import ui.resource.Bundle;
-import ui.window.MainFrame;
+import model.spem2.Artifact ;
+import model.spem2.TaskDefinition ;
+import model.spem2.TaskDescriptor ;
+import process.utility.BreakdownElementsControler ;
+import ui.dialog.ArtifactManagerDialog ;
+import ui.resource.Bundle ;
+import ui.resource.LocaleController ;
+import ui.resource.LocaleListener ;
+import ui.window.MainFrame ;
 
 /**
  * ArtifactPanel : Panel view for an artifact
@@ -37,7 +40,7 @@ import ui.window.MainFrame;
 public class ArtifactPanel extends JPanel implements Observer
 {
 	private static final long serialVersionUID = -3397031967959716980L ;
-	
+
 	private MainFrame mainFrame = null ;
 
 	private Artifact artifact ;
@@ -86,15 +89,20 @@ public class ArtifactPanel extends JPanel implements Observer
 
 	private JTable outTasksTable = null ;
 
-	private JPanel buttonsPanel = null;
+	private JPanel buttonsPanel = null ;
 
-	private JButton saveButton = null;
+	private JButton saveButton = null ;
 
-	private JPanel dataPanel = null;
+	private JPanel dataPanel = null ;
 
-	private JScrollPane dataScrollPane = null;
+	private JScrollPane dataScrollPane = null ;
 
-	private JButton manageButton = null;
+	private JButton manageButton = null ;
+
+	/**
+	 * The locale controller for the language.
+	 */
+	private LocaleController controllerLocale = null ;
 
 	/**
 	 * This is the default constructor
@@ -102,11 +110,47 @@ public class ArtifactPanel extends JPanel implements Observer
 	public ArtifactPanel (MainFrame _frame, Artifact _artifact)
 	{
 		super() ;
+
+		this.controllerLocale = LocaleController.getInstance() ;
+		this.controllerLocale.addLocaleListener(new LocaleListener()
+		{
+			public void localeChanged ()
+			{
+				updateText() ;
+			}
+		}) ;
+
 		this.mainFrame = _frame ;
 		this.artifact = _artifact ;
 		this.artifact.addObserver(this) ;
 
 		initialize() ;
+	}
+
+	/**
+	 * 
+	 * This method updates texts in this panel during a language changing.
+	 * 
+	 * @author MaT
+	 * @version 1.0
+	 * 
+	 */
+	private void updateText ()
+	{
+		inTasksEmptyLabel.setText(Bundle.getText("ArtifactPanelNoTask")) ;
+		outTasksEmptyLabel.setText(Bundle.getText("ArtifactPanelNoTask")) ;
+		idLabel.setText(Bundle.getText("ArtifactPanelIDLabel")) ;
+		nameLabel.setText(Bundle.getText("ArtifactPanelNameLabel")) ;
+		productLabel.setText(Bundle.getText("ArtifactPanelProductLabel")) ;
+		descriptionLabel.setText(Bundle.getText("ArtifactPanelDescriptionLabel")) ;
+		idTextField.setText(artifact.getId()) ;
+		nameTextField.setText(artifact.getName()) ;
+		productTextField.setText(artifact.getProduct().getName()) ;
+		saveButton.setText(Bundle.getText("Save")) ;
+		manageButton.setText(Bundle.getText("ArtifactPanelButton")) ;
+		((TitledBorder) infoPanel.getBorder()).setTitle(Bundle.getText("ArtifactPanelInfoTitle")) ;
+		((TitledBorder) inTasksPanel.getBorder()).setTitle(Bundle.getText("ArtifactPanelInHead")) ;
+		((TitledBorder) outTasksPanel.getBorder()).setTitle(Bundle.getText("ArtifactPanelOutHead")) ;
 	}
 
 	/**
@@ -123,9 +167,9 @@ public class ArtifactPanel extends JPanel implements Observer
 		this.setSize(493, 259) ;
 		this.add(getInfoPanel(), null) ;
 		this.add(Box.createRigidArea(new Dimension(0, 5))) ;
-		this.add(getButtonsPanel(), null);
+		this.add(getButtonsPanel(), null) ;
 		this.add(Box.createRigidArea(new Dimension(0, 5))) ;
-		this.add(getDataScrollPane(), null);
+		this.add(getDataScrollPane(), null) ;
 		this.add(Box.createVerticalGlue()) ;
 	}
 
@@ -134,10 +178,10 @@ public class ArtifactPanel extends JPanel implements Observer
 	 */
 	public void update (Observable _observable, Object _object)
 	{
-		nameTextField.setText(((Artifact) _observable).getName()) ;
-		descriptionTextArea.setText(((Artifact) _observable).getDescription()) ;
+		nameTextField.setText( ((Artifact) _observable).getName()) ;
+		descriptionTextArea.setText( ((Artifact) _observable).getDescription()) ;
 		MainTabbedPane.getInstance().setTitle(this, ((Artifact) _observable).getName()) ;
-		
+
 		if ( ((Artifact) _observable).getUsingTasks().size() == 0)
 		{
 			inTasksPanel.removeAll() ;
@@ -151,7 +195,7 @@ public class ArtifactPanel extends JPanel implements Observer
 			inTasksPanel.add(getInTasksScrollPane(), null) ;
 			inTasksPanel.revalidate() ;
 		}
-		
+
 		if ( ((Artifact) _observable).getProducingTasks().size() == 0)
 		{
 			outTasksPanel.removeAll() ;
@@ -167,7 +211,6 @@ public class ArtifactPanel extends JPanel implements Observer
 		}
 	}
 
-		
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -211,17 +254,16 @@ public class ArtifactPanel extends JPanel implements Observer
 	{
 		if (inTasksPanel == null)
 		{
-			FlowLayout flowLayout = new FlowLayout();
-			flowLayout.setAlignment(java.awt.FlowLayout.LEFT);
+			FlowLayout flowLayout = new FlowLayout() ;
+			flowLayout.setAlignment(java.awt.FlowLayout.LEFT) ;
 			inTasksPanel = new JPanel() ;
-			inTasksPanel.setLayout(flowLayout);
+			inTasksPanel.setLayout(flowLayout) ;
 			inTasksPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, Bundle.getText("ArtifactPanelInHead"),
 					javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, null, null)) ;
 
-			
 			if (artifact.getUsingTasks().size() == 0)
 			{
-				inTasksPanel.add(inTasksEmptyLabel, null);
+				inTasksPanel.add(inTasksEmptyLabel, null) ;
 			}
 
 			else
@@ -241,16 +283,16 @@ public class ArtifactPanel extends JPanel implements Observer
 	{
 		if (outTasksPanel == null)
 		{
-			FlowLayout flowLayout1 = new FlowLayout();
-			flowLayout1.setAlignment(java.awt.FlowLayout.LEFT);
+			FlowLayout flowLayout1 = new FlowLayout() ;
+			flowLayout1.setAlignment(java.awt.FlowLayout.LEFT) ;
 			outTasksPanel = new JPanel() ;
-			outTasksPanel.setLayout(flowLayout1);
+			outTasksPanel.setLayout(flowLayout1) ;
 			outTasksPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, Bundle.getText("ArtifactPanelOutHead"),
 					javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, null, null)) ;
-			
+
 			if (artifact.getProducingTasks().size() == 0)
 			{
-				outTasksPanel.add(outTasksEmptyLabel, null);
+				outTasksPanel.add(outTasksEmptyLabel, null) ;
 			}
 
 			else
@@ -357,8 +399,8 @@ public class ArtifactPanel extends JPanel implements Observer
 			idTextField = new JTextField(30) ;
 			idTextField.setText(artifact.getId()) ;
 			idTextField.setMaximumSize(new Dimension(400, 20)) ;
-			idTextField.setBackground(java.awt.Color.white);
-			idTextField.setEditable(false);
+			idTextField.setBackground(java.awt.Color.white) ;
+			idTextField.setEditable(false) ;
 		}
 		return idTextField ;
 	}
@@ -375,8 +417,8 @@ public class ArtifactPanel extends JPanel implements Observer
 			nameTextField = new JTextField(30) ;
 			nameTextField.setText(artifact.getName()) ;
 			nameTextField.setMaximumSize(new Dimension(400, 20)) ;
-			nameTextField.setBackground(java.awt.Color.white);
-			nameTextField.setEditable(true);
+			nameTextField.setBackground(java.awt.Color.white) ;
+			nameTextField.setEditable(true) ;
 		}
 		return nameTextField ;
 	}
@@ -393,8 +435,8 @@ public class ArtifactPanel extends JPanel implements Observer
 			productTextField = new JTextField(30) ;
 			productTextField.setText(artifact.getProduct().getName()) ;
 			productTextField.setMaximumSize(new Dimension(400, 20)) ;
-			productTextField.setBackground(java.awt.Color.white);
-			productTextField.setEditable(false);
+			productTextField.setBackground(java.awt.Color.white) ;
+			productTextField.setEditable(false) ;
 		}
 		return productTextField ;
 	}
@@ -414,30 +456,30 @@ public class ArtifactPanel extends JPanel implements Observer
 		}
 		return descriptionScrollPane ;
 	}
-	
+
 	/**
-	 * This method initializes buttonsPanel	
-	 * 	
-	 * @return javax.swing.JPanel	
+	 * This method initializes buttonsPanel
+	 * 
+	 * @return javax.swing.JPanel
 	 */
 	private JPanel getButtonsPanel ()
 	{
 		if (buttonsPanel == null)
 		{
 			buttonsPanel = new JPanel() ;
-			buttonsPanel.setLayout(new BoxLayout(getButtonsPanel(), BoxLayout.X_AXIS));
-			buttonsPanel.add(getSaveButton(), null);
+			buttonsPanel.setLayout(new BoxLayout(getButtonsPanel(), BoxLayout.X_AXIS)) ;
+			buttonsPanel.add(getSaveButton(), null) ;
 			buttonsPanel.add(Box.createRigidArea(new Dimension(10, 0))) ;
-			buttonsPanel.add(getManageButton(), null);
+			buttonsPanel.add(getManageButton(), null) ;
 			buttonsPanel.add(Box.createHorizontalGlue()) ;
 		}
 		return buttonsPanel ;
 	}
 
 	/**
-	 * This method initializes saveButton	
-	 * 	
-	 * @return javax.swing.JButton	
+	 * This method initializes saveButton
+	 * 
+	 * @return javax.swing.JButton
 	 */
 	private JButton getSaveButton ()
 	{
@@ -454,11 +496,11 @@ public class ArtifactPanel extends JPanel implements Observer
 		}
 		return saveButton ;
 	}
-	
+
 	/**
-	 * This method initializes manageButton	
-	 * 	
-	 * @return javax.swing.JButton	
+	 * This method initializes manageButton
+	 * 
+	 * @return javax.swing.JButton
 	 */
 	private JButton getManageButton ()
 	{
@@ -474,7 +516,7 @@ public class ArtifactPanel extends JPanel implements Observer
 			}) ;
 		}
 		return manageButton ;
-	}	
+	}
 
 	/**
 	 * This method initializes descriptionTextArea
@@ -490,37 +532,37 @@ public class ArtifactPanel extends JPanel implements Observer
 		}
 		return descriptionTextArea ;
 	}
-	
+
 	/**
-	 * This method initializes dataPanel	
-	 * 	
-	 * @return javax.swing.JPanel	
+	 * This method initializes dataPanel
+	 * 
+	 * @return javax.swing.JPanel
 	 */
 	private JPanel getDataPanel ()
 	{
 		if (dataPanel == null)
 		{
 			dataPanel = new JPanel() ;
-			dataPanel.setLayout(new BoxLayout(getDataPanel(), BoxLayout.Y_AXIS));
-			dataPanel.add(getInTasksPanel(), null);
+			dataPanel.setLayout(new BoxLayout(getDataPanel(), BoxLayout.Y_AXIS)) ;
+			dataPanel.add(getInTasksPanel(), null) ;
 			dataPanel.add(Box.createRigidArea(new Dimension(0, 5))) ;
-			dataPanel.add(getOutTasksPanel(), null);
+			dataPanel.add(getOutTasksPanel(), null) ;
 			dataPanel.add(Box.createVerticalGlue()) ;
 		}
 		return dataPanel ;
 	}
 
 	/**
-	 * This method initializes dataScrollPane	
-	 * 	
-	 * @return javax.swing.JScrollPane	
+	 * This method initializes dataScrollPane
+	 * 
+	 * @return javax.swing.JScrollPane
 	 */
 	private JScrollPane getDataScrollPane ()
 	{
 		if (dataScrollPane == null)
 		{
 			dataScrollPane = new JScrollPane() ;
-			dataScrollPane.setViewportView(getDataPanel());
+			dataScrollPane.setViewportView(getDataPanel()) ;
 		}
 		return dataScrollPane ;
 	}
@@ -588,13 +630,13 @@ public class ArtifactPanel extends JPanel implements Observer
 		}
 		return outTasksTable ;
 	}
-	
+
 	/**
 	 * TaskDefinitionsTableModel : Table model for tasks (definitions)
-	 *
+	 * 
 	 * @author Conde Mickael K.
 	 * @version 1.0
-	 *
+	 * 
 	 */
 	private class TaskDefinitionsTableModel extends AbstractTableModel implements Observer
 	{
@@ -611,10 +653,14 @@ public class ArtifactPanel extends JPanel implements Observer
 		 */
 		private final short COLUMN_NUMBER = 3 ;
 
-		
+		/**
+		 * The locale controller for the language.
+		 */
+		private LocaleController controllerLocale = null ;
+
 		/**
 		 * Constructor
-		 *
+		 * 
 		 * @param _artifact
 		 * @param _in
 		 */
@@ -622,12 +668,34 @@ public class ArtifactPanel extends JPanel implements Observer
 		{
 			super() ;
 
+			this.controllerLocale = LocaleController.getInstance() ;
+			this.controllerLocale.addLocaleListener(new LocaleListener()
+			{
+				public void localeChanged ()
+				{
+					updateText() ;
+				}
+			}) ;
+
 			this.artifact = _artifact ;
 			data = _in ? this.artifact.getUsingTasks() : this.artifact.getProducingTasks() ;
 			head = new ArrayList <String>() ;
 			head.add(Bundle.getText("ArtifactPanelTableTasksID")) ;
 			head.add(Bundle.getText("ArtifactPanelTableTasksName")) ;
 			head.add(Bundle.getText("ArtifactPanelTableTasksDescription")) ;
+		}
+
+		/**
+		 * 
+		 * This method updates texts in this table during a language changing.
+		 * 
+		 * @author MaT
+		 * @version 1.0
+		 * 
+		 */
+		private void updateText ()
+		{
+			// !TODO
 		}
 
 		/**
@@ -687,7 +755,7 @@ public class ArtifactPanel extends JPanel implements Observer
 		public void update (Observable _observable, Object _object)
 		{
 			fireTableDataChanged() ;
-			
+
 		}
 
 	}

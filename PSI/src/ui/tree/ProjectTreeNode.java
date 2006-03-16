@@ -11,6 +11,8 @@ import model.HumanResource;
 import model.Project;
 import model.spem2.Iteration;
 import ui.resource.Bundle;
+import ui.resource.LocaleController;
+import ui.resource.LocaleListener;
 
 /**
  * ProjectTreeNode : tree like representation of a Project
@@ -26,6 +28,13 @@ public class ProjectTreeNode extends DefaultMutableTreeNode implements Observer
 	private Project project = null ;
 	
 	private MainTree tree = null ; 
+	
+	/**
+	 * The locale controller for the language.
+	 */
+	private LocaleController controllerLocale = null;
+	
+	DefaultMutableTreeNode RessourcesRoot = null ;
 
 	
 	/**
@@ -37,6 +46,13 @@ public class ProjectTreeNode extends DefaultMutableTreeNode implements Observer
 	public ProjectTreeNode (Project _project, MainTree _tree)
 	{
 		super() ;
+		
+		this.controllerLocale = LocaleController.getInstance();
+	    this.controllerLocale.addLocaleListener(new LocaleListener(){
+	    	public void localeChanged() {
+	    		updateText();
+	        }
+	    });
 
 		this.tree = _tree ;
 		this.project = _project ;
@@ -62,14 +78,41 @@ public class ProjectTreeNode extends DefaultMutableTreeNode implements Observer
 		// Resources information
 		if (project.getResources() != null)
 		{
-			DefaultMutableTreeNode localRessourcesRoot = new DefaultMutableTreeNode(Bundle.getText("MainTreeNodeResources")) ;
+			RessourcesRoot = new DefaultMutableTreeNode(Bundle.getText("MainTreeNodeResources")) ;
 			Iterator <HumanResource> localIterator = project.getResources().iterator() ;
 			while (localIterator.hasNext())
 			{
-				localRessourcesRoot.add(new ResourceTreeNode(localIterator.next(), tree)) ;
+				RessourcesRoot.add(new ResourceTreeNode(localIterator.next(), tree)) ;
 			}
-			this.add(localRessourcesRoot) ;
+			this.add(RessourcesRoot) ;
 		}
+	}
+	
+	/**
+	 * 
+	 * This method updates texts in this tree during a language changing.
+	 *
+	 * @author MaT
+	 * @version 1.0
+	 *
+	 */
+	private void updateText()
+	{
+		//project name.
+		if (this.project.getIterations().size() == 0)
+		{
+			this.setUserObject(project.getName()) ;
+		}
+		else
+		{
+			Iteration localIts[] = this.project.getIterations().toArray(new Iteration[0]) ;
+			this.setUserObject(project.getName() + " (" + Bundle.getText("MainTreeNodeIterations") + localIts[localIts.length - 1].getDescriptor().getName() + ")") ;
+		}
+		//resources.
+		if (project.getResources() != null)
+		{
+			RessourcesRoot.setUserObject(Bundle.getText("MainTreeNodeResources")) ;
+		}	
 	}
 
 	/**

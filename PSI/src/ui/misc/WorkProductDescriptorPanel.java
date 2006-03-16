@@ -15,12 +15,16 @@ import javax.swing.JPanel ;
 import javax.swing.JScrollPane ;
 import javax.swing.JTable ;
 import javax.swing.JTextField ;
+import javax.swing.border.TitledBorder ;
 import javax.swing.table.AbstractTableModel ;
 
 import model.spem2.Artifact ;
 import model.spem2.TaskDescriptor ;
 import model.spem2.WorkProductDescriptor ;
 import ui.resource.Bundle ;
+import ui.resource.LocaleController ;
+import ui.resource.LocaleListener ;
+
 import javax.swing.JTextArea ;
 
 /**
@@ -93,15 +97,52 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 	private JScrollPane descriptionScrollPane = null ;
 
 	/**
+	 * The locale controller for the language.
+	 */
+	private LocaleController controllerLocale = null ;
+
+	/**
 	 * This is the default constructor
 	 */
 	public WorkProductDescriptorPanel (WorkProductDescriptor _product)
 	{
 		super() ;
 
+		this.controllerLocale = LocaleController.getInstance() ;
+		this.controllerLocale.addLocaleListener(new LocaleListener()
+		{
+			public void localeChanged ()
+			{
+				updateText() ;
+			}
+		}) ;
+
 		this.product = _product ;
 		this.product.addObserver(this) ;
 		initialize() ;
+	}
+
+	/**
+	 * 
+	 * This method updates texts in this table during a language changing.
+	 * 
+	 * @author MaT
+	 * @version 1.0
+	 * 
+	 */
+	private void updateText ()
+	{
+		artifactsEmptyLabel.setText(Bundle.getText("WorkProductDescriptorPanelNoArtifact")) ;
+		inTasksEmptyLabel.setText(Bundle.getText("WorkProductDescriptorPanelNoTask")) ;
+		outTasksEmptyLabel.setText(Bundle.getText("WorkProductDescriptorPanelNoTask")) ;
+		((TitledBorder) infoPanel.getBorder()).setTitle(Bundle.getText("WorkProductDescriptorPanelInfoTitle")) ;
+		idLabel.setText(Bundle.getText("WorkProductDescriptorPanelIDLabel")) ;
+		nameLabel.setText(Bundle.getText("WorkProductDescriptorPanelNameLabel")) ;
+		typeLabel.setText(Bundle.getText("WorkProductDescriptorPanelTypeLabel")) ;
+		descriptionLabel.setText(Bundle.getText("WorkProductDescriptorPanelDescriptionLabel")) ;
+		((TitledBorder) artifactsPanel.getBorder()).setTitle(Bundle.getText("WorkProductDescriptorPanelArtifactHead")) ;
+		((TitledBorder) inTasksPanel.getBorder()).setTitle(Bundle.getText("WorkProductDescriptorPanelInHead")) ;
+		((TitledBorder) outTasksPanel.getBorder()).setTitle(Bundle.getText("WorkProductDescriptorPanelOutHead")) ;
 	}
 
 	/**
@@ -421,7 +462,7 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 			idTextField = new JTextField(30) ;
 			idTextField.setText(product.getId()) ;
 			idTextField.setMaximumSize(new java.awt.Dimension(400, 20)) ;
-			idTextField.setBackground(java.awt.Color.white);
+			idTextField.setBackground(java.awt.Color.white) ;
 			idTextField.setEditable(false) ;
 		}
 		return idTextField ;
@@ -439,7 +480,7 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 			nameTextField = new JTextField(30) ;
 			nameTextField.setText(product.getName()) ;
 			nameTextField.setMaximumSize(new java.awt.Dimension(400, 20)) ;
-			nameTextField.setBackground(java.awt.Color.white);
+			nameTextField.setBackground(java.awt.Color.white) ;
 			nameTextField.setEditable(false) ;
 		}
 		return nameTextField ;
@@ -460,7 +501,7 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 				typeTextField.setText(product.getProductType().getName()) ;
 			}
 			typeTextField.setMaximumSize(new java.awt.Dimension(400, 20)) ;
-			typeTextField.setBackground(java.awt.Color.white);
+			typeTextField.setBackground(java.awt.Color.white) ;
 			typeTextField.setEditable(false) ;
 		}
 		return typeTextField ;
@@ -600,6 +641,11 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		private final short COLUMN_NUMBER = 3 ;
 
 		/**
+		 * The locale controller for the language.
+		 */
+		private LocaleController controllerLocale = null ;
+
+		/**
 		 * Constructor
 		 * 
 		 * @param _role
@@ -608,6 +654,15 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		{
 			super() ;
 
+			this.controllerLocale = LocaleController.getInstance() ;
+			this.controllerLocale.addLocaleListener(new LocaleListener()
+			{
+				public void localeChanged ()
+				{
+					updateText() ;
+				}
+			}) ;
+
 			this.product = _product ;
 			this.product.addObserver(this) ;
 			this.data = product.getArtifacts() ;
@@ -615,6 +670,19 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 			head.add(Bundle.getText("WorkProductDescriptorPanelTableArtifactsID")) ;
 			head.add(Bundle.getText("WorkProductDescriptorPanelTableArtifactsName")) ;
 			head.add(Bundle.getText("WorkProductDescriptorPanelTableArtifactsDescription")) ;
+		}
+
+		/**
+		 * 
+		 * This method updates texts in this table during a language changing.
+		 * 
+		 * @author MaT
+		 * @version 1.0
+		 * 
+		 */
+		private void updateText ()
+		{
+			// !TODO
 		}
 
 		/**
@@ -680,10 +748,10 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 
 	/**
 	 * TaskDescriptorsTableModel : Table model for tasks (descriptors)
-	 *
+	 * 
 	 * @author Conde Mickael K.
 	 * @version 1.0
-	 *
+	 * 
 	 */
 	private class TaskDescriptorsTableModel extends AbstractTableModel
 	{
@@ -701,6 +769,11 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		private final short COLUMN_NUMBER = 3 ;
 
 		/**
+		 * The locale controller for the language.
+		 */
+		private LocaleController controllerLocale = null ;
+
+		/**
 		 * Constructor
 		 * 
 		 * @param _product
@@ -711,12 +784,34 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		{
 			super() ;
 
+			this.controllerLocale = LocaleController.getInstance() ;
+			this.controllerLocale.addLocaleListener(new LocaleListener()
+			{
+				public void localeChanged ()
+				{
+					updateText() ;
+				}
+			}) ;
+
 			this.product = _product ;
 			data = _in ? this.product.getUsingTasks() : this.product.getProducingTasks() ;
 			head = new ArrayList <String>() ;
 			head.add(Bundle.getText("WorkProductDescriptorPanelTableTasksID")) ;
 			head.add(Bundle.getText("WorkProductDescriptorPanelTableTasksName")) ;
 			head.add(Bundle.getText("WorkProductDescriptorPanelTableTasksDescription")) ;
+		}
+
+		/**
+		 * 
+		 * This method updates texts in this table during a language changing.
+		 * 
+		 * @author MaT
+		 * @version 1.0
+		 * 
+		 */
+		private void updateText ()
+		{
+			// !TODO
 		}
 
 		/**
@@ -771,6 +866,5 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		}
 
 	}
-	
-	
+
 } // @jve:decl-index=0:visual-constraint="10,10"

@@ -1,29 +1,32 @@
 
 package ui.misc ;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Observable;
-import java.util.Observer;
+import java.awt.Dimension ;
+import java.awt.FlowLayout ;
+import java.util.ArrayList ;
+import java.util.Collection ;
+import java.util.Iterator ;
+import java.util.Observable ;
+import java.util.Observer ;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.Box ;
+import javax.swing.BoxLayout ;
+import javax.swing.JLabel ;
+import javax.swing.JPanel ;
+import javax.swing.JScrollPane ;
+import javax.swing.JTable ;
+import javax.swing.JTextArea ;
+import javax.swing.JTextField ;
+import javax.swing.border.TitledBorder ;
+import javax.swing.table.AbstractTableModel ;
 
-import model.spem2.TaskDefinition;
-import model.spem2.TaskDescriptor;
-import model.spem2.WorkProductDescriptor;
-import process.GlobalController;
-import ui.resource.Bundle;
+import model.spem2.TaskDefinition ;
+import model.spem2.TaskDescriptor ;
+import model.spem2.WorkProductDescriptor ;
+import process.GlobalController ;
+import ui.resource.Bundle ;
+import ui.resource.LocaleController ;
+import ui.resource.LocaleListener ;
 
 /**
  * JPanelTaskDescriptor : TODO type description
@@ -91,12 +94,49 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 
 	private JLabel tasksEmptyLabel = null ;
 
+	/**
+	 * The locale controller for the language.
+	 */
+	private LocaleController controllerLocale = null ;
+
 	public TaskDescriptorPanel (TaskDescriptor _task)
 	{
 		super() ;
+
+		this.controllerLocale = LocaleController.getInstance() ;
+		this.controllerLocale.addLocaleListener(new LocaleListener()
+		{
+			public void localeChanged ()
+			{
+				updateText() ;
+			}
+		}) ;
+
 		this.task = _task ;
 		this.task.addObserver(this) ;
 		initialize() ;
+	}
+
+	/**
+	 * 
+	 * This method updates texts in this table during a language changing.
+	 * 
+	 * @author MaT
+	 * @version 1.0
+	 * 
+	 */
+	private void updateText ()
+	{
+		tasksEmptyLabel.setText(Bundle.getText("TaskDescriptorPanelNoTask")) ;
+		inProductsEmptyLabel.setText(Bundle.getText("TaskDescriptorPanelNoProduct")) ;
+		outProductsEmptyLabel.setText(Bundle.getText("TaskDescriptorPanelNoProduct")) ;
+		((TitledBorder) infoPanel.getBorder()).setTitle(Bundle.getText("TaskDescriptorPanelInfoTitle")) ;
+		idLabel.setText(Bundle.getText("TaskDescriptorPanelIDLabel")) ;
+		nameLabel.setText(Bundle.getText("TaskDescriptorPanelNameLabel")) ;
+		descriptionLabel.setText(Bundle.getText("TaskDescriptorPanelDescriptionLabel")) ;
+		((TitledBorder) inProductsPanel.getBorder()).setTitle(Bundle.getText("TaskDescriptorPanelInHead")) ;
+		((TitledBorder) outProductsPanel.getBorder()).setTitle(Bundle.getText("TaskDescriptorPanelOutHead")) ;
+		((TitledBorder) tasksPanel.getBorder()).setTitle(Bundle.getText("TaskDescriptorPanelTaskHead")) ;
 	}
 
 	/**
@@ -125,11 +165,11 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 	public void update (Observable _observable, Object _object)
 	{
 		boolean tasksFound = false ;
-		Iterator<TaskDefinition> localIt = ((TaskDescriptor) _observable).getTasks().iterator() ;
+		Iterator <TaskDefinition> localIt = ((TaskDescriptor) _observable).getTasks().iterator() ;
 		TaskDefinition localTask ;
 
 		while (localIt.hasNext())
-		{				
+		{
 			localTask = localIt.next() ;
 			if (GlobalController.currentIteration.getTasks().contains(localTask))
 			{
@@ -137,7 +177,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 				break ;
 			}
 		}
-		
+
 		if (!tasksFound)
 		{
 			tasksPanel.removeAll() ;
@@ -298,7 +338,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		}
 		return descriptionScrollPane ;
 	}
-	
+
 	/**
 	 * This method initializes inProductsPanel
 	 * 
@@ -403,19 +443,19 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 					javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, null, null)) ;
 
 			boolean tasksFound = false ;
-			Iterator<TaskDefinition> localIt = task.getTasks().iterator() ;
+			Iterator <TaskDefinition> localIt = task.getTasks().iterator() ;
 			TaskDefinition localTask ;
 
 			while (localIt.hasNext())
-			{				
+			{
 				localTask = localIt.next() ;
 				if (GlobalController.currentIteration.getTasks().contains(localTask))
 				{
 					tasksFound = true ;
 					break ;
 				}
-			}			
-			
+			}
+
 			if (!tasksFound)
 			{
 				tasksPanel.add(tasksEmptyLabel, null) ;
@@ -503,7 +543,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		}
 		return inProductsTable ;
 	}
-	
+
 	/**
 	 * This method initializes outTasksScrollPane
 	 * 
@@ -559,6 +599,11 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		private final short COLUMN_NUMBER = 3 ;
 
 		/**
+		 * The locale controller for the language.
+		 */
+		private LocaleController controllerLocale = null ;
+
+		/**
 		 * Constructor
 		 * 
 		 * @param _role
@@ -567,14 +612,36 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		{
 			super() ;
 
+			this.controllerLocale = LocaleController.getInstance() ;
+			this.controllerLocale.addLocaleListener(new LocaleListener()
+			{
+				public void localeChanged ()
+				{
+					updateText() ;
+				}
+			}) ;
+
 			this.task = _task ;
 			this.task.addObserver(this) ;
-			
+
 			this.data = task.getTasks() ;
 			this.head = new ArrayList <String>() ;
 			head.add(Bundle.getText("TaskDescriptorPanelTableTasksID")) ;
 			head.add(Bundle.getText("TaskDescriptorPanelTableTasksName")) ;
 			head.add(Bundle.getText("TaskDescriptorPanelTableTasksDescription")) ;
+		}
+
+		/**
+		 * 
+		 * This method updates texts in this table during a language changing.
+		 * 
+		 * @author MaT
+		 * @version 1.0
+		 * 
+		 */
+		private void updateText ()
+		{
+			// !TODO
 		}
 
 		/**
@@ -591,9 +658,9 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		public int getRowCount ()
 		{
 			int localCount = 0 ;
-			
-			Iterator<TaskDefinition> localIt = data.iterator() ;
-			
+
+			Iterator <TaskDefinition> localIt = data.iterator() ;
+
 			while (localIt.hasNext())
 			{
 				if (GlobalController.currentIteration.getTasks().contains(localIt.next()))
@@ -601,7 +668,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 					localCount++ ;
 				}
 			}
-			
+
 			return localCount ;
 		}
 
@@ -610,19 +677,19 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		 */
 		public Object getValueAt (int _row, int _col)
 		{
-			Collection<TaskDefinition> localCol = new ArrayList<TaskDefinition>() ;
-			Iterator<TaskDefinition> localIt = data.iterator() ;
+			Collection <TaskDefinition> localCol = new ArrayList <TaskDefinition>() ;
+			Iterator <TaskDefinition> localIt = data.iterator() ;
 			TaskDefinition localTask ;
-			
+
 			while (localIt.hasNext())
-			{				
+			{
 				localTask = localIt.next() ;
 				if (GlobalController.currentIteration.getTasks().contains(localTask))
 				{
 					localCol.add(localTask) ;
 				}
 			}
-			
+
 			Object tempArray[] = localCol.toArray() ;
 			switch (_col)
 			{
@@ -662,7 +729,7 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 
 		}
 	}
-	
+
 	private class WorkProductDescriptorsTableModel extends AbstractTableModel
 	{
 		private static final long serialVersionUID = -8928082572980054226L ;
@@ -679,6 +746,11 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		private final short COLUMN_NUMBER = 3 ;
 
 		/**
+		 * The locale controller for the language.
+		 */
+		private LocaleController controllerLocale = null ;
+
+		/**
 		 * Constructor
 		 * 
 		 * @param _product
@@ -689,12 +761,34 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		{
 			super() ;
 
+			this.controllerLocale = LocaleController.getInstance() ;
+			this.controllerLocale.addLocaleListener(new LocaleListener()
+			{
+				public void localeChanged ()
+				{
+					updateText() ;
+				}
+			}) ;
+
 			this.task = _task ;
 			data = _in ? this.task.getInputProducts() : this.task.getOutputProducts() ;
 			head = new ArrayList <String>() ;
 			head.add(Bundle.getText("TaskDescriptorPanelTableProductsID")) ;
 			head.add(Bundle.getText("TaskDescriptorPanelTableProductsName")) ;
 			head.add(Bundle.getText("TaskDescriptorPanelTableProductsDescription")) ;
+		}
+
+		/**
+		 * 
+		 * This method updates texts in this table during a language changing.
+		 * 
+		 * @author MaT
+		 * @version 1.0
+		 * 
+		 */
+		private void updateText ()
+		{
+			// !TODO
 		}
 
 		/**
@@ -750,9 +844,3 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 
 	}
 }
-
-
-
-
-
-

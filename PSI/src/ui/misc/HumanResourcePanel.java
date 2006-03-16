@@ -16,11 +16,14 @@ import javax.swing.JPanel ;
 import javax.swing.JScrollPane ;
 import javax.swing.JTable ;
 import javax.swing.JTextField ;
+import javax.swing.border.TitledBorder ;
 import javax.swing.table.AbstractTableModel ;
 
 import process.GlobalController ;
 
 import ui.resource.Bundle ;
+import ui.resource.LocaleController ;
+import ui.resource.LocaleListener ;
 
 import model.HumanResource ;
 import model.spem2.RoleDescriptor ;
@@ -78,6 +81,11 @@ public class HumanResourcePanel extends JPanel implements Observer
 	private JTable tasksDescriptorTable = null ;
 
 	/**
+	 * The locale controller for the language.
+	 */
+	private LocaleController controllerLocale = null ;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param _descriptor
@@ -85,10 +93,40 @@ public class HumanResourcePanel extends JPanel implements Observer
 	public HumanResourcePanel (HumanResource _descriptor)
 	{
 		super() ;
+
+		this.controllerLocale = LocaleController.getInstance() ;
+		this.controllerLocale.addLocaleListener(new LocaleListener()
+		{
+			public void localeChanged ()
+			{
+				updateText() ;
+			}
+		}) ;
+
 		this.humanResource = _descriptor ;
 		this.humanResource.addObserver(this) ;
 		initialize() ;
 
+	}
+
+	/**
+	 * 
+	 * This method updates texts in this panel during a language changing.
+	 * 
+	 * @author MaT
+	 * @version 1.0
+	 * 
+	 */
+	private void updateText ()
+	{
+		rolesEmptyLabel.setText(Bundle.getText("HumanResourceDescriptorPanelNoRole")) ;
+		tasksDescriptorEmptyLabel.setText(Bundle.getText("HumanResourceDescriptorPanelNoTask")) ;
+		((TitledBorder) infoPanel.getBorder()).setTitle(Bundle.getText("HumanResourceDescriptorPanelInfoTitle")) ;
+		idLabel.setText(Bundle.getText("HumanResourceDescriptorPanelIDLabel")) ;
+		nameLabel.setText(Bundle.getText("HumanResourceDescriptorPanelNameLabel")) ;
+		mailLabel.setText(Bundle.getText("HumanResourceDescriptorPanelMailLabel")) ;
+		((TitledBorder) rolesPanel.getBorder()).setTitle(Bundle.getText("HumanResourceDescriptorPanelTableHead")) ;
+		((TitledBorder) tasksDescriptorPanel.getBorder()).setTitle(Bundle.getText("HumanResourceDescriptorPanelTableTasksHead")) ;
 	}
 
 	/**
@@ -458,6 +496,11 @@ public class HumanResourcePanel extends JPanel implements Observer
 		private HumanResource human ;
 
 		/**
+		 * The locale controller for the language.
+		 */
+		private LocaleController controllerLocale = null ;
+
+		/**
 		 * The number of columns to show (id, name and description)
 		 */
 		private final short COLUMN_NUMBER = 3 ;
@@ -471,12 +514,34 @@ public class HumanResourcePanel extends JPanel implements Observer
 		{
 			super() ;
 
+			this.controllerLocale = LocaleController.getInstance() ;
+			this.controllerLocale.addLocaleListener(new LocaleListener()
+			{
+				public void localeChanged ()
+				{
+					updateText() ;
+				}
+			}) ;
+
 			this.human = _human ;
 			data = this.human.getPerformingTasks() ;
 			head = new ArrayList <String>() ;
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableTasksID")) ;
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableTasksName")) ;
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableTasksDescription")) ;
+		}
+
+		/**
+		 * 
+		 * This method updates texts in this panel during a language changing.
+		 * 
+		 * @author MaT
+		 * @version 1.0
+		 * 
+		 */
+		private void updateText ()
+		{
+			// !TODO
 		}
 
 		/**
@@ -575,6 +640,11 @@ public class HumanResourcePanel extends JPanel implements Observer
 		private HumanResource human ;
 
 		/**
+		 * The locale controller for the language.
+		 */
+		private LocaleController controllerLocale = null ;
+
+		/**
 		 * The number of columns to show (id, name and description)
 		 */
 		private final short COLUMN_NUMBER = 3 ;
@@ -588,6 +658,15 @@ public class HumanResourcePanel extends JPanel implements Observer
 		{
 			super() ;
 
+			this.controllerLocale = LocaleController.getInstance() ;
+			this.controllerLocale.addLocaleListener(new LocaleListener()
+			{
+				public void localeChanged ()
+				{
+					updateText() ;
+				}
+			}) ;
+
 			this.human = _human ;
 			this.human.addObserver(this) ;
 			this.data = humanResource.getPerformingRoles() ;
@@ -595,6 +674,19 @@ public class HumanResourcePanel extends JPanel implements Observer
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableID")) ;
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableName")) ;
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableDescription")) ;
+		}
+
+		/**
+		 * 
+		 * This method updates texts in this table during a language changing.
+		 * 
+		 * @author MaT
+		 * @version 1.0
+		 * 
+		 */
+		private void updateText ()
+		{
+			// !TODO
 		}
 
 		/**

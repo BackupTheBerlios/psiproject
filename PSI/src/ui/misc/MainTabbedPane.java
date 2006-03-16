@@ -1,30 +1,29 @@
 
 package ui.misc ;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.Color ;
+import java.awt.Component ;
+import java.awt.FontMetrics ;
+import java.awt.Graphics ;
+import java.awt.Point ;
+import java.awt.Rectangle ;
+import java.awt.event.MouseEvent ;
+import java.awt.event.MouseListener ;
+import java.awt.event.MouseMotionListener ;
+import java.beans.PropertyChangeEvent ;
+import java.beans.PropertyChangeListener ;
 
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JTabbedPane;
-import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
-import javax.swing.plaf.basic.BasicTabbedPaneUI;
-import javax.swing.plaf.metal.MetalTabbedPaneUI;
+import javax.swing.Icon ;
+import javax.swing.JComponent ;
+import javax.swing.JTabbedPane ;
+import javax.swing.JViewport ;
+import javax.swing.SwingUtilities ;
+import javax.swing.plaf.basic.BasicTabbedPaneUI ;
+import javax.swing.plaf.metal.MetalTabbedPaneUI ;
 
 /**
  * MainTabbedPane : The main container of the application Singleton is implemented for global access
- * to this element.
- * Part of this code is taken from java forums
+ * to this element. Part of this code is taken from java forums
  * 
  * @author Conde Mickael K.
  * @author fast_
@@ -38,12 +37,12 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 	private static MainTabbedPane instance = null ;
 
 	private BasicTabbedPaneUI paneUI = null ;
-	
+
 	/**
-	   * The viewport of the scrolled tabs.
-	   */
-	  private JViewport headerViewport = null;
-	
+	 * The viewport of the scrolled tabs.
+	 */
+	private JViewport headerViewport = null ;
+
 	/**
 	 * The normal closeicon.
 	 */
@@ -67,10 +66,10 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 	{
 		super() ;
 		super.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT) ;
-		
+
 		this.addMouseListener(this) ;
 		this.addMouseMotionListener(this) ;
-		
+
 		paneUI = new CloseableMetalTabbedPaneUI() ;
 		super.setUI(paneUI) ;
 
@@ -90,9 +89,6 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 		return instance ;
 	}
 
-	
-	
-	
 	/**
 	 * @see javax.swing.JTabbedPane#addTab(java.lang.String, java.awt.Component)
 	 */
@@ -112,8 +108,8 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 	public void addTab (String _title, Icon _icon, Component _component)
 	{
 		int localTabCount = getTabCount() ;
-		
-		for (int i = 0 ; i < localTabCount; i++ )
+
+		for (int i = 0; i < localTabCount; i++ )
 		{
 			if (getComponentAt(i).equals(_component))
 			{
@@ -121,9 +117,9 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 				return ;
 			}
 		}
-		
+
 		boolean doPaintCloseIcon = true ;
-		
+
 		try
 		{
 			Object prop = null ;
@@ -162,9 +158,9 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 			{
 				if ("TabbedPane.scrollableViewport".equals(c.getName())) headerViewport = (JViewport) c ;
 			}
-		}	
+		}
 	}
-	
+
 	private void setCloseIconVisibleAt (int _index, boolean _visible) throws IndexOutOfBoundsException
 	{
 		super.setIconAt(_index, _visible ? new CloseTabIcon(null) : null) ;
@@ -172,18 +168,20 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 
 	/**
 	 * Updates the title for specified component
-	 *
+	 * 
 	 * @author Conde Mickael K.
 	 * @version 1.0
 	 * 
-	 * @param _component the target component
-	 * @param _title the new title to set
+	 * @param _component
+	 *            the target component
+	 * @param _title
+	 *            the new title to set
 	 */
-	public void setTitle(Component _component, String _title)
-	{		
+	public void setTitle (Component _component, String _title)
+	{
 		int localTabCount = getTabCount() ;
-		
-		for (int i = 0 ; i < localTabCount; i++ )
+
+		for (int i = 0; i < localTabCount; i++ )
 		{
 			if (getComponentAt(i).equals(_component))
 			{
@@ -192,13 +190,13 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 			}
 		}
 	}
-	
+
 	/**
 	 * @see java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent)
 	 */
 	public void mouseDragged (MouseEvent _evt)
 	{
-		
+
 	}
 
 	/**
@@ -206,7 +204,7 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 	 */
 	public void mouseMoved (MouseEvent _evt)
 	{
-		
+
 	}
 
 	/**
@@ -223,7 +221,7 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 	public void mouseEntered (MouseEvent _evt)
 	{
 		processMouseEvents(_evt) ;
-		
+
 	}
 
 	/**
@@ -232,7 +230,7 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 	public void mouseExited (MouseEvent _evt)
 	{
 		processMouseEvents(_evt) ;
-		
+
 	}
 
 	/**
@@ -240,7 +238,7 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 	 */
 	public void mousePressed (MouseEvent _evt)
 	{
-		
+
 	}
 
 	/**
@@ -248,9 +246,9 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 	 */
 	public void mouseReleased (MouseEvent _evt)
 	{
-		
+
 	}
-	
+
 	/**
 	 * Notifies all listeners that have registered interest for notification on this event type.
 	 * 
@@ -268,7 +266,7 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 		 */
 		return true ;
 	}
-	
+
 	/**
 	 * Processes all caught <code>MouseEvent</code>s.
 	 * 
@@ -292,7 +290,10 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 				}
 			}
 		}
-		if (otherWasOver) { repaint() ; }
+		if (otherWasOver)
+		{
+			repaint() ;
+		}
 		CloseTabIcon icon = (CloseTabIcon) getIconAt(tabNumber) ;
 		if (icon != null)
 		{
@@ -353,7 +354,7 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 			}
 		}
 	}
-	
+
 	/**
 	 * CloseTabIcon : The class which generates the 'X' icon for the tabs. The constructor accepts
 	 * an icon which is extra to the 'X' icon, so you can have tabs like in JBuilder. This value is
@@ -474,7 +475,7 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 						g.fillRect(x + 1, y_p, 12, 13) ;
 					}
 
-					 this.x_pos = x ;
+					this.x_pos = x ;
 					this.y_pos = y ;
 					y_p = y + 2 ;
 					g.setColor(Color.black) ;
@@ -528,7 +529,7 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 			return new Rectangle(x_pos, y_pos, width, height) ;
 		}
 	}
-	  
+
 	/**
 	 * CloseableMetalTabbedPaneUI : A specific <code>BasicTabbedPaneUI</code>.
 	 * 
@@ -555,8 +556,10 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 
 		/**
 		 * Creates a new instance of <code>CloseableTabbedPaneUI</code>
-		 * @param horizontalTextPosition the horizontal position of the text (e.g.
-		 * SwingUtilities.TRAILING or SwingUtilities.LEFT)
+		 * 
+		 * @param horizontalTextPosition
+		 *            the horizontal position of the text (e.g. SwingUtilities.TRAILING or
+		 *            SwingUtilities.LEFT)
 		 */
 		public CloseableTabbedPaneUI (int horizontalTextPosition)
 		{
@@ -565,15 +568,25 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 
 		/**
 		 * Layouts the label
-		 * @param tabPlacement the placement of the tabs
-		 * @param metrics the font metrics
-		 * @param tabIndex the index of the tab
-		 * @param title the title of the tab
-		 * @param icon the icon of the tab
-		 * @param tabRect the tab boundaries
-		 * @param iconRect the icon boundaries
-		 * @param textRect the text boundaries
-		 * @param isSelected true whether the tab is selected, false otherwise
+		 * 
+		 * @param tabPlacement
+		 *            the placement of the tabs
+		 * @param metrics
+		 *            the font metrics
+		 * @param tabIndex
+		 *            the index of the tab
+		 * @param title
+		 *            the title of the tab
+		 * @param icon
+		 *            the icon of the tab
+		 * @param tabRect
+		 *            the tab boundaries
+		 * @param iconRect
+		 *            the icon boundaries
+		 * @param textRect
+		 *            the text boundaries
+		 * @param isSelected
+		 *            true whether the tab is selected, false otherwise
 		 */
 		protected void layoutLabel (int tabPlacement, FontMetrics metrics, int tabIndex, String title, Icon icon, Rectangle tabRect, Rectangle iconRect,
 				Rectangle textRect, boolean isSelected)
@@ -588,7 +601,7 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 			}
 
 			SwingUtilities.layoutCompoundLabel((JComponent) tabPane, metrics, title, icon, SwingUtilities.CENTER, SwingUtilities.CENTER, SwingUtilities.CENTER,
-			//SwingUtilities.TRAILING,
+			// SwingUtilities.TRAILING,
 					horizontalTextPosition, tabRect, iconRect, textRect, textIconGap + 2) ;
 
 			tabPane.putClientProperty("html", null) ;
@@ -601,15 +614,14 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 			textRect.y += yNudge ;
 		}
 	}
-	
-	
+
 	/**
 	 * CloseableMetalTabbedPaneUI : A specific <code>MetalTabbedPaneUI</code>.
-	 *
+	 * 
 	 * @author fast_ (java forums)
 	 * @author Conde Mickael K.
 	 * @version 1.0
-	 *
+	 * 
 	 */
 	class CloseableMetalTabbedPaneUI extends MetalTabbedPaneUI
 	{
@@ -628,8 +640,10 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 
 		/**
 		 * Creates a new instance of <code>CloseableMetalTabbedPaneUI</code>
-		 * @param horizontalTextPosition the horizontal position of the text (e.g.
-		 * SwingUtilities.TRAILING or SwingUtilities.LEFT)
+		 * 
+		 * @param horizontalTextPosition
+		 *            the horizontal position of the text (e.g. SwingUtilities.TRAILING or
+		 *            SwingUtilities.LEFT)
 		 */
 		public CloseableMetalTabbedPaneUI (int horizontalTextPosition)
 		{
@@ -638,15 +652,25 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 
 		/**
 		 * Layouts the label
-		 * @param tabPlacement the placement of the tabs
-		 * @param metrics the font metrics
-		 * @param tabIndex the index of the tab
-		 * @param title the title of the tab
-		 * @param icon the icon of the tab
-		 * @param tabRect the tab boundaries
-		 * @param iconRect the icon boundaries
-		 * @param textRect the text boundaries
-		 * @param isSelected true whether the tab is selected, false otherwise
+		 * 
+		 * @param tabPlacement
+		 *            the placement of the tabs
+		 * @param metrics
+		 *            the font metrics
+		 * @param tabIndex
+		 *            the index of the tab
+		 * @param title
+		 *            the title of the tab
+		 * @param icon
+		 *            the icon of the tab
+		 * @param tabRect
+		 *            the tab boundaries
+		 * @param iconRect
+		 *            the icon boundaries
+		 * @param textRect
+		 *            the text boundaries
+		 * @param isSelected
+		 *            true whether the tab is selected, false otherwise
 		 */
 		protected void layoutLabel (int tabPlacement, FontMetrics metrics, int tabIndex, String title, Icon icon, Rectangle tabRect, Rectangle iconRect,
 				Rectangle textRect, boolean isSelected)
@@ -661,7 +685,7 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 			}
 
 			SwingUtilities.layoutCompoundLabel((JComponent) tabPane, metrics, title, icon, SwingUtilities.CENTER, SwingUtilities.CENTER, SwingUtilities.CENTER,
-			//SwingUtilities.TRAILING,
+			// SwingUtilities.TRAILING,
 					horizontalTextPosition, tabRect, iconRect, textRect, textIconGap + 2) ;
 
 			tabPane.putClientProperty("html", null) ;
@@ -675,6 +699,4 @@ public class MainTabbedPane extends JTabbedPane implements MouseListener, MouseM
 		}
 	}
 
-
-	
 }

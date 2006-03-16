@@ -52,9 +52,12 @@ import ui.dialog.PreferencesDialog ;
 import ui.dialog.ProgressDialog ;
 import ui.misc.LogPanel ;
 import ui.misc.MainTabbedPane ;
-import ui.misc.TaskDefinitionPanel;
+import ui.misc.TaskDefinitionPanel ;
 import ui.resource.Bundle ;
 import ui.tree.MainTree ;
+
+import ui.resource.LocaleController ;
+import ui.resource.LocaleListener ;
 
 /**
  * MainFrame : PSI main window
@@ -98,7 +101,7 @@ public class MainFrame extends JFrame
 	private JMenuItem prefsEditMenuItem = null ;
 
 	private JMenuItem importProcessFileMenuItem = null ;
-	
+
 	private JMenuItem importTasksFileMenuItem = null ;
 
 	private JMenuItem saveFileMenuItem = null ;
@@ -125,6 +128,8 @@ public class MainFrame extends JFrame
 
 	private JPanel mainContentPane = null ;
 
+	private LocaleController controllerLocale = null ;
+
 	private JPanel statusPanel = null ;
 
 	private JLabel statusLabel = null ;
@@ -140,6 +145,16 @@ public class MainFrame extends JFrame
 	private JButton iterationButton = null ;
 
 	private JButton saveAsButton = null ;
+
+	private JTextArea jTextAreaWelcom = null ;
+
+	private JButton jButtonCreate = null ;
+
+	private JButton jButtonOpen = null ;
+
+	private JButton jButtonHelp = null ;
+
+	private JPanel defaultPanel = null ;
 
 	Preferences preferences = null ;
 
@@ -220,22 +235,32 @@ public class MainFrame extends JFrame
 		catch (Exception exc)
 		{
 		}
-
+		this.controllerLocale = LocaleController.getInstance() ;
+		this.controllerLocale.addLocaleListener(new LocaleListener()
+		{
+			public void localeChanged ()
+			{
+				initText() ;
+			}
+		}) ;
 		new SplashScreen(this, 4) ;
 		initialize() ;
+		initText() ;
 		LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageAppStarted"))) ;
 
-		// Opening help
-		if (preferences.getBoolean("load_help", true))
-		{
-			new HelpFrame() ;
-		}
-		
 		// Trying to open the last project if necessary
 		if (preferences.getBoolean("load_last_project", true))
 		{
 			try
 			{
+				// close the defaut tab.
+				if (defaultPanel != null)
+				{
+					MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance() ;
+					mainTabbedPane.remove(0) ;
+					defaultPanel = null ;
+				}
+
 				currentProject = ProjectControler.open(new File(preferences.get("last_project", ""))) ;
 				if (currentProject != null)
 				{
@@ -245,7 +270,6 @@ public class MainFrame extends JFrame
 					actionSaveAs.setEnabled(true) ;
 					getIterationButton().setEnabled(true) ;
 					getExportFileMenu().setEnabled(true) ;
-					getImportTasksFileMenuItem().setEnabled(true) ;
 
 					getProjectTree().loadProject(currentProject) ;
 					LogPanel.getInstance().addInformation(
@@ -254,6 +278,7 @@ public class MainFrame extends JFrame
 			}
 			catch (FileParseException exc)
 			{
+				JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileOpenIncorrectFormat"), "PSI", JOptionPane.ERROR_MESSAGE) ;
 			}
 		}
 	}
@@ -318,6 +343,16 @@ public class MainFrame extends JFrame
 		statusbarTimer = new Timer(1000, new ActionListener()
 		{
 			public void actionPerformed (ActionEvent _e)
+			{
+				Date now = new Date() ;
+				statusLabel.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(now)) ;
+			}
+		}) ;
+		this.statusbarTimer.start() ;
+
+		statusbarTimer = new Timer(1000, new ActionListener()
+		{
+			public void actionPerformed (ActionEvent _e)
 
 			{
 				Date now = new Date() ;
@@ -337,6 +372,59 @@ public class MainFrame extends JFrame
 			}
 		}) ;
 		this.statusbarTimer.start() ;
+	}
+
+	/**
+	 * 
+	 */
+	private void initText ()
+	{
+		fileMenu.setText(Bundle.getText("MainFrameFileMenu")) ;
+		fileMenu.setMnemonic(Bundle.getText("MainFrameFileMenuMn").charAt(0)) ;
+		editMenu.setText(Bundle.getText("MainFrameEditMenu")) ;
+		editMenu.setMnemonic(Bundle.getText("MainFrameEditMenuMn").charAt(0)) ;
+		aboutMenu.setText(Bundle.getText("MainFrameAboutMenu")) ;
+		// aboutMenu.setMnemonic(Bundle.getText("MainFrameAboutMenuMn").charAt(0)) ;
+		openFileMenuItem.setText(Bundle.getText("MainFrameFileMenuOpen")) ;
+		openFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuOpenMn").charAt(0)) ;
+		createFileMenuItem.setText(Bundle.getText("MainFrameFileMenuCreate")) ;
+		createFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuCreateMn").charAt(0)) ;
+		importProcessFileMenuItem.setText(Bundle.getText("MainFrameFileMenuImportProcess")) ;
+		importProcessFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuImportProcessMn").charAt(0)) ;
+		importTasksFileMenuItem.setText(Bundle.getText("MainFrameFileMenuImportOW")) ;
+		importTasksFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuImportOWMn").charAt(0)) ;
+		saveFileMenuItem.setText(Bundle.getText("MainFrameFileMenuSave")) ;
+		saveFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuSaveMn").charAt(0)) ;
+		saveAsFileMenuItem.setText(Bundle.getText("MainFrameFileMenuSaveAs")) ;
+		saveAsFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuSaveAsMn").charAt(0)) ;
+		closeFileMenuItem.setText(Bundle.getText("MainFrameFileMenuClose")) ;
+		closeFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuCloseMn").charAt(0)) ;
+		quitFileMenuItem.setText(Bundle.getText("MainFrameFileMenuQuit")) ;
+		quitFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuQuitMn").charAt(0)) ;
+		helpAboutMenuItem.setText(Bundle.getText("MainFrameAboutMenuHelp")) ;
+		helpAboutMenuItem.setMnemonic(Bundle.getText("MainFrameAboutMenuHelpMn").charAt(0)) ;
+		aboutAboutMenuItem.setText(Bundle.getText("MainFrameAboutMenuAbout")) ;
+		aboutAboutMenuItem.setMnemonic(Bundle.getText("MainFrameAboutMenuAboutMn").charAt(0)) ;
+		prefsEditMenuItem.setText(Bundle.getText("MainFrameEditMenuPrefs")) ;
+		prefsEditMenuItem.setMnemonic(Bundle.getText("MainFrameEditMenuPrefsMn").charAt(0)) ;
+		exportFileMenu.setText(Bundle.getText("MainFrameFileMenuExport")) ;
+		exportFileMenu.setMnemonic(Bundle.getText("MainFrameFileMenuExportMn").charAt(0)) ;
+		export2DBFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExport2DB")) ;
+		export2DBFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExport2DBMn").charAt(0)) ;
+		exportOWFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExportOW")) ;
+		exportOWFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExportOWMn").charAt(0)) ;
+		createButton.setToolTipText(Bundle.getText("MainFrameFileCreateProjectButton")) ;
+		openButton.setToolTipText(Bundle.getText("MainFrameFileOpenProjectButton")) ;
+		saveButton.setToolTipText(Bundle.getText("MainFrameFileSaveProjectButton")) ;
+		iterationButton.setToolTipText(Bundle.getText("MainFrameFileIterateProjectButton")) ;
+		saveAsButton.setToolTipText(Bundle.getText("MainFrameFileSaveAsProjectButton")) ;
+		jTextAreaWelcom.setText(Bundle.getText("MainFrameDefaultPanelDescription")) ;
+		jButtonCreate.setToolTipText(Bundle.getText("MainFrameDefaultPanelCreateButton")) ;
+		jButtonOpen.setToolTipText(Bundle.getText("MainFrameDefaultPanelOpenButton")) ;
+		jButtonHelp.setToolTipText(Bundle.getText("MainFrameDefaultPanelHelpButton")) ;
+		if (defaultPanel != null) MainTabbedPane.getInstance().setTitleAt(0, Bundle.getText("MainFrameDefaultPanelTitle")) ;
+		logContainer.setTitleAt(0, Bundle.getText("MainFrameLogTab")) ;
+		statusLabel.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(new Date())) ;
 	}
 
 	/**
@@ -385,10 +473,6 @@ public class MainFrame extends JFrame
 	 */
 	private void actionCreate (ActionEvent evt)
 	{
-		// close the defaut tab.
-		MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance() ;
-		if ( (mainTabbedPane.getTabCount() > 0) && (mainTabbedPane.getTitleAt(0).equals(Bundle.getText("MainFrameDefaultPanelTitle"))))
-			mainTabbedPane.remove(0) ;
 		/*
 		 * Setting up a JFile Chooser with a special file filter that will only accept .xml files
 		 */
@@ -451,15 +535,22 @@ public class MainFrame extends JFrame
 					LogPanel.getInstance().addInformation(
 							new LogInformation(Bundle.getText("MainFrameLogMessageProjectCreated") + " : " + currentProject.getName())) ;
 				}
+				// close the defaut tab.
+				if (defaultPanel != null)
+				{
+					MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance() ;
+					mainTabbedPane.remove(0) ;
+					defaultPanel = null ;
+				}
 			}
 			catch (FileParseException exc)
 			{
 				JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileCreateIncorrectFormat"), "PSI", JOptionPane.ERROR_MESSAGE) ;
 			}
-
 			progressbar.stopTimer() ;
 			progressbar.dispose() ;
 		}
+
 	}
 
 	/**
@@ -473,11 +564,6 @@ public class MainFrame extends JFrame
 	 */
 	private void actionImport (ActionEvent evt)
 	{
-
-		// close the defaut tab.
-		MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance() ;
-		if ( (mainTabbedPane.getTabCount() > 0) && (mainTabbedPane.getTitleAt(0).equals(Bundle.getText("MainFrameDefaultPanelTitle"))))
-			mainTabbedPane.remove(0) ;
 		/*
 		 * Setting up a JFile Chooser with a special file filter that will only accept .dpe files
 		 * generated by IEPP
@@ -556,6 +642,14 @@ public class MainFrame extends JFrame
 
 			progressbar.stopTimer() ;
 			progressbar.dispose() ;
+
+			// close the defaut tab.
+			if (defaultPanel != null)
+			{
+				MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance() ;
+				mainTabbedPane.remove(0) ;
+				defaultPanel = null ;
+			}
 		}
 	}
 
@@ -570,10 +664,6 @@ public class MainFrame extends JFrame
 	 */
 	private void actionOpen (ActionEvent e)
 	{
-		// close the defaut tab.
-		MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance() ;
-		if ( (mainTabbedPane.getTabCount() > 0) && (mainTabbedPane.getTitleAt(0).equals(Bundle.getText("MainFrameDefaultPanelTitle"))))
-			mainTabbedPane.remove(0) ;
 		JFileChooser localFileChooser = new JFileChooser() ;
 		localFileChooser.setDialogTitle(Bundle.getText("MainFrameFileOpenProjectTitle")) ;
 		localFileChooser.setAcceptAllFileFilterUsed(false) ;
@@ -632,6 +722,13 @@ public class MainFrame extends JFrame
 					getProjectTree().loadProject(currentProject) ;
 					LogPanel.getInstance().addInformation(
 							new LogInformation(Bundle.getText("MainFrameLogMessageProjectOpened") + " : " + currentProject.getName())) ;
+					// close the defaut tab.
+					if (defaultPanel != null)
+					{
+						MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance() ;
+						mainTabbedPane.remove(0) ;
+						defaultPanel = null ;
+					}
 				}
 			}
 			catch (FileParseException exc)
@@ -639,6 +736,7 @@ public class MainFrame extends JFrame
 				JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileOpenIncorrectFormat"), "PSI", JOptionPane.ERROR_MESSAGE) ;
 			}
 		}
+
 	}
 
 	/**
@@ -663,11 +761,8 @@ public class MainFrame extends JFrame
 	 */
 	private void actionSave ()
 	{
-		if (!GlobalController.projectChanged)
-		{
-			return ;
-		}
-		
+		if (!GlobalController.projectChanged) { return ; }
+
 		File localFile = new File(preferences.get("last_project", "")) ;
 
 		if (!localFile.exists())
@@ -836,15 +931,13 @@ public class MainFrame extends JFrame
 		if (fileMenu == null)
 		{
 			fileMenu = new JMenu() ;
-			fileMenu.setText(Bundle.getText("MainFrameFileMenu")) ;
-			fileMenu.setMnemonic(Bundle.getText("MainFrameFileMenuMn").charAt(0)) ;
 			fileMenu.add(getOpenFileMenuItem()) ;
 			fileMenu.add(getCloseFileMenuItem()) ;
 			fileMenu.addSeparator() ;
 			fileMenu.add(getCreateFileMenuItem()) ;
 			fileMenu.addSeparator() ;
 			fileMenu.add(getImportProcessFileMenuItem()) ;
-			fileMenu.add(getImportTasksFileMenuItem ()) ;
+			fileMenu.add(getImportTasksFileMenuItem()) ;
 			fileMenu.addSeparator() ;
 			fileMenu.add(getSaveFileMenuItem()) ;
 			fileMenu.add(getSaveAsFileMenuItem()) ;
@@ -866,8 +959,6 @@ public class MainFrame extends JFrame
 		if (editMenu == null)
 		{
 			editMenu = new JMenu() ;
-			editMenu.setText(Bundle.getText("MainFrameEditMenu")) ;
-			editMenu.setMnemonic(Bundle.getText("MainFrameEditMenuMn").charAt(0)) ;
 			editMenu.add(getPrefsEditMenuItem()) ;
 		}
 		return editMenu ;
@@ -883,8 +974,6 @@ public class MainFrame extends JFrame
 		if (aboutMenu == null)
 		{
 			aboutMenu = new JMenu() ;
-			aboutMenu.setText(Bundle.getText("MainFrameAboutMenu")) ;
-			// aboutMenu.setMnemonic(Bundle.getText("MainFrameAboutMenuMn").charAt(0)) ;
 			aboutMenu.add(getHelpAboutMenuItem()) ;
 			aboutMenu.addSeparator() ;
 			aboutMenu.add(getAboutAboutMenuItem()) ;
@@ -903,8 +992,6 @@ public class MainFrame extends JFrame
 		{
 			openFileMenuItem = new JMenuItem() ;
 			openFileMenuItem.setAction(actionOpen) ;
-			openFileMenuItem.setText(Bundle.getText("MainFrameFileMenuOpen")) ;
-			openFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuOpenMn").charAt(0)) ;
 			openFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
 		return openFileMenuItem ;
@@ -921,8 +1008,6 @@ public class MainFrame extends JFrame
 		{
 			createFileMenuItem = new JMenuItem() ;
 			createFileMenuItem.setAction(actionCreate) ;
-			createFileMenuItem.setText(Bundle.getText("MainFrameFileMenuCreate")) ;
-			createFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuCreateMn").charAt(0)) ;
 			createFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
 		return createFileMenuItem ;
@@ -939,13 +1024,11 @@ public class MainFrame extends JFrame
 		{
 			importProcessFileMenuItem = new JMenuItem() ;
 			importProcessFileMenuItem.setAction(actionImport) ;
-			importProcessFileMenuItem.setText(Bundle.getText("MainFrameFileMenuImportProcess")) ;
-			importProcessFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuImportProcessMn").charAt(0)) ;
 			importProcessFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
 		return importProcessFileMenuItem ;
 	}
-	
+
 	/**
 	 * This method initializes importProjectFileMenuItem
 	 * 
@@ -956,9 +1039,8 @@ public class MainFrame extends JFrame
 		if (importTasksFileMenuItem == null)
 		{
 			importTasksFileMenuItem = new JMenuItem() ;
-			importTasksFileMenuItem.setText(Bundle.getText("MainFrameFileMenuImportOW")) ;
-			importTasksFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuImportOWMn").charAt(0)) ;
-			importTasksFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_MASK|java.awt.event.InputEvent.SHIFT_MASK)) ;
+			importTasksFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_MASK
+					| java.awt.event.InputEvent.SHIFT_MASK)) ;
 			importTasksFileMenuItem.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
@@ -1014,8 +1096,7 @@ public class MainFrame extends JFrame
 						try
 						{
 							ProjectControler.importFromOpenWorkbench(localFile, currentProject) ;
-							LogPanel.getInstance().addInformation(
-									new LogInformation(Bundle.getText("MainFrameLogMessageTasksImported"))) ;
+							LogPanel.getInstance().addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageTasksImported"))) ;
 						}
 						catch (FileParseException exc)
 						{
@@ -1043,8 +1124,6 @@ public class MainFrame extends JFrame
 		{
 			saveFileMenuItem = new JMenuItem() ;
 			saveFileMenuItem.setAction(actionSave) ;
-			saveFileMenuItem.setText(Bundle.getText("MainFrameFileMenuSave")) ;
-			saveFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuSaveMn").charAt(0)) ;
 			saveFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK)) ;
 		}
 		return saveFileMenuItem ;
@@ -1061,8 +1140,6 @@ public class MainFrame extends JFrame
 		{
 			saveAsFileMenuItem = new JMenuItem() ;
 			saveAsFileMenuItem.setAction(actionSaveAs) ;
-			saveAsFileMenuItem.setText(Bundle.getText("MainFrameFileMenuSaveAs")) ;
-			saveAsFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuSaveAsMn").charAt(0)) ;
 			saveAsFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK
 					| java.awt.event.InputEvent.SHIFT_MASK)) ;
 		}
@@ -1079,8 +1156,6 @@ public class MainFrame extends JFrame
 		if (closeFileMenuItem == null)
 		{
 			closeFileMenuItem = new JMenuItem() ;
-			closeFileMenuItem.setText(Bundle.getText("MainFrameFileMenuClose")) ;
-			closeFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuCloseMn").charAt(0)) ;
 			closeFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.CTRL_MASK)) ;
 			closeFileMenuItem.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -1090,7 +1165,7 @@ public class MainFrame extends JFrame
 					projectTree.closeProject() ;
 					MainTabbedPane.getInstance().removeAll() ;
 					getDefaultPanel() ;
-					
+
 					// Actions deactivation
 					actionImport.setEnabled(false) ;
 					actionSave.setEnabled(false) ;
@@ -1114,8 +1189,6 @@ public class MainFrame extends JFrame
 		if (quitFileMenuItem == null)
 		{
 			quitFileMenuItem = new JMenuItem() ;
-			quitFileMenuItem.setText(Bundle.getText("MainFrameFileMenuQuit")) ;
-			quitFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuQuitMn").charAt(0)) ;
 			quitFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.ALT_MASK)) ;
 			quitFileMenuItem.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -1138,8 +1211,6 @@ public class MainFrame extends JFrame
 		if (helpAboutMenuItem == null)
 		{
 			helpAboutMenuItem = new JMenuItem() ;
-			helpAboutMenuItem.setText(Bundle.getText("MainFrameAboutMenuHelp")) ;
-			helpAboutMenuItem.setMnemonic(Bundle.getText("MainFrameAboutMenuHelpMn").charAt(0)) ;
 			helpAboutMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK)) ;
 			helpAboutMenuItem.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -1165,8 +1236,6 @@ public class MainFrame extends JFrame
 		if (aboutAboutMenuItem == null)
 		{
 			aboutAboutMenuItem = new JMenuItem() ;
-			aboutAboutMenuItem.setText(Bundle.getText("MainFrameAboutMenuAbout")) ;
-			aboutAboutMenuItem.setMnemonic(Bundle.getText("MainFrameAboutMenuAboutMn").charAt(0)) ;
 			aboutAboutMenuItem.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
@@ -1191,17 +1260,11 @@ public class MainFrame extends JFrame
 		if (prefsEditMenuItem == null)
 		{
 			prefsEditMenuItem = new JMenuItem() ;
-			prefsEditMenuItem.setText(Bundle.getText("MainFrameEditMenuPrefs")) ;
-			prefsEditMenuItem.setMnemonic(Bundle.getText("MainFrameEditMenuPrefsMn").charAt(0)) ;
 			prefsEditMenuItem.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
 				{
-					MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance() ;
-					if ( (mainTabbedPane.getTabCount() > 0) && (mainTabbedPane.getTitleAt(0).equals(Bundle.getText("MainFrameDefaultPanelTitle"))))
-						mainTabbedPane.remove(0) ;
 					new PreferencesDialog(MainFrame.this) ;
-
 				}
 			}) ;
 		}
@@ -1233,8 +1296,6 @@ public class MainFrame extends JFrame
 		if (exportFileMenu == null)
 		{
 			exportFileMenu = new JMenu() ;
-			exportFileMenu.setText(Bundle.getText("MainFrameFileMenuExport")) ;
-			exportFileMenu.setMnemonic(Bundle.getText("MainFrameFileMenuExportMn").charAt(0)) ;
 			exportFileMenu.add(getExportDominoFileMenuItem()) ;
 			exportFileMenu.add(getExportOWFileMenuItem()) ;
 			exportFileMenu.add(getExport2DBFileMenuItem()) ;
@@ -1252,8 +1313,6 @@ public class MainFrame extends JFrame
 		if (exportDominoFileMenuItem == null)
 		{
 			exportDominoFileMenuItem = new JMenuItem() ;
-			exportDominoFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExportDomino")) ;
-			exportDominoFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExportDominoMn").charAt(0)) ;
 			exportDominoFileMenuItem.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
@@ -1338,8 +1397,6 @@ public class MainFrame extends JFrame
 		if (export2DBFileMenuItem == null)
 		{
 			export2DBFileMenuItem = new JMenuItem() ;
-			export2DBFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExport2DB")) ;
-			export2DBFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExport2DBMn").charAt(0)) ;
 			export2DBFileMenuItem.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
@@ -1386,7 +1443,7 @@ public class MainFrame extends JFrame
 					{
 						ProgressDialog progressbar = new ProgressDialog(MainFrame.this) ;
 						progressbar.initialize() ;
-						
+
 						// Adding extension if necessary
 						if (!localFile.getName().endsWith(".xml"))
 						{
@@ -1409,7 +1466,7 @@ public class MainFrame extends JFrame
 								JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileExportError"), "PSI", JOptionPane.ERROR_MESSAGE) ;
 							}
 						}
-						
+
 						progressbar.stopTimer() ;
 						progressbar.dispose() ;
 					}
@@ -1429,8 +1486,6 @@ public class MainFrame extends JFrame
 		if (exportOWFileMenuItem == null)
 		{
 			exportOWFileMenuItem = new JMenuItem() ;
-			exportOWFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExportOW")) ;
-			exportOWFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExportOWMn").charAt(0)) ;
 			exportOWFileMenuItem.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
@@ -1477,7 +1532,7 @@ public class MainFrame extends JFrame
 					{
 						ProgressDialog progressbar = new ProgressDialog(MainFrame.this) ;
 						progressbar.initialize() ;
-						
+
 						// Adding extension if necessary
 						if (!localFile.getName().endsWith(".xml"))
 						{
@@ -1500,7 +1555,7 @@ public class MainFrame extends JFrame
 								JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileExportError"), "PSI", JOptionPane.ERROR_MESSAGE) ;
 							}
 						}
-						
+
 						progressbar.stopTimer() ;
 						progressbar.dispose() ;
 					}
@@ -1534,6 +1589,7 @@ public class MainFrame extends JFrame
 				}
 			}) ;
 			rightSplitPane.setTopComponent(MainTabbedPane.getInstance()) ;
+			getDefaultPanel() ;
 			rightSplitPane.setBottomComponent(getLogContainer()) ;
 		}
 		return rightSplitPane ;
@@ -1541,29 +1597,28 @@ public class MainFrame extends JFrame
 
 	public void getDefaultPanel ()
 	{
-		JPanel defaultPanel = new JPanel() ;
+		defaultPanel = new JPanel() ;
 		// north.
 		JPanel jPanelFlowNorth = new JPanel(new FlowLayout()) ;
 		JLabel jLabelLogo = new JLabel(new ImageIcon(getClass().getResource("/ui/resource/psilogo150_150.gif"))) ;
 		jPanelFlowNorth.add(jLabelLogo) ;
-		JTextArea jTextAreaWelcom = new JTextArea(Bundle.getText("MainFrameDefaultPanelDescription")) ;
+		jTextAreaWelcom = new JTextArea() ;
 		jTextAreaWelcom.setPreferredSize(new Dimension(400, 250)) ;
 		jTextAreaWelcom.setBackground(Color.WHITE) ;
+		jTextAreaWelcom.setEditable(false) ;
 		jPanelFlowNorth.add(jTextAreaWelcom) ;
 		jPanelFlowNorth.setBackground(Color.WHITE) ;
 		// center.
 		JPanel jPanelFlowCenter = new JPanel(new FlowLayout()) ;
-		JButton jButtonCreate = new JButton() ;
+		jButtonCreate = new JButton() ;
 		jButtonCreate.setAction(actionCreate) ;
 		jButtonCreate.setIcon(new ImageIcon(getClass().getResource("/ui/resource/create.gif"))) ;
 		jButtonCreate.setPreferredSize(new Dimension(100, 100)) ;
-		jButtonCreate.setToolTipText(Bundle.getText("MainFrameDefaultPanelCreateButton")) ;
-		JButton jButtonOpen = new JButton() ;
+		jButtonOpen = new JButton() ;
 		jButtonOpen.setAction(actionOpen) ;
 		jButtonOpen.setIcon(new ImageIcon(getClass().getResource("/ui/resource/open.gif"))) ;
 		jButtonOpen.setPreferredSize(new Dimension(100, 100)) ;
-		jButtonOpen.setToolTipText(Bundle.getText("MainFrameDefaultPanelOpenButton")) ;
-		JButton jButtonHelp = new JButton() ;
+		jButtonHelp = new JButton() ;
 		jButtonHelp.setAction(new AbstractAction()
 		{
 			private static final long serialVersionUID = 7373920162223888058L ;
@@ -1578,7 +1633,6 @@ public class MainFrame extends JFrame
 		}) ;
 		jButtonHelp.setIcon(new ImageIcon(getClass().getResource("/ui/resource/help.gif"))) ;
 		jButtonHelp.setPreferredSize(new Dimension(100, 100)) ;
-		jButtonHelp.setToolTipText(Bundle.getText("MainFrameDefaultPanelHelpButton")) ;
 		jPanelFlowCenter.add(jButtonCreate) ;
 		jPanelFlowCenter.add(Box.createRigidArea(new Dimension(75, 1))) ;
 		jPanelFlowCenter.add(jButtonOpen) ;
@@ -1656,9 +1710,7 @@ public class MainFrame extends JFrame
 		{
 			statusLabel = new JLabel() ;
 
-			Date now = new Date() ;
-
-			statusLabel.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(now)) ;
+			statusLabel.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(new Date())) ;
 			statusPanel = new JPanel() ;
 			statusPanel.setLayout(new BorderLayout()) ;
 
@@ -1699,7 +1751,6 @@ public class MainFrame extends JFrame
 		{
 			createButton = new JButton() ;
 			createButton.setAction(actionCreate) ;
-			createButton.setToolTipText(Bundle.getText("MainFrameFileCreateProjectButton")) ;
 			createButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_create.gif"))) ;
 		}
 		return createButton ;
@@ -1716,7 +1767,6 @@ public class MainFrame extends JFrame
 		{
 			openButton = new JButton() ;
 			openButton.setAction(actionOpen) ;
-			openButton.setToolTipText(Bundle.getText("MainFrameFileOpenProjectButton")) ;
 			openButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_open.gif"))) ;
 		}
 		return openButton ;
@@ -1733,7 +1783,6 @@ public class MainFrame extends JFrame
 		{
 			saveButton = new JButton() ;
 			saveButton.setAction(actionSave) ;
-			saveButton.setToolTipText(Bundle.getText("MainFrameFileSaveProjectButton")) ;
 			saveButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_save.gif"))) ;
 		}
 		return saveButton ;
@@ -1760,25 +1809,25 @@ public class MainFrame extends JFrame
 					{
 						boolean keep = JOptionPane.showConfirmDialog(MainFrame.this, Bundle.getText("MainFrameConfirmKeepTasks"), "PSI",
 								JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION ;
-						
+
 						BreakdownElementsControler.addIterationIntoProject(getProject(), keep) ;
-						
+
 						// Removing all tasks panel if necessary
 						if (!keep)
 						{
 							int localTabCount = MainTabbedPane.getInstance().getTabCount() ;
-							
+
 							ArrayList <TaskDefinitionPanel> localTD = new ArrayList <TaskDefinitionPanel>() ;
-							
-							for (int i = 0 ; i < localTabCount; i++ )
+
+							for (int i = 0; i < localTabCount; i++ )
 							{
 								if (MainTabbedPane.getInstance().getComponentAt(i) instanceof TaskDefinitionPanel)
 								{
-									localTD.add((TaskDefinitionPanel)MainTabbedPane.getInstance().getComponentAt(i)) ;
+									localTD.add((TaskDefinitionPanel) MainTabbedPane.getInstance().getComponentAt(i)) ;
 								}
 							}
-							
-							for (int i = 0 ; i < localTD.size(); i++ )
+
+							for (int i = 0; i < localTD.size(); i++ )
 							{
 								MainTabbedPane.getInstance().remove(localTD.get(i)) ;
 							}
@@ -1787,7 +1836,6 @@ public class MainFrame extends JFrame
 				}
 			}) ;
 
-			iterationButton.setToolTipText(Bundle.getText("MainFrameFileIterateProjectButton")) ;
 			iterationButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_iteration.gif"))) ;
 		}
 		return iterationButton ;
@@ -1804,7 +1852,6 @@ public class MainFrame extends JFrame
 		{
 			saveAsButton = new JButton() ;
 			saveAsButton.setAction(actionSaveAs) ;
-			saveAsButton.setToolTipText(Bundle.getText("MainFrameFileSaveAsProjectButton")) ;
 			saveAsButton.setIcon(new ImageIcon(getClass().getResource("/ui/resource/tools_save_as.gif"))) ;
 		}
 		return saveAsButton ;

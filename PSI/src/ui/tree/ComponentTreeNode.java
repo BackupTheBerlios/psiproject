@@ -12,6 +12,8 @@ import model.spem2.BreakdownElement;
 import model.spem2.RoleDescriptor;
 import model.spem2.WorkProductDescriptor;
 import ui.resource.Bundle;
+import ui.resource.LocaleController;
+import ui.resource.LocaleListener;
 
 /**
  * ComponentTreeNode : A tree representation of a component
@@ -28,6 +30,17 @@ public class ComponentTreeNode extends DefaultMutableTreeNode
 	private Component component ;
 	
 	private MainTree tree = null ;
+	
+	/**
+	 * The locale controller for the language.
+	 */
+	private LocaleController controllerLocale = null;
+	
+	private DefaultMutableTreeNode WDNode = null ;
+	
+	private DefaultMutableTreeNode ProductsNode = null ; 
+	
+	DefaultMutableTreeNode RoleNode = null ;
 
 	
 	/**
@@ -39,14 +52,21 @@ public class ComponentTreeNode extends DefaultMutableTreeNode
 	public ComponentTreeNode (Component _component, MainTree _tree)
 	{
 		super() ;
+		
+		this.controllerLocale = LocaleController.getInstance();
+	    this.controllerLocale.addLocaleListener(new LocaleListener(){
+	    	public void localeChanged() {
+	    		updateText();
+	        }
+	    });
 
 		this.tree = _tree ;
 		this.component = _component ;
 		this.setUserObject(component.getDescriptor().getName()) ;
 
-		DefaultMutableTreeNode localWDNode = new DefaultMutableTreeNode(Bundle.getText("MainTreeNodeWorkDefinitions")) ;
-		DefaultMutableTreeNode localRoleNode = new DefaultMutableTreeNode(Bundle.getText("MainTreeNodeRoles")) ;
-		DefaultMutableTreeNode localProductsNode = new DefaultMutableTreeNode(Bundle.getText("MainTreeNodeWorkProducts")) ;
+		WDNode = new DefaultMutableTreeNode(Bundle.getText("MainTreeNodeWorkDefinitions")) ;
+		RoleNode = new DefaultMutableTreeNode(Bundle.getText("MainTreeNodeRoles")) ;
+		ProductsNode = new DefaultMutableTreeNode(Bundle.getText("MainTreeNodeWorkProducts")) ;
 		
 		Collection <BreakdownElement> localNested = component.getNestedElements() ;
 		BreakdownElement localElement ;
@@ -58,23 +78,30 @@ public class ComponentTreeNode extends DefaultMutableTreeNode
 
 			if (localElement instanceof RoleDescriptor)
 			{
-				localRoleNode.add(new RoleDescriptorTreeNode((RoleDescriptor) localElement, tree)) ;
+				RoleNode.add(new RoleDescriptorTreeNode((RoleDescriptor) localElement, tree)) ;
 			}
 			
 			else if (localElement instanceof Activity)
 			{
-				localWDNode.add(new ActivityTreeNode((Activity) localElement, tree)) ;
+				WDNode.add(new ActivityTreeNode((Activity) localElement, tree)) ;
 			}
 			
 			else if (localElement instanceof WorkProductDescriptor)
 			{
-				localProductsNode.add(new WorkProductDescriptorTreeNode((WorkProductDescriptor) localElement, tree)) ;
+				ProductsNode.add(new WorkProductDescriptorTreeNode((WorkProductDescriptor) localElement, tree)) ;
 			}
 		}
 
-		this.add(localWDNode) ;
-		this.add(localRoleNode) ;
-		this.add(localProductsNode) ;
+		this.add(WDNode) ;
+		this.add(RoleNode) ;
+		this.add(ProductsNode) ;
+	}
+	
+	private void updateText()
+	{
+		WDNode.setUserObject(Bundle.getText("MainTreeNodeWorkDefinitions")) ;
+		RoleNode.setUserObject(Bundle.getText("MainTreeNodeRoles")) ;
+		ProductsNode.setUserObject(Bundle.getText("MainTreeNodeWorkProducts")) ;
 	}
 
 	/**

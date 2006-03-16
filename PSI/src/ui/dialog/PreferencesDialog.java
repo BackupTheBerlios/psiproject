@@ -25,6 +25,7 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import ui.resource.Bundle;
+import ui.resource.LocaleController;
 import ui.window.MainFrame;
 
 /**
@@ -42,6 +43,8 @@ public class PreferencesDialog extends JDialog
 	Preferences preferences ;
 
 	MainFrame owner = null ;
+	
+	private LocaleController controllerLocale = null;
 	
 	private JPanel mainContentPane = null ;
 
@@ -96,7 +99,7 @@ public class PreferencesDialog extends JDialog
 	private JCheckBox projectCheckBox = null ;
 
 	private JLabel projectLabel = null ;
-
+	
 	/**
 	 * This is the default constructor
 	 */
@@ -105,6 +108,7 @@ public class PreferencesDialog extends JDialog
 		super(_owner) ;
 		this.owner = _owner ;
 		this.preferences = Preferences.userRoot() ;
+		this.controllerLocale = LocaleController.getInstance();
 		initialize() ;
 	}
 
@@ -190,6 +194,8 @@ public class PreferencesDialog extends JDialog
 						Bundle.setCurrentLocale(Locale.ENGLISH) ;
 						preferences.put("locale", "en") ;
 					}
+					
+					controllerLocale.fireLocaleChanged() ;
 					
 					// Look and feel
 					LookAndFeelInfo localLAF = (LookAndFeelInfo) (lafComboBox.getSelectedItem()) ;

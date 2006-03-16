@@ -2,22 +2,23 @@
 package ui.misc ;
 
 import java.awt.BorderLayout ;
-import java.awt.Dimension;
+import java.awt.Dimension ;
 import java.util.ArrayList ;
-import java.util.Date;
+import java.util.Date ;
 
 import javax.swing.JPanel ;
 import javax.swing.JScrollPane ;
 import javax.swing.JTable ;
 import javax.swing.table.AbstractTableModel ;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer ;
 
 import model.LogInformation ;
 import ui.resource.Bundle ;
+import ui.resource.LocaleController ;
+import ui.resource.LocaleListener ;
 
 /**
- * LogPanel : This is the container of the table containing the log entries
- * Implements singleton
+ * LogPanel : This is the container of the table containing the log entries Implements singleton
  * 
  * @author Conde Mickael K.
  * @version 1.0
@@ -46,11 +47,16 @@ public class LogPanel extends JPanel
 	 * The table model that will be used by the logTable
 	 */
 	private LogTableModel logTableModel ;
-	
+
 	/**
 	 * The single instance
 	 */
 	private static LogPanel instance = null ;
+
+	/**
+	 * The locale controller for the language.
+	 */
+	private LocaleController controllerLocale = null ;
 
 	/**
 	 * Constructor
@@ -62,6 +68,15 @@ public class LogPanel extends JPanel
 		 * NOTES : in this constructor we create a table with a table model which is defined in this
 		 * file. each row of a table will contain
 		 */
+
+		this.controllerLocale = LocaleController.getInstance() ;
+		this.controllerLocale.addLocaleListener(new LocaleListener()
+		{
+			public void localeChanged ()
+			{
+				updateText() ;
+			}
+		}) ;
 
 		logTableModel = new LogTableModel() ;
 		logTable = new JTable(logTableModel) ;
@@ -85,6 +100,24 @@ public class LogPanel extends JPanel
 	private void initialize ()
 	{
 		this.setLayout(new java.awt.BorderLayout()) ;
+	}
+
+	/**
+	 * 
+	 * This method updates texts in this table during a language changing.
+	 * 
+	 * @author MaT
+	 * @version 1.0
+	 * 
+	 */
+	private void updateText ()
+	{
+		// log cleaning.
+		int sizeOfData = this.logTableModel.data.size() ;
+		this.logTableModel.data.clear() ;
+		this.logTableModel.fireTableRowsDeleted(0, sizeOfData) ;
+		// adding of a "Language changed" log.
+		this.addInformation(new LogInformation(Bundle.getText("MainFrameLogMessageLanguageChanged"))) ;
 	}
 
 	/**
@@ -119,6 +152,11 @@ public class LogPanel extends JPanel
 
 		private ArrayList <LogInformation> data ;
 
+		/**
+		 * The locale controller for the language.
+		 */
+		private LocaleController controllerLocale = null ;
+
 		private String[] titles = {
 				Bundle.getText("LogPanelTableColumn1"), Bundle.getText("LogPanelTableColumn2")
 		} ;
@@ -126,8 +164,30 @@ public class LogPanel extends JPanel
 		public LogTableModel ()
 		{
 			super() ;
-
+			this.controllerLocale = LocaleController.getInstance() ;
+			this.controllerLocale.addLocaleListener(new LocaleListener()
+			{
+				public void localeChanged ()
+				{
+					updateText() ;
+				}
+			}) ;
 			this.data = new ArrayList <LogInformation>() ;
+		}
+
+		/**
+		 * 
+		 * This method updates texts in this table model during a language changing.
+		 * 
+		 * @author MaT
+		 * @version 1.0
+		 * 
+		 */
+		private void updateText ()
+		{
+			this.titles[0] = Bundle.getText("LogPanelTableColumn1") ;
+			this.titles[1] = Bundle.getText("LogPanelTableColumn2") ;
+
 		}
 
 		/**
@@ -141,7 +201,7 @@ public class LogPanel extends JPanel
 
 			this.data = _data ;
 		}
-		
+
 		/**
 		 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
 		 */
@@ -224,14 +284,14 @@ public class LogPanel extends JPanel
 			}
 
 		}
-		
-		public void addRow(LogInformation _logInformation)
+
+		public void addRow (LogInformation _logInformation)
 		{
 			data.add(_logInformation) ;
 			fireTableRowsInserted(getRowCount(), getRowCount()) ;
 		}
-		
-		public void removeFirstRow()
+
+		public void removeFirstRow ()
 		{
 			data.remove(0) ;
 			fireTableRowsDeleted(0, 0) ;
@@ -239,13 +299,12 @@ public class LogPanel extends JPanel
 
 	}
 
-	
 	/**
 	 * DateFieldRenderer : Renders a date in the planning table
-	 *
+	 * 
 	 * @author Conde Mickael K.
 	 * @version 1.0
-	 *
+	 * 
 	 */
 	private class DateFieldRenderer extends DefaultTableCellRenderer
 	{
@@ -253,13 +312,13 @@ public class LogPanel extends JPanel
 
 		/**
 		 * Constructor
-		 *
+		 * 
 		 */
 		public DateFieldRenderer ()
 		{
 			super() ;
 		}
-	
+
 		/**
 		 * @see javax.swing.table.DefaultTableCellRenderer#setValue(java.lang.Object)
 		 */
@@ -268,13 +327,12 @@ public class LogPanel extends JPanel
 		{
 			super.setValue(Bundle.logFormat.format(_object)) ;
 		}
-		
-	}
 
+	}
 
 	/**
 	 * Getter
-	 *
+	 * 
 	 * @return Returns the instance.
 	 */
 	public static LogPanel getInstance ()
@@ -283,7 +341,7 @@ public class LogPanel extends JPanel
 		{
 			instance = new LogPanel() ;
 		}
-		
+
 		return instance ;
 	}
 }

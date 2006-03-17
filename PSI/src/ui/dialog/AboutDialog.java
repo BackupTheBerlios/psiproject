@@ -145,6 +145,8 @@ public class AboutDialog {
 		if (jTextAreaMembres == null) {
 			jTextAreaMembres = new JTextArea();
 			jTextAreaMembres.setText(Bundle.getText("AboutDialogStaff"));
+			jTextAreaMembres.setEnabled(true);
+			jTextAreaMembres.setEditable(false);
 			jTextAreaMembres.setBackground(new java.awt.Color(238,238,238));
 		}
 		return jTextAreaMembres;
@@ -160,6 +162,8 @@ public class AboutDialog {
 		if (jTextAreaPresentation == null) {
 			jTextAreaPresentation = new JTextArea();
 			jTextAreaPresentation.setBackground(new java.awt.Color(238,238,238));
+			jTextAreaPresentation.setEnabled(true);
+			jTextAreaPresentation.setEditable(false);
 			jTextAreaPresentation.setText(Bundle.getText("AboutDialogPresentation"));
 		}
 		return jTextAreaPresentation;
@@ -207,6 +211,7 @@ public class AboutDialog {
 			jTextAreaLGPL.setSize(new java.awt.Dimension(640,330));
 			jTextAreaLGPL.setBackground(java.awt.SystemColor.inactiveCaptionText);
 			jTextAreaLGPL.setWrapStyleWord(true);
+			jTextAreaLGPL.setEnabled(true);
 			jTextAreaLGPL.setText(Bundle.getText("AboutDialogLGPL"));
 		}
 		return jTextAreaLGPL;
@@ -225,6 +230,8 @@ public class AboutDialog {
 			jTextAreaVersion.setBackground(new java.awt.Color(238,238,238));
 			jTextAreaVersion.setFont(new java.awt.Font("Verdana", java.awt.Font.BOLD, 14));
 			jTextAreaVersion.setPreferredSize(new java.awt.Dimension(154,45));
+			jTextAreaVersion.setEnabled(true);
+			jTextAreaVersion.setEditable(false);
 			jTextAreaVersion.setText(Bundle.getText("AboutDialogVersion"));
 		}
 		return jTextAreaVersion ;

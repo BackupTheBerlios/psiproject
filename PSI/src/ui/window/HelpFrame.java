@@ -4,6 +4,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.io.IOException;
+import java.net.URL;
 
 import ui.resource.Bundle;
 import ui.tree.HelpTreeNode;
@@ -13,10 +15,9 @@ import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.ImageIcon;
 import javax.swing.JScrollPane;
 import javax.swing.JEditorPane;
-import javax.swing.JLabel;
+import java.awt.Toolkit;
 
 /**
  * HelpFrame : TODO type description
@@ -34,9 +35,6 @@ public class HelpFrame
 	private JPanel jPanel = null;
 	private JScrollPane jScrollPane = null;
 	private JEditorPane jEditorPane = null;
-	private JEditorPane jEditorPaneNorth = null;
-	private JLabel jLabel = null;
-	private JPanel jPanel1 = null;
 	private JPanel jPanel2 = null;
 	public HelpFrame() {
 		super();
@@ -58,6 +56,7 @@ public class HelpFrame
 			jFrame.setLocation(new java.awt.Point(50,50));
 			jFrame.setPreferredSize(new java.awt.Dimension(900,550));
 			jFrame.setResizable(false);
+			jFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/ui/resource/aide.gif")));
 			jFrame.setContentPane(getJContentPane());
 			jFrame.pack();
 			jFrame.setVisible(true);	
@@ -116,18 +115,18 @@ public class HelpFrame
 	        		                    	currentNode = (HelpTreeNode)currentNode.getParent();
 	        		                    	//s = "Pere: " + currentNode.getID() + "Fils :" + s;
 	        		                    	}*/
-	        		                   jEditorPaneNorth.setText(Bundle.getText("HelpDialogItem" + s));
-		        		               jEditorPane.setText(Bundle.getText("HelpDialogContenu" + s));    
-		        		           
-		        		               String image = Bundle.getText("HelpDialogNameFile" + s);
-		        		               try{
-		        		                   jLabel.setIcon(new ImageIcon(getClass().getResource(image)));
-		        		                   jLabel.setVisible(true);
-		        		               }
-		        		               catch (Exception exc)
-		        		   			   {
-		        		            	   jLabel.setVisible(false);
-		        		               }
+	        		                    String sPath = System.getProperty( "user.dir" ) + "/";
+	        		        			try
+	        		        			{
+	        		        				jEditorPane.setPage(new URL("file:///" + sPath + Bundle.getText("HelpDialogContenu" + s)));
+	        		        			}
+	        		        			catch (IOException exc)
+	        		        			{
+	        		        				// TODO Auto-generated catch block
+	        		        				exc.printStackTrace();
+	        		        			}
+	        		        			jEditorPane.setEditable(false);
+
 					}});
 			
 			jSplitPane.setLeftComponent(jTree);
@@ -167,10 +166,6 @@ public class HelpFrame
 	{
 		if (jPanel == null)
 		{
-			jLabel = new JLabel();
-			jLabel.setIcon(new ImageIcon(getClass().getResource("/ui/resource/psilogo150_150.gif")));
-			jLabel.setForeground(java.awt.Color.white);
-			jLabel.setBackground(java.awt.Color.white);
 			jPanel = new JPanel() ;
 			jPanel.setLayout(new BorderLayout());
 			jPanel.setForeground(java.awt.Color.white);
@@ -206,43 +201,20 @@ public class HelpFrame
 		if (jEditorPane == null)
 		{
 			jEditorPane = new JEditorPane() ;
+			String sPath = System.getProperty( "user.dir" ) + "/";
+			try
+			{
+				jEditorPane.setPage(new URL("file:///" + sPath + Bundle.getText("HelpDialogContenuDefault")));
+			}
+			catch (IOException exc)
+			{
+				// TODO Auto-generated catch block
+				exc.printStackTrace();
+			}
 			jEditorPane.setEditable(false);
-			jEditorPane.setText(Bundle.getText("HelpDialogContenuDefault"));
 		}
+
 		return jEditorPane ;
-	}
-	/**
-	 * This method initializes jTextArea1	
-	 * 	
-	 * @return javax.swing.JTextArea	
-	 */
-	private JEditorPane getJEditorPaneNorth ()
-	{
-		if (jEditorPaneNorth == null)
-		{
-			jEditorPaneNorth = new JEditorPane() ;
-			jEditorPaneNorth.setFont(new java.awt.Font("Verdana", java.awt.Font.BOLD, 14));
-			jEditorPaneNorth.setPreferredSize(new java.awt.Dimension(0,30));
-			jEditorPaneNorth.setEditable(false);
-			jEditorPaneNorth.setText(Bundle.getText("HelpDialogItemDefault"));
-		}
-		return jEditorPaneNorth ;
-	}
-	/**
-	 * This method initializes jPanel1	
-	 * 	
-	 * @return javax.swing.JPanel	
-	 */
-	private JPanel getJPanel1 ()
-	{
-		if (jPanel1 == null)
-		{
-			jPanel1 = new JPanel() ;
-			jPanel1.setBackground(java.awt.Color.white);
-			jPanel1.setForeground(java.awt.Color.white);
-			jPanel1.add(jLabel, java.awt.BorderLayout.CENTER);
-		}
-		return jPanel1 ;
 	}
 	/**
 	 * This method initializes jPanel2	
@@ -255,8 +227,6 @@ public class HelpFrame
 		{
 			jPanel2 = new JPanel() ;
 			jPanel2.setLayout(new BorderLayout());
-			jPanel2.add(getJPanel1(), java.awt.BorderLayout.SOUTH);
-			jPanel2.add(getJEditorPaneNorth(), java.awt.BorderLayout.NORTH);
 			jPanel2.add(getJEditorPane(), java.awt.BorderLayout.CENTER);
 		}
 		return jPanel2 ;

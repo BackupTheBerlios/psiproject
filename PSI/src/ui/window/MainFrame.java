@@ -1216,9 +1216,12 @@ public class MainFrame extends JFrame
 			{
 				public void actionPerformed (java.awt.event.ActionEvent e)
 				{
-					MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance() ;
+					/*MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance() ;
 					if ( (mainTabbedPane.getTabCount() > 0) && (mainTabbedPane.getTitleAt(0).equals(Bundle.getText("MainFrameDefaultPanelTitle"))))
+					{
 						mainTabbedPane.remove(0) ;
+						defaultPanel = null ;
+					}*/
 					new HelpFrame() ;
 				}
 			}) ;
@@ -1625,9 +1628,12 @@ public class MainFrame extends JFrame
 
 			public void actionPerformed (ActionEvent e)
 			{
-				MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance() ;
+				/*MainTabbedPane mainTabbedPane = MainTabbedPane.getInstance() ;
 				if ( (mainTabbedPane.getTabCount() > 0) && (mainTabbedPane.getTitleAt(0).equals(Bundle.getText("MainFrameDefaultPanelTitle"))))
+				{
 					mainTabbedPane.remove(0) ;
+					defaultPanel = null ;
+				}*/
 				new HelpFrame() ;
 			}
 		}) ;

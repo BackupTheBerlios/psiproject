@@ -187,7 +187,8 @@ public class LogPanel extends JPanel
 		{
 			this.titles[0] = Bundle.getText("LogPanelTableColumn1") ;
 			this.titles[1] = Bundle.getText("LogPanelTableColumn2") ;
-
+			LogPanel.this.logTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("LogPanelTableColumn1")) ;
+			LogPanel.this.logTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("LogPanelTableColumn2")) ;
 		}
 
 		/**

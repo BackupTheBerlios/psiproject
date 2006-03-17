@@ -1341,7 +1341,7 @@ public class MainFrame extends JFrame
 						{
 							String localFileName = _file.getName() ;
 							String localFileExtension = localFileName.substring(localFileName.lastIndexOf(".") + 1) ;
-							return (_file.isDirectory() || (_file.isFile() && _file.canRead() && localFileExtension.equalsIgnoreCase("xml"))) ;
+							return (_file.isDirectory() || (_file.isFile() && _file.canRead() && (localFileExtension.equalsIgnoreCase("xml") || localFileExtension.equalsIgnoreCase("mes")))) ;
 						}
 
 						/*
@@ -1361,9 +1361,9 @@ public class MainFrame extends JFrame
 					if ( (localFile = localFileChooser.getSelectedFile()) != null)
 					{
 						// Adding extension if necessary
-						if (!localFile.getName().endsWith(".xml"))
+						if (!localFile.getName().endsWith(".mes"))
 						{
-							localFile = new File(localFile.getAbsolutePath() + ".xml") ;
+							localFile = new File(localFile.getAbsolutePath() + ".mes") ;
 						}
 
 						// Checking if the file already exists before saving

@@ -2897,6 +2897,16 @@ public class ProjectControler
 
 	}
 
+	/**
+	 * Exports current iteration task to 2DB format
+	 *
+	 * @author Kass
+	 * @version 1.0
+	 * 
+	 * @param _project
+	 * @param _destination
+	 * @throws FileSaveException
+	 */
 	public static void exportTo2DB (Project _project, File _destination) throws FileSaveException
 	{
 		try
@@ -2907,7 +2917,7 @@ public class ProjectControler
 			OutputStreamWriter localOSW = new OutputStreamWriter(localBOS, "ISO-8859-1") ;
 
 			// date format for open workbench
-			DateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy") ;
+			DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy") ;
 
 			/*
 			 * Initialisation
@@ -3008,6 +3018,9 @@ public class ProjectControler
 			}
 
 			// Generating general data
+			
+			localOSW.write("<activity id=\"" + GlobalController.currentIteration.getDescriptor().getId() + "\">\n") ;
+			localOSW.write("<name>IT " + GlobalController.currentIteration.getDescriptor().getName() + "</name>\n") ;
 			localIterator = _project.getProcess().getNestedElements().iterator() ;
 			while (localIterator.hasNext())
 			{
@@ -3070,6 +3083,8 @@ public class ProjectControler
 				} // End taskDescs
 
 			}
+			
+			localOSW.write("</activity>\n") ;
 
 			localOSW.write("</project>\n") ;
 			localOSW.write("</PSI-2DB>\n") ;

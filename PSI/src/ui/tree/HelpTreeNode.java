@@ -1,27 +1,30 @@
-package ui.tree;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+package ui.tree ;
+
+import javax.swing.tree.DefaultMutableTreeNode ;
 
 /**
  * HelpTreeNode : TODO type description
- *
+ * 
  * @author Evi
  * @version 1.0
- *
+ * 
  */
 public class HelpTreeNode extends DefaultMutableTreeNode
 {
-	
-	private int ID = 0;
-	public HelpTreeNode(String _name,int _id)
+	private static final long serialVersionUID = 1L ;
+
+	private int ID = 0 ;
+
+	public HelpTreeNode (String _name, int _id)
 	{
-		super(_name);
-		this.ID = _id;
+		super(_name) ;
+		this.ID = _id ;
 	}
-	
-	public int getID()
+
+	public int getID ()
 	{
-		return this.ID;
+		return this.ID ;
 	}
 
 }

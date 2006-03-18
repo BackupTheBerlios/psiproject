@@ -119,8 +119,6 @@ public class HumanResourcePanel extends JPanel implements Observer
 	 */
 	private void updateText ()
 	{
-		rolesEmptyLabel.setText(Bundle.getText("HumanResourceDescriptorPanelNoRole")) ;
-		tasksDescriptorEmptyLabel.setText(Bundle.getText("HumanResourceDescriptorPanelNoTask")) ;
 		((TitledBorder) infoPanel.getBorder()).setTitle(Bundle.getText("HumanResourceDescriptorPanelInfoTitle")) ;
 		idLabel.setText(Bundle.getText("HumanResourceDescriptorPanelIDLabel")) ;
 		nameLabel.setText(Bundle.getText("HumanResourceDescriptorPanelNameLabel")) ;
@@ -533,7 +531,7 @@ public class HumanResourcePanel extends JPanel implements Observer
 
 		/**
 		 * 
-		 * This method updates texts in this panel during a language changing.
+		 * This method updates texts in this table during a language changing.
 		 * 
 		 * @author MaT
 		 * @version 1.0
@@ -541,7 +539,30 @@ public class HumanResourcePanel extends JPanel implements Observer
 		 */
 		private void updateText ()
 		{
-			// !TODO
+			boolean tasksFound = false ;
+			Iterator <TaskDefinition> localIt = humanResource.getPerformingTasks().iterator() ;
+			TaskDefinition localTask ;
+			
+			while (localIt.hasNext())
+			{
+				localTask = localIt.next() ;
+				if (GlobalController.currentIteration.getTasks().contains(localTask))
+				{
+					tasksFound = true ;
+					break ;
+				}
+			}
+			if (!tasksFound)
+			{
+				tasksDescriptorEmptyLabel.setText(Bundle.getText("HumanResourceDescriptorPanelNoTask")) ;
+			}
+			else
+			{
+				HumanResourcePanel.this.tasksDescriptorTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("HumanResourceDescriptorPanelTableTasksID")) ;
+				HumanResourcePanel.this.tasksDescriptorTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("HumanResourceDescriptorPanelTableTasksName")) ;
+				HumanResourcePanel.this.tasksDescriptorTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("HumanResourceDescriptorPanelTableTasksDescription")) ;
+			}
+			
 		}
 
 		/**
@@ -686,7 +707,16 @@ public class HumanResourcePanel extends JPanel implements Observer
 		 */
 		private void updateText ()
 		{
-			// !TODO
+			if (humanResource.getPerformingRoles().size() == 0)
+			{
+				rolesEmptyLabel.setText(Bundle.getText("HumanResourceDescriptorPanelNoRole")) ;
+			}
+			else
+			{
+				HumanResourcePanel.this.rolesTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("HumanResourceDescriptorPanelTableID")) ;
+				HumanResourcePanel.this.rolesTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("HumanResourceDescriptorPanelTableName")) ;
+				HumanResourcePanel.this.rolesTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("HumanResourceDescriptorPanelTableDescription")) ;
+			}
 		}
 
 		/**

@@ -107,8 +107,6 @@ public class RoleDescriptorPanel extends JPanel implements Observer
 	 */
 	private void updateText ()
 	{
-		resourcesEmptyLabel.setText(Bundle.getText("RoleDescriptorPanelNoResources")) ;
-		taskDescriptorsEmptyLabel.setText(Bundle.getText("RoleDescriptorPanelNoTasks")) ;
 		((TitledBorder) infoPanel.getBorder()).setTitle(Bundle.getText("RoleDescriptorPanelInfoTitle")) ;
 		((TitledBorder) resourcesPanel.getBorder()).setTitle(Bundle.getText("RoleDescriptorPanelTableHead")) ;
 		idLabel.setText(Bundle.getText("RoleDescriptorPanelIDLabel")) ;
@@ -477,7 +475,18 @@ public class RoleDescriptorPanel extends JPanel implements Observer
 		 */
 		private void updateText ()
 		{
-			// !TODO
+			if (roleDescriptor.getPerformers().size() == 0)
+			{
+				resourcesEmptyLabel.setText(Bundle.getText("RoleDescriptorPanelNoResources")) ;
+			}
+			else
+			{
+				RoleDescriptorPanel.this.resourcesTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("RoleDescriptorPanelTableID")) ;
+				RoleDescriptorPanel.this.resourcesTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("RoleDescriptorPanelTableName")) ;
+				RoleDescriptorPanel.this.resourcesTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("RoleDescriptorPanelTableMail")) ;
+			}
+			
+			
 		}
 
 		/**
@@ -605,7 +614,17 @@ public class RoleDescriptorPanel extends JPanel implements Observer
 		 */
 		private void updateText ()
 		{
-			// !TODO
+			if (roleDescriptor.getPrimaryTasks().size() == 0)
+			{
+				taskDescriptorsEmptyLabel.setText(Bundle.getText("RoleDescriptorPanelNoTasks")) ;
+			}
+			else
+			{
+				RoleDescriptorPanel.this.taskDescriptorsTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("RoleDescriptorPanelTableTasksID")) ;
+				RoleDescriptorPanel.this.taskDescriptorsTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("RoleDescriptorPanelTableTasksName")) ;
+				RoleDescriptorPanel.this.taskDescriptorsTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("RoleDescriptorPanelTableTasksDescription")) ;
+			}
+			
 		}
 
 		/**

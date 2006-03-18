@@ -132,9 +132,6 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 	 */
 	private void updateText ()
 	{
-		artifactsEmptyLabel.setText(Bundle.getText("WorkProductDescriptorPanelNoArtifact")) ;
-		inTasksEmptyLabel.setText(Bundle.getText("WorkProductDescriptorPanelNoTask")) ;
-		outTasksEmptyLabel.setText(Bundle.getText("WorkProductDescriptorPanelNoTask")) ;
 		((TitledBorder) infoPanel.getBorder()).setTitle(Bundle.getText("WorkProductDescriptorPanelInfoTitle")) ;
 		idLabel.setText(Bundle.getText("WorkProductDescriptorPanelIDLabel")) ;
 		nameLabel.setText(Bundle.getText("WorkProductDescriptorPanelNameLabel")) ;
@@ -688,7 +685,16 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		 */
 		private void updateText ()
 		{
-			// !TODO
+			if (product.getArtifacts().size() == 0)
+			{
+				artifactsEmptyLabel.setText(Bundle.getText("WorkProductDescriptorPanelNoArtifact")) ;
+			}
+			else
+			{
+				WorkProductDescriptorPanel.this.artifactsTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("WorkProductDescriptorPanelTableArtifactsID")) ;
+				WorkProductDescriptorPanel.this.artifactsTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("WorkProductDescriptorPanelTableArtifactsName")) ;
+				WorkProductDescriptorPanel.this.artifactsTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("WorkProductDescriptorPanelTableArtifactsDescription")) ;
+			}
 		}
 
 		/**
@@ -817,7 +823,26 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		 */
 		private void updateText ()
 		{
-			// !TODO
+			if (product.getUsingTasks().size() == 0)
+			{
+				inTasksEmptyLabel.setText(Bundle.getText("WorkProductDescriptorPanelNoTask")) ;
+			}
+			else
+			{
+				WorkProductDescriptorPanel.this.inTasksTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("WorkProductDescriptorPanelTableTasksID")) ;
+				WorkProductDescriptorPanel.this.inTasksTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("WorkProductDescriptorPanelTableTasksName")) ;
+				WorkProductDescriptorPanel.this.inTasksTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("WorkProductDescriptorPanelTableTasksDescription")) ;
+			}
+			if (product.getProducingTasks().size() == 0)
+			{
+				outTasksEmptyLabel.setText(Bundle.getText("WorkProductDescriptorPanelNoTask")) ;
+			}
+			else
+			{
+				WorkProductDescriptorPanel.this.outTasksTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("WorkProductDescriptorPanelTableTasksID")) ;
+				WorkProductDescriptorPanel.this.outTasksTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("WorkProductDescriptorPanelTableTasksName")) ;
+				WorkProductDescriptorPanel.this.outTasksTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("WorkProductDescriptorPanelTableTasksDescription")) ;
+			}
 		}
 
 		/**

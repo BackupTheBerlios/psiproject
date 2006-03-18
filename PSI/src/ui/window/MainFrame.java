@@ -413,6 +413,8 @@ public class MainFrame extends JFrame
 		export2DBFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExport2DBMn").charAt(0)) ;
 		exportOWFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExportOW")) ;
 		exportOWFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExportOWMn").charAt(0)) ;
+		exportDominoFileMenuItem.setText(Bundle.getText("MainFrameFileMenuExportDomino")) ;
+		exportDominoFileMenuItem.setMnemonic(Bundle.getText("MainFrameFileMenuExportDominoMn").charAt(0)) ;
 		createButton.setToolTipText(Bundle.getText("MainFrameFileCreateProjectButton")) ;
 		openButton.setToolTipText(Bundle.getText("MainFrameFileOpenProjectButton")) ;
 		saveButton.setToolTipText(Bundle.getText("MainFrameFileSaveProjectButton")) ;

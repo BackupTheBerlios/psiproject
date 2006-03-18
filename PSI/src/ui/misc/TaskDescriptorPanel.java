@@ -127,9 +127,6 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 	 */
 	private void updateText ()
 	{
-		tasksEmptyLabel.setText(Bundle.getText("TaskDescriptorPanelNoTask")) ;
-		inProductsEmptyLabel.setText(Bundle.getText("TaskDescriptorPanelNoProduct")) ;
-		outProductsEmptyLabel.setText(Bundle.getText("TaskDescriptorPanelNoProduct")) ;
 		((TitledBorder) infoPanel.getBorder()).setTitle(Bundle.getText("TaskDescriptorPanelInfoTitle")) ;
 		idLabel.setText(Bundle.getText("TaskDescriptorPanelIDLabel")) ;
 		nameLabel.setText(Bundle.getText("TaskDescriptorPanelNameLabel")) ;
@@ -644,7 +641,31 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		 */
 		private void updateText ()
 		{
-			// !TODO
+			
+			boolean tasksFound = false ;
+			Iterator <TaskDefinition> localIt = task.getTasks().iterator() ;
+			TaskDefinition localTask ;
+
+			while (localIt.hasNext())
+			{
+				localTask = localIt.next() ;
+				if (GlobalController.currentIteration.getTasks().contains(localTask))
+				{
+					tasksFound = true ;
+					break ;
+				}
+			}
+
+			if (!tasksFound)
+			{
+				tasksEmptyLabel.setText(Bundle.getText("TaskDescriptorPanelNoTask")) ;
+			}
+			else
+			{
+				TaskDescriptorPanel.this.tasksTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("TaskDescriptorPanelTableTasksID")) ;
+				TaskDescriptorPanel.this.tasksTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("TaskDescriptorPanelTableTasksName")) ;
+				TaskDescriptorPanel.this.tasksTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("TaskDescriptorPanelTableTasksDescription")) ;
+			}
 		}
 
 		/**
@@ -791,7 +812,26 @@ public class TaskDescriptorPanel extends JPanel implements Observer
 		 */
 		private void updateText ()
 		{
-			// !TODO
+			if (task.getInputProducts().size() == 0)
+			{
+				inProductsEmptyLabel.setText(Bundle.getText("TaskDescriptorPanelNoProduct")) ;
+			}
+			else
+			{
+				TaskDescriptorPanel.this.inProductsTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("TaskDescriptorPanelTableProductsID")) ;
+				TaskDescriptorPanel.this.inProductsTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("TaskDescriptorPanelTableProductsName")) ;
+				TaskDescriptorPanel.this.inProductsTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("TaskDescriptorPanelTableProductsDescription")) ;
+			}
+			if (task.getOutputProducts().size() == 0)
+			{
+				outProductsEmptyLabel.setText(Bundle.getText("TaskDescriptorPanelNoProduct")) ;
+			}
+			else
+			{
+				TaskDescriptorPanel.this.outProductsTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("TaskDescriptorPanelTableProductsID")) ;
+				TaskDescriptorPanel.this.outProductsTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("TaskDescriptorPanelTableProductsName")) ;
+				TaskDescriptorPanel.this.outProductsTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("TaskDescriptorPanelTableProductsDescription")) ;
+			}
 		}
 
 		/**

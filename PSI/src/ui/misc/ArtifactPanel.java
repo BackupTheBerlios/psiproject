@@ -137,7 +137,6 @@ public class ArtifactPanel extends JPanel implements Observer
 	 */
 	private void updateText ()
 	{
-		inTasksEmptyLabel.setText(Bundle.getText("ArtifactPanelNoTask")) ;
 		outTasksEmptyLabel.setText(Bundle.getText("ArtifactPanelNoTask")) ;
 		idLabel.setText(Bundle.getText("ArtifactPanelIDLabel")) ;
 		nameLabel.setText(Bundle.getText("ArtifactPanelNameLabel")) ;
@@ -695,7 +694,28 @@ public class ArtifactPanel extends JPanel implements Observer
 		 */
 		private void updateText ()
 		{
-			// !TODO
+			if (artifact.getUsingTasks().size() == 0)
+			{
+				inTasksEmptyLabel.setText(Bundle.getText("ArtifactPanelNoTask")) ;
+			}
+			else
+			{
+				ArtifactPanel.this.inTasksTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("ArtifactPanelTableTasksID")) ;
+				ArtifactPanel.this.inTasksTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("ArtifactPanelTableTasksName")) ;
+				ArtifactPanel.this.inTasksTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("ArtifactPanelTableTasksDescription")) ;
+			}
+			if (artifact.getProducingTasks().size() == 0)
+			{
+				outTasksEmptyLabel.setText(Bundle.getText("ArtifactPanelNoTask")) ;
+			}
+			else
+			{
+				ArtifactPanel.this.outTasksTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("ArtifactPanelTableTasksID")) ;
+				ArtifactPanel.this.outTasksTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("ArtifactPanelTableTasksName")) ;
+				ArtifactPanel.this.outTasksTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("ArtifactPanelTableTasksDescription")) ;
+			}
+			
+			
 		}
 
 		/**

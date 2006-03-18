@@ -151,8 +151,6 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 	 */
 	private void updateText ()
 	{
-		inArtifactsEmptyLabel.setText(Bundle.getText("TaskDefinitionPanelNoArtifact")) ;
-		outArtifactsEmptyLabel.setText(Bundle.getText("TaskDefinitionPanelNoArtifact")) ;
 		((TitledBorder) infoPanel.getBorder()).setTitle(Bundle.getText("TaskDefinitionPanelInfoTitle")) ;
 		((TitledBorder) planificationPanel.getBorder()).setTitle(Bundle.getText("TaskDefinitionPanelPlanTitle")) ;
 		((TitledBorder) inArtifactsPanel.getBorder()).setTitle(Bundle.getText("TaskDefinitionPanelInHead")) ;
@@ -751,7 +749,26 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		 */
 		private void updateText ()
 		{
-			// !TODO
+			if (task.getInputProducts().size() == 0)
+			{
+				inArtifactsEmptyLabel.setText(Bundle.getText("TaskDefinitionPanelNoArtifact")) ;
+			}
+			else
+			{
+				TaskDefinitionPanel.this.inArtifactsTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("TaskDefinitionPanelTableArtifactID")) ;
+				TaskDefinitionPanel.this.inArtifactsTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("TaskDefinitionPanelTableArtifactName")) ;
+				TaskDefinitionPanel.this.inArtifactsTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("TaskDefinitionPanelTableArtifactDescription")) ;
+			}
+			if (task.getOutputProducts().size() == 0)
+			{
+				outArtifactsEmptyLabel.setText(Bundle.getText("TaskDefinitionPanelNoArtifact")) ;
+			}
+			else
+			{
+				TaskDefinitionPanel.this.outArtifactsTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("TaskDefinitionPanelTableArtifactID")) ;
+				TaskDefinitionPanel.this.outArtifactsTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("TaskDefinitionPanelTableArtifactName")) ;
+				TaskDefinitionPanel.this.outArtifactsTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("TaskDefinitionPanelTableArtifactDescription")) ;
+			}
 		}
 
 		/**
@@ -881,7 +898,10 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		 */
 		private void updateText ()
 		{
-			// !TODO
+			TaskDefinitionPanel.this.planificationTable.getColumnModel().getColumn(0).setHeaderValue(Bundle.getText("TaskDefinitionPanelPlanTableType")) ;
+			TaskDefinitionPanel.this.planificationTable.getColumnModel().getColumn(1).setHeaderValue(Bundle.getText("TaskDefinitionPanelPlanTableStart")) ;
+			TaskDefinitionPanel.this.planificationTable.getColumnModel().getColumn(2).setHeaderValue(Bundle.getText("TaskDefinitionPanelPlanTableFinish")) ;
+			TaskDefinitionPanel.this.planificationTable.getColumnModel().getColumn(3).setHeaderValue(Bundle.getText("TaskDefinitionPanelPlanTableAmount")) ;
 		}
 
 		/**

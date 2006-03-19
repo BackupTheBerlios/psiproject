@@ -1,34 +1,38 @@
 
 package ui.misc ;
 
-import java.awt.Dimension ;
-import java.awt.FlowLayout ;
-import java.util.ArrayList ;
-import java.util.Collection ;
-import java.util.Iterator ;
-import java.util.Observable ;
-import java.util.Observer ;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Observable;
+import java.util.Observer;
 
-import javax.swing.Box ;
-import javax.swing.BoxLayout ;
-import javax.swing.JLabel ;
-import javax.swing.JPanel ;
-import javax.swing.JScrollPane ;
-import javax.swing.JTable ;
-import javax.swing.JTextField ;
-import javax.swing.border.TitledBorder ;
-import javax.swing.table.AbstractTableModel ;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.AbstractTableModel;
 
-import process.GlobalController ;
-
-import ui.resource.Bundle ;
-import ui.resource.LocaleController ;
-import ui.resource.LocaleListener ;
-
-import model.HumanResource ;
-import model.spem2.RoleDescriptor ;
-import model.spem2.TaskDefinition ;
-import model.spem2.TaskDescriptor ;
+import model.HumanResource;
+import model.spem2.RoleDescriptor;
+import model.spem2.TaskDefinition;
+import model.spem2.TaskDescriptor;
+import process.GlobalController;
+import process.utility.BreakdownElementsControler;
+import ui.resource.Bundle;
+import ui.resource.LocaleController;
+import ui.resource.LocaleListener;
 
 /**
  * HumanResourcePanel : Panel describing resources
@@ -80,6 +84,18 @@ public class HumanResourcePanel extends JPanel implements Observer
 	private JScrollPane tasksDescriptorScrollPane = null ;
 
 	private JTable tasksDescriptorTable = null ;
+	
+	private MouseListener tasksMouseListener = null ;
+	
+	private MouseListener rolesMouseListener = null ;
+	
+	private JPopupMenu taskDefinitionPopupMenu = null ;
+
+	private JMenuItem taskUnlinkMenuItem = null ;
+	
+	private JPopupMenu rolePopupMenu = null ;
+
+	private JMenuItem roleUnlinkMenuItem = null ;
 
 	/**
 	 * The locale controller for the language.
@@ -129,6 +145,9 @@ public class HumanResourcePanel extends JPanel implements Observer
 		
 		tasksDescriptorEmptyLabel.setText(Bundle.getText("HumanResourceDescriptorPanelNoTask")) ;
 		rolesEmptyLabel.setText(Bundle.getText("HumanResourceDescriptorPanelNoRole")) ;
+		
+		taskUnlinkMenuItem.setText(Bundle.getText("HumanResourceDescriptorPanelUnlink")) ;
+		roleUnlinkMenuItem.setText(Bundle.getText("HumanResourceDescriptorPanelUnlink")) ;
 	}
 
 	/**
@@ -142,7 +161,49 @@ public class HumanResourcePanel extends JPanel implements Observer
 	{
 		rolesEmptyLabel = new JLabel(Bundle.getText("HumanResourceDescriptorPanelNoRole")) ;
 		tasksDescriptorEmptyLabel = new JLabel(Bundle.getText("HumanResourceDescriptorPanelNoTask")) ;
-
+		
+		taskDefinitionPopupMenu = new JPopupMenu() ;
+		taskUnlinkMenuItem = new JMenuItem(Bundle.getText("HumanResourceDescriptorPanelUnlink")) ;
+		taskUnlinkMenuItem.addActionListener(new java.awt.event.ActionListener()
+		{
+			public void actionPerformed (java.awt.event.ActionEvent e)
+			{				
+				ArrayList <TaskDefinition> localTasks = new ArrayList <TaskDefinition>(((TaskDefinitionsTableModel)getTasksDescriptorTable().getModel()).getData()) ;
+				
+				ArrayList <TaskDefinition> localCol = new ArrayList <TaskDefinition>() ;
+				for (int i = 0 ; i < localTasks.size() ; i++)
+				{
+					if (GlobalController.currentIteration.getTasks().contains(localTasks.get(i)))
+					{
+						localCol.add(localTasks.get(i)) ;
+					}
+				}
+				
+				for (int i = 0 ; i < getTasksDescriptorTable().getSelectedRows().length ; i++)
+				{					
+					BreakdownElementsControler.unlinkTaskDefinitionAndHumanResource(localCol.get(getTasksDescriptorTable().getSelectedRows()[i]), getHumanResource()) ;
+				}
+				
+			}
+		}) ;
+		taskDefinitionPopupMenu.add(taskUnlinkMenuItem) ;
+		
+		rolePopupMenu = new JPopupMenu() ;
+		roleUnlinkMenuItem = new JMenuItem(Bundle.getText("HumanResourceDescriptorPanelUnlink")) ;
+		roleUnlinkMenuItem.addActionListener(new java.awt.event.ActionListener()
+		{
+			public void actionPerformed (java.awt.event.ActionEvent e)
+			{			
+				ArrayList <RoleDescriptor> localRoles = new ArrayList <RoleDescriptor>(((RolesTableModel)getRolesTable().getModel()).getData()) ;				
+				
+				for (int i = 0 ; i < getRolesTable().getSelectedRows().length ; i++)
+				{					
+					BreakdownElementsControler.unlinkRoleDescriptorAndHumanResource(localRoles.get(getRolesTable().getSelectedRows()[i]), getHumanResource()) ;
+				}
+			}
+		}) ;
+		rolePopupMenu.add(roleUnlinkMenuItem) ;
+		
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)) ;
 		this.setComponentOrientation(java.awt.ComponentOrientation.LEFT_TO_RIGHT) ;
 		this.add(getInfoPanel(), null) ;
@@ -151,6 +212,55 @@ public class HumanResourcePanel extends JPanel implements Observer
 		this.add(Box.createRigidArea(new Dimension(0, 30))) ;
 		this.add(getTasksDescriptorPanel(), null) ;
 		this.add(Box.createVerticalGlue()) ;
+	}
+
+	
+	
+	/**
+	 * Getter
+	 *
+	 * @return Returns the rolesMouseListener.
+	 */
+	private MouseListener getRolesMouseListener ()
+	{
+		if (this.rolesMouseListener == null)
+		{
+			this.rolesMouseListener = new MouseAdapter()
+			{
+					public void mouseReleased(MouseEvent _e)
+					{
+						if ((_e.isPopupTrigger() || _e.getButton() == MouseEvent.BUTTON3) && getRolesTable().getSelectedRows().length > 0)
+						{
+							rolePopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;							
+						}
+					};
+			} ;
+		}
+		
+		return this.rolesMouseListener ;
+	}
+
+	/**
+	 * Getter
+	 *
+	 * @return Returns the tasksMouseListener.
+	 */
+	private MouseListener getTasksMouseListener ()
+	{
+		if (this.tasksMouseListener == null)
+		{
+			this.tasksMouseListener = new MouseAdapter()
+			{
+					public void mouseReleased(MouseEvent _e)
+					{
+						if ((_e.isPopupTrigger() || _e.getButton() == MouseEvent.BUTTON3) && getTasksDescriptorTable().getSelectedRows().length > 0)
+						{
+							taskDefinitionPopupMenu.show(_e.getComponent(), _e.getX(), _e.getY()) ;							
+						}
+					};
+			} ;
+		}
+		return this.tasksMouseListener ;
 	}
 
 	/**
@@ -366,6 +476,7 @@ public class HumanResourcePanel extends JPanel implements Observer
 			rolesTable.setPreferredScrollableViewportSize(new Dimension(600, 80)) ;
 			rolesTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			rolesTable.getTableHeader().setReorderingAllowed(false) ;
+			rolesTable.addMouseListener(getRolesMouseListener()) ;
 		}
 
 		return rolesTable ;
@@ -424,10 +535,11 @@ public class HumanResourcePanel extends JPanel implements Observer
 	{
 		if (tasksDescriptorTable == null)
 		{
-			tasksDescriptorTable = new JTable(new TaskDescriptorsTableModel(humanResource)) ;
+			tasksDescriptorTable = new JTable(new TaskDefinitionsTableModel(humanResource)) ;
 			tasksDescriptorTable.setPreferredScrollableViewportSize(new Dimension(600, 80)) ;
 			tasksDescriptorTable.getColumnModel().getColumn(0).setMaxWidth(150) ;
 			tasksDescriptorTable.getTableHeader().setReorderingAllowed(false) ;
+			tasksDescriptorTable.addMouseListener(getTasksMouseListener()) ;
 		}
 
 		return tasksDescriptorTable ;
@@ -487,7 +599,7 @@ public class HumanResourcePanel extends JPanel implements Observer
 	 * @version 1.0
 	 * 
 	 */
-	private class TaskDescriptorsTableModel extends AbstractTableModel
+	private class TaskDefinitionsTableModel extends AbstractTableModel
 	{
 		private static final long serialVersionUID = -405519902328407279L ;
 
@@ -512,7 +624,7 @@ public class HumanResourcePanel extends JPanel implements Observer
 		 * 
 		 * @param _task
 		 */
-		public TaskDescriptorsTableModel (HumanResource _human)
+		public TaskDefinitionsTableModel (HumanResource _human)
 		{
 			super() ;
 
@@ -532,6 +644,20 @@ public class HumanResourcePanel extends JPanel implements Observer
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableTasksName")) ;
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableTasksDescription")) ;
 		}
+
+		
+		
+		/**
+		 * Getter
+		 *
+		 * @return Returns the data.
+		 */
+		public Collection <TaskDefinition> getData ()
+		{
+			return this.data ;
+		}
+
+
 
 		/**
 		 * 
@@ -699,6 +825,16 @@ public class HumanResourcePanel extends JPanel implements Observer
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableID")) ;
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableName")) ;
 			head.add(Bundle.getText("HumanResourceDescriptorPanelTableDescription")) ;
+		}
+
+		/**
+		 * Getter
+		 *
+		 * @return Returns the data.
+		 */
+		public Collection <RoleDescriptor> getData ()
+		{
+			return this.data ;
 		}
 
 		/**

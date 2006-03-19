@@ -162,6 +162,9 @@ public class TaskDefinitionPanel extends JPanel implements Observer
 		activityLabel.setText(Bundle.getText("TaskDefinitionPanelActivityLabel")) ;
 		saveButton.setText(Bundle.getText("Save")) ;
 		manageButton.setText(Bundle.getText("TaskDefinitionPanelButton")) ;
+		
+		inArtifactsEmptyLabel.setText(Bundle.getText("TaskDefinitionPanelNoArtifact")) ;
+		outArtifactsEmptyLabel.setText(Bundle.getText("TaskDefinitionPanelNoArtifact")) ;
 	}
 
 	/**

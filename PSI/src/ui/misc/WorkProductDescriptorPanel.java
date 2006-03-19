@@ -147,6 +147,10 @@ public class WorkProductDescriptorPanel extends JPanel implements Observer
 		((TitledBorder) artifactsPanel.getBorder()).setTitle(Bundle.getText("WorkProductDescriptorPanelArtifactHead")) ;
 		((TitledBorder) inTasksPanel.getBorder()).setTitle(Bundle.getText("WorkProductDescriptorPanelInHead")) ;
 		((TitledBorder) outTasksPanel.getBorder()).setTitle(Bundle.getText("WorkProductDescriptorPanelOutHead")) ;
+		
+		artifactsEmptyLabel.setText(Bundle.getText("WorkProductDescriptorPanelNoArtifact")) ;
+		inTasksEmptyLabel.setText(Bundle.getText("WorkProductDescriptorPanelNoTask")) ;
+		outTasksEmptyLabel.setText(Bundle.getText("WorkProductDescriptorPanelNoTask")) ;
 	}
 
 	/**

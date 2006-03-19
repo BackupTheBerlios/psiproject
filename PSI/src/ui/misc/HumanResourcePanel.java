@@ -126,6 +126,9 @@ public class HumanResourcePanel extends JPanel implements Observer
 		mailLabel.setText(Bundle.getText("HumanResourceDescriptorPanelMailLabel")) ;
 		((TitledBorder) rolesPanel.getBorder()).setTitle(Bundle.getText("HumanResourceDescriptorPanelTableHead")) ;
 		((TitledBorder) tasksDescriptorPanel.getBorder()).setTitle(Bundle.getText("HumanResourceDescriptorPanelTableTasksHead")) ;
+		
+		tasksDescriptorEmptyLabel.setText(Bundle.getText("HumanResourceDescriptorPanelNoTask")) ;
+		rolesEmptyLabel.setText(Bundle.getText("HumanResourceDescriptorPanelNoRole")) ;
 	}
 
 	/**

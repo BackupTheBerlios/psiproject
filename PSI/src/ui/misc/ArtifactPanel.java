@@ -137,8 +137,7 @@ public class ArtifactPanel extends JPanel implements Observer
 	 * 
 	 */
 	private void updateText ()
-	{
-		outTasksEmptyLabel.setText(Bundle.getText("ArtifactPanelNoTask")) ;
+	{		
 		idLabel.setText(Bundle.getText("ArtifactPanelIDLabel")) ;
 		nameLabel.setText(Bundle.getText("ArtifactPanelNameLabel")) ;
 		productLabel.setText(Bundle.getText("ArtifactPanelProductLabel")) ;
@@ -151,6 +150,9 @@ public class ArtifactPanel extends JPanel implements Observer
 		((TitledBorder) infoPanel.getBorder()).setTitle(Bundle.getText("ArtifactPanelInfoTitle")) ;
 		((TitledBorder) inTasksPanel.getBorder()).setTitle(Bundle.getText("ArtifactPanelInHead")) ;
 		((TitledBorder) outTasksPanel.getBorder()).setTitle(Bundle.getText("ArtifactPanelOutHead")) ;
+		
+		inTasksEmptyLabel.setText(Bundle.getText("ArtifactPanelNoTask")) ;
+		outTasksEmptyLabel.setText(Bundle.getText("ArtifactPanelNoTask")) ;
 	}
 
 	/**

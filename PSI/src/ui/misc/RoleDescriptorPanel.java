@@ -113,6 +113,9 @@ public class RoleDescriptorPanel extends JPanel implements Observer
 		idLabel.setText(Bundle.getText("RoleDescriptorPanelIDLabel")) ;
 		nameLabel.setText(Bundle.getText("RoleDescriptorPanelNameLabel")) ;
 		((TitledBorder) taskDescriptorsPanel.getBorder()).setTitle(Bundle.getText("RoleDescriptorPanelTableTasksHead")) ;
+		
+		resourcesEmptyLabel.setText(Bundle.getText("RoleDescriptorPanelNoResources")) ;
+		taskDescriptorsEmptyLabel.setText(Bundle.getText("RoleDescriptorPanelNoTasks")) ;
 
 	}
 

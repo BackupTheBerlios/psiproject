@@ -401,7 +401,7 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 		roleExpandMenuItemBis.setText(Bundle.getText("MainTreePopupShow")) ;
 		roleUnlinkMenuItem.setText(Bundle.getText("MainTreePopupDeleteRole")) ;
 		activityCloseMenuItemBis.setText(Bundle.getText("MainTreePopupClose")) ;
-		workProductAddMenuItem.setText(Bundle.getText("MainTreePopupClose")) ;
+		workProductAddMenuItem.setText(Bundle.getText("MainTreePopupAddArtifact")) ;
 		workProductExpandMenuItem.setText(Bundle.getText("MainTreePopupShow")) ;
 		workProductCloseMenuItem.setText(Bundle.getText("MainTreePopupClose")) ;
 		taskDescriptorAddMenuItem.setText(Bundle.getText("MainTreePopupAddTask")) ;

@@ -17,7 +17,7 @@ import javax.swing.Timer ;
 /**
  * SplashScreen : Allows to display a plash screen when this software is started.
  * 
- * @author Mat.
+ * @author MaT
  * @version 1.0
  * 
  */

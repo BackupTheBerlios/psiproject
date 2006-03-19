@@ -63,6 +63,7 @@ import ui.resource.LocaleListener ;
  * MainFrame : PSI main window
  * 
  * @author Conde Mickael K.
+ * @author MaT
  * @version 1.0
  * 
  */

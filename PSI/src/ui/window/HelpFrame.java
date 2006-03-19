@@ -26,6 +26,7 @@ import ui.tree.HelpTreeNode ;
  * HelpFrame : TODO type description
  * 
  * @author Evi
+ * @author MaT
  * @version 1.0
  * 
  */

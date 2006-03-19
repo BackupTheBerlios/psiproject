@@ -21,6 +21,7 @@ import ui.resource.LocaleListener ;
  * LogPanel : This is the container of the table containing the log entries Implements singleton
  * 
  * @author Conde Mickael K.
+ * @author MaT
  * @version 1.0
  * 
  */

@@ -35,6 +35,7 @@ import model.spem2.TaskDescriptor ;
  * 
  * @author Florence MATTLER
  * @author Conde Mickael K.
+ * @author MaT
  * @version 1.0
  * 
  */

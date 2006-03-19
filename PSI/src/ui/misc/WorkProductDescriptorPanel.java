@@ -31,6 +31,7 @@ import javax.swing.JTextArea ;
  * WorkProductDescriptorPanel : panel view for a product
  * 
  * @author Conde Mickael K.
+ * @author MaT
  * @version 1.0
  * 
  */

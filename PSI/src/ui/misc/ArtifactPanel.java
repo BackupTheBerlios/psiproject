@@ -34,6 +34,7 @@ import ui.window.MainFrame ;
  * ArtifactPanel : Panel view for an artifact
  * 
  * @author Conde Mickael K.
+ * @author MaT
  * @version 1.0
  * 
  */

@@ -29,6 +29,7 @@ import ui.resource.LocaleListener ;
  * RoleDescriptorPanel : RoleDescriptor panel view
  * 
  * @author Conde Mickael K.
+ * @author MaT
  * @version 1.0
  * 
  */

@@ -32,6 +32,7 @@ import ui.resource.LocaleListener ;
  * JPanelTaskDescriptor : TODO type description
  * 
  * @author kass
+ * @author MaT
  * @version 1.0
  * 
  */

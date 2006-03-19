@@ -27,6 +27,7 @@ import javax.swing.plaf.metal.MetalTabbedPaneUI ;
  * 
  * @author Conde Mickael K.
  * @author fast_
+ * @author MaT
  * @version 1.0
  * 
  */

@@ -62,6 +62,7 @@ import ui.window.MainFrame ;
  * MainTree : surcharged JTree to handle drag and drop
  * 
  * @author Conde Mickael K
+ * @author MaT
  * @version 1.0
  * 
  */
@@ -412,6 +413,8 @@ public class MainTree extends JTree implements DragGestureListener, DragSourceLi
 		taskDefinitionCloseMenuItem.setText(Bundle.getText("MainTreePopupClose")) ;
 		taskDefinitionDeleteMenuItem.setText(Bundle.getText("Delete")) ;
 		taskDefinitionExpandMenuItem.setText(Bundle.getText("MainTreePopupShow")) ;
+		if(((DefaultMutableTreeNode)this.treeModel.getRoot()).getChildCount() == 0)
+			((DefaultMutableTreeNode)this.treeModel.getRoot()).setUserObject(Bundle.getText("MainTreeDefault"));
 	}
 
 	/**

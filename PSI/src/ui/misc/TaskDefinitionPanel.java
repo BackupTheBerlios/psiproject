@@ -42,6 +42,7 @@ import ui.window.MainFrame ;
  * TaskDefinitionPanel : Panel view for a task definition
  * 
  * @author Conde Mickael K.
+ * @author MaT
  * @version 1.0
  * 
  */

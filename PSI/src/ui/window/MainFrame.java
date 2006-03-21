@@ -6,6 +6,7 @@ import java.awt.Color ;
 import java.awt.Dimension ;
 import java.awt.FlowLayout ;
 import java.awt.HeadlessException ;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent ;
 import java.awt.event.ActionListener ;
 import java.io.File ;
@@ -282,6 +283,13 @@ public class MainFrame extends JFrame
 				JOptionPane.showMessageDialog(MainFrame.this, Bundle.getText("MainFrameFileOpenIncorrectFormat"), "PSI", JOptionPane.ERROR_MESSAGE) ;
 			}
 		}
+		
+		// Opening help if necessary
+		if (preferences.getBoolean("load_help", true))
+		{
+			//new HelpFrame() ;
+			
+		}
 	}
 
 	/**
@@ -293,6 +301,7 @@ public class MainFrame extends JFrame
 		this.setName("mainFrame") ;
 		this.setJMenuBar(getMainMenuBar()) ;
 		this.setTitle("Project Supervising Indicators") ;
+		this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/ui/resource/psilogo.gif"))) ;
 		this.setBounds(preferences.getInt("window_xposition", 0), preferences.getInt("window_yposition", 0), preferences.getInt("window_width", 700),
 				preferences.getInt("window_height", 600)) ;
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE) ;

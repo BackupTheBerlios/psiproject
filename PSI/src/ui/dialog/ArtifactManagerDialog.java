@@ -409,7 +409,7 @@ public class ArtifactManagerDialog extends JDialog
 	{
 		if (addButton == null)
 		{
-			addButton = new JButton(Bundle.getText("Add")) ;
+			addButton = new JButton(">>") ;
 			// Disabling
 			if (getInOutComboBox().getSelectedIndex() == 0)
 			{
@@ -498,7 +498,7 @@ public class ArtifactManagerDialog extends JDialog
 	{
 		if (removeButton == null)
 		{
-			removeButton = new JButton(Bundle.getText("Delete")) ;
+			removeButton = new JButton("<<") ;
 			if (getInOutComboBox().getSelectedIndex() == 0)
 			{
 				if (artifact.getUsingTasks().size() == 0)
